@@ -47,9 +47,9 @@ const Header = () => {
           <div className="pl-8">
             <div className=" flex gap-2">
               <Calendar className="text-purple-500" />
-              <h1>Customer Portal</h1>
+              <h1>Employee Portal</h1>
             </div>
-            <p className="mx-8">Welcome, Chaudhary sumit</p>
+            <p className="mx-8">Welcome, Sarah Johnson</p>
           </div>
           <div className="flex gap-5 pr-9">
             <button className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 min-h-sm border border-gray-300">
@@ -57,11 +57,13 @@ const Header = () => {
               <span>Profile</span>
             </button>
             <button
-              onClick={() => logoutMutation.mutate()}
+              // onClick={() => logoutMutation.mutate()}
               className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 border border-gray-300"
             >
+              <Link to={"/"}>
               <LogOut />
               <span>Logout</span>
+              </Link>
             </button>
           </div>
         </div>
@@ -92,7 +94,7 @@ const Header = () => {
                 className={({ isActive }) =>
                   `flex gap-2 px-3 py-2 rounded-xl transition ${isActive ? "bg-white text-black shadow" : "hover:bg-gray-200"}`
                 }
-                to={"/admin/Customers"}
+                to={"/employee/Dashboard"}
               >
                 <ClipboardList className="max-h-5 max-w-4 font-semibold" />
                 <span className="text-sm font-medium">All Tasks</span>
@@ -101,7 +103,7 @@ const Header = () => {
                 className={({ isActive }) =>
                   `flex gap-2 px-3 py-2 rounded-xl transition ${isActive ? "bg-white text-black shadow" : "hover:bg-gray-200"}`
                 }
-                to={"/admin/Bookings"}
+                to={"/employee/Pending"}
               >
                 <Clock4 className="max-h-5 max-w-4 font-semibold" />
                 <span className="text-sm font-medium">Pending</span>
@@ -110,13 +112,13 @@ const Header = () => {
                 className={({ isActive }) =>
                   `flex gap-2 px-3 py-2 rounded-xl transition ${isActive ? "bg-white text-black shadow" : "hover:bg-gray-200"}`
                 }
-                to={"/admin/Employees"}
+                to={"/employee/InProgress"}
               >
                 <CircleAlert className="max-h-5 max-w-4 font-semibold" />
                 <span className="text-sm font-medium">In Progress(1)</span>
               </NavLink>
               <NavLink
-                to={"/admin/Tasks"}
+                to={"/employee/Completed"}
                 className={({ isActive }) =>
                   `flex gap-2 px-3 py-2 rounded-xl transition ${isActive ? "bg-white text-black shadow" : "hover:bg-gray-200"}`
                 }
