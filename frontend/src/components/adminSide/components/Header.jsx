@@ -27,7 +27,7 @@ const Header = () => {
           <div className="pl-8">
             <div className=" flex gap-2">
               <Calendar className="text-purple-500" />
-              <h1>Customer Portal</h1>
+              <h1>Admin Portal</h1>
             </div>
             <p className="mx-8">Welcome, Chaudhary sumit</p>
           </div>

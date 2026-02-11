@@ -5,6 +5,8 @@ import { Users, Calendar, CircleUser, DollarSign } from "lucide-react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
+import LiveIcon from "./components/LiveIcon";
+
 const Dashboard = () => {
   return (
     <div className="bg-[#f0f1f3]">
@@ -78,15 +80,21 @@ const Dashboard = () => {
               <div className="flex flex-col gap-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Received</span>
-                  <span className="text-green-600 text-md font-bold">$40,000</span>
+                  <span className="text-green-600 text-md font-bold">
+                    $40,000
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Pending Amount</span>
-                  <span className="text-orange-600 text-md font-bold">$25,000</span>
+                  <span className="text-orange-600 text-md font-bold">
+                    $25,000
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Expected</span>
-                  <span className="text-blue-600 text-md font-bold">$65,000</span>
+                  <span className="text-blue-600 text-md font-bold">
+                    $65,000
+                  </span>
                 </div>
               </div>
             </div>
@@ -138,6 +146,9 @@ const Dashboard = () => {
               </tbody>
             </table>
           </div>
+        </section>
+        <section className="flex justify-end mr-15">
+          <LiveIcon />
         </section>
       </main>
       <Footer />

@@ -4,6 +4,8 @@ import { ClipboardList } from "lucide-react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
+import LiveIcon from "./components/LiveIcon";
+
 import AssignTaskModal from "./popupmodals/AssignTaskModal";
 
 const Tasks = () => {
@@ -116,6 +118,9 @@ const Tasks = () => {
               </tbody>
             </table>
           </div>
+        </section>
+        <section className="flex justify-end mr-15">
+          <LiveIcon />
         </section>
       </main>
       <Footer />

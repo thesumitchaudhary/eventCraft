@@ -3,6 +3,9 @@ import { DollarSign, TrendingUp, FileText } from "lucide-react";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+
+import LiveIcon from "./components/LiveIcon";
+
 import RevenueByEventChart from "./components/charts/RevenueByEventChart";
 
 const Revenue = () => {
@@ -82,6 +85,9 @@ const Revenue = () => {
               </tbody>
             </table>
           </div>
+        </section>
+        <section className="flex justify-end mr-15">
+          <LiveIcon />
         </section>
       </main>
       <Footer />

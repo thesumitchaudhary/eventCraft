@@ -2,6 +2,7 @@ import React from "react";
 import { Search } from "lucide-react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import LiveIcon from "./components/LiveIcon";
 
 const Customers = () => {
   return (
@@ -44,7 +45,7 @@ const Customers = () => {
                   </td>
                   <td>2</td>
                 </tr>
-                  <tr className="border-b border-gray-300">
+                <tr className="border-b border-gray-300">
                   <td className="py-2 border-b border-gray-300 p-1">
                     John Doe
                   </td>
@@ -60,6 +61,9 @@ const Customers = () => {
               </tbody>
             </table>
           </div>
+        </section>
+        <section className="flex justify-end mr-15">
+          <LiveIcon />
         </section>
       </main>
       <Footer />
