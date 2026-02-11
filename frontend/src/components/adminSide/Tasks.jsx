@@ -31,7 +31,7 @@ const Tasks = () => {
           </div>
         </section>
         <section className="my-10 mx-5">
-          <div className="bg-gray-50 p-5">
+          <div className="bg-gray-50 p-5 border border-gray-300 rounded-2xl">
             <table className="w-full my-3 border-collapse">
               <thead>
                 <tr className="border-b border-black text-left">

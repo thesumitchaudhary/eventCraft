@@ -34,6 +34,7 @@ const Dashboard = () => {
             </h1>
             <div className="flex gap-3">
               <Link to={"/admin/Dashboard"}>Admin</Link>
+              <Link to={"/employee/Dashboard"}>Employee</Link>
               <button
                 onClick={(e) => {
                   setOpen(true);
@@ -102,7 +103,7 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="mx-8 flex gap-5">
-            <div className="border p-2 max-w-md border-gray-300 rounded-2xl">
+            <div className="border p-2 max-w-md hover:shadow-lg border-gray-300 rounded-2xl">
               <Calenders className="mx-auto my-5 w-12 h-12 p-3 rounded-full bg-purple-100 text-[#9810fa]" />
               <h3 className="text-center my-2 font-semibold text-base">
                 Easy Event Booking
@@ -119,14 +120,14 @@ const Dashboard = () => {
                 occasion
               </p>
             </div>
-            <div className="border p-2 max-w-md border-gray-300 rounded-2xl">
+            <div className="border p-2 max-w-md hover:shadow-lg border-gray-300 rounded-2xl">
               <Users className="mx-auto my-5 w-12 h-12 p-3 rounded-full bg-purple-100 text-[#9810fa]" />
               <h3 className="text-center my-2 font-semibold">Expert Team</h3>
               <p className="text-sm mx-7 text-gray-500 text-center">
                 Professional event planners and staff dedicated to your event
               </p>
             </div>
-            <div className="border p-2 max-w-md border-gray-300 rounded-2xl">
+            <div className="border p-2 max-w-md hover:shadow-lg border-gray-300 rounded-2xl">
               <Heart className="mx-auto my-5 w-12 h-12 p-3 rounded-full bg-purple-100 text-[#9810fa]" />
               <h3 className="text-center my-2 font-semibold">
                 Memorable Experiences
@@ -216,12 +217,12 @@ const Dashboard = () => {
             <h1 className="flex gap-3 text-xl font-semibold">
               <Calenders className="text-[#c27aff]" /> Eventify
             </h1>
-            <p className="px-1 my-2 text-[#768ea7] text-base">
+            <p className="w-90 my-2 text-[#768ea7] text-base">
               Creating unforgettable moments through professional event
               management and planning services.
             </p>
             <div className="flex gap-3">
-              <div className="h-10 w-10 bg-[#1e2939] p-1 rounded-full">
+              <div className="h-10 w-10 bg-[#1e2939] p-1 rounded-full hover:bg-purple-400 transition-colors ">
                 <Facebook className="h-8 w-8 rounded-full bg-[#1e2939] p-2" />
               </div>
               <div className="h-10 w-10 bg-[#1e2939] p-1 rounded-full">
@@ -236,8 +237,10 @@ const Dashboard = () => {
             </div>
           </div>
           <div>
-            <h3 className="text-lg font-semibold">Quick Links</h3>
-            <ul className="text-[#768ea7] text-base my-7">
+            <h3 className="text-lg font-semibold whitespace-nowrap">
+              Quick Links
+            </h3>
+            <ul className="text-[#768ea7] text-base my-4 flex flex-col gap-2">
               <li>About us</li>
               <li>Our Services</li>
               <li>Portfolio</li>
@@ -247,19 +250,32 @@ const Dashboard = () => {
           </div>
           <div>
             <h3 className="text-lg font-semibold">Services</h3>
-            <ul className="text-[#768ea7] text-base">
-              <li>Wedding Planning</li>
-              <li>Corporate Events</li>
-              <li>Birthday Parties</li>
-              <li>Social Gatherings</li>
-              <li>Special Occasions</li>
+            <ul className="text-[#768ea7] text-base my-4 flex flex-col gap-2">
+              <li className="whitespace-nowrap">Wedding Planning</li>
+              <li className="whitespace-nowrap">Corporate Events</li>
+              <li className="whitespace-nowrap">Birthday Parties</li>
+              <li className="whitespace-nowrap">Social Gatherings</li>
+              <li className="whitespace-nowrap">Special Occasions</li>
             </ul>
           </div>
           <div>
             <h3 className="text-lg font-semibold">contact us</h3>
-            <MapPin />
-            <Phone />
-            <Mail />
+            <div className="flex flex-col gap-4 my-5">
+              <div className="flex gap-2">
+                <MapPin className="text-purple-500" />
+                <span className="mr-10">
+                  123 Event Street, New York, NY 10001
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <Phone className="text-purple-500" />
+                <span>+1 (555) 123-4567</span>
+              </div>
+              <div className="flex gap-2">
+                <Mail className="text-purple-500" />
+                <span>info@eventify.com</span>
+              </div>
+            </div>
           </div>
         </div>
         <br />

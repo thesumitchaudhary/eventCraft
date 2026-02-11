@@ -33,22 +33,22 @@ const Employees = () => {
         </section>
         <section className="my-10 mx-5">
           <div className="flex gap-5">
-            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl">
+            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300">
               <p>Total Employees</p>
               <h3>2</h3>
             </div>
-            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl">
+            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300">
               <p>Active Tasks</p>
               <h3>2</h3>
             </div>
-            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl">
+            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300">
               <p>Completed Tasks</p>
               <h3>1</h3>
             </div>
           </div>
         </section>
         <section className="my-10 mx-5">
-          <div className="bg-gray-50">
+          <div className="bg-gray-50 border border-gray-300 rounded-2xl p-2">
             <table className="w-full my-3 border-collapse">
               <thead>
                 <tr className="border-b border-black text-left">

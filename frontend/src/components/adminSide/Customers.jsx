@@ -19,7 +19,7 @@ const Customers = () => {
           </div>
         </section>
         <section className="my-5 mx-5">
-          <div className="bg-gray-50 p-3">
+          <div className="bg-gray-50 p-3 border border-gray-300 rounded-2xl">
             <table className="w-full my-3 border-collapse">
               <thead>
                 <tr className="border-b border-gray-300 text-left">

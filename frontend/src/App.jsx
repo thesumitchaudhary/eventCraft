@@ -64,9 +64,10 @@ function App() {
         <Route path="/admin/Revenue" element={<Revenue />} />
         <Route path="/admin/Tasks" element={<Tasks />} />
 
-        <Route path="/Employee/dashboard" element={<EmployeeDashboard />} />
-        <Route path="/Employee/Completed" element={<Completed />} />
-        <Route path="/Employee/Completed" element={<Completed />} />
+        <Route path="/employee/Dashboard" element={<EmployeeDashboard />} />
+        <Route path="/employee/Completed" element={<Completed />} />
+        <Route path="/employee/InProgress" element={<InProgress />} />
+        <Route path="/employee/Pending" element={<Pending />} />
 
       </Routes>
     </>
