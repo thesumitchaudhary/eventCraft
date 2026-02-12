@@ -8,13 +8,12 @@ const LiveChatModal = ({ closeLiveModal }) => {
   const [storeMessage, setStoreMessage] = useState([]);
 
   useEffect(() => {
-    const handleRecieveMessege = () => {
-      // store the DATA coming from server, not input message
-      setStoreMessage((prev) => [...prev, message]);
+    const handleRecieveMessege = (data) => {
+      setStoreMessage((prev) => [...prev, data]);
     };
+
     socket.on("recieve_message", handleRecieveMessege);
 
-    //cleanup
     return () => {
       socket.off("recieve_message", handleRecieveMessege);
     };
@@ -22,21 +21,31 @@ const LiveChatModal = ({ closeLiveModal }) => {
 
   const isOnline = mode === "online";
 
+  // const anotherFunction = () => {
+  //    socket.off("recieve_message", handleRecieveMessege);
+  // };
+
   const sendMessage = () => {
     if (!message.trim()) return;
 
-    socket.emit("send_message", {
+    const msgData = {
       text: message,
       time: new Date().toLocaleTimeString(),
-    });
+    };
 
+    socket.emit("send_message", msgData);
+
+    setStoreMessage((prev) => [...prev, msgData]); // instantly show
     setMessage("");
   };
 
   return (
     <div
       className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-md"
-      onClick={closeLiveModal}
+      onClick={() => {
+        closeLiveModal(); // prop function
+        anotherFunction(); // your local function
+      }}
     >
       {/* Modal Box */}
       <div

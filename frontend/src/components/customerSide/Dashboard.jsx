@@ -34,7 +34,7 @@ const Dashboard = () => {
     queryFn: () => fetcher("http://localhost:4041/api/index/my-bookings"),
   });
 
-  console.log(data)
+  console.log(data);
 
   return (
     <div className="bg-[#eeeeef] min-h-screen relative">
