@@ -1,41 +1,13 @@
 import mongoose from "mongoose";
 
 const customerSchema = new mongoose.Schema(
-  { 
-    firstname: {
-      type: String,
-      // required: true,
-      // trim: true,
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
-
-    lastname: {
-      type: String,
-      // required: true,
-      // trim: true,
-    },
-
-    email: {
-      type: String,
-      // required: true,
-      // unique: true,
-      // lowercase: true,
-    },
-
-    password: {
-      type: String,
-      // required: true,
-      // minlength: 6,
-      // select: false,
-    },
-
-    phone: {
-      type: String,
-      // required: true,
-    },
-
-    address: {
-      type: String,
-    },
+    phone: String,
+    address: String,
   },
   { timestamps: true }
 );
