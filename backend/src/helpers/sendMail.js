@@ -1,28 +1,49 @@
-import nodemailer from "nodemailer";
+import transporter from "./sendVerificationMail.js";
+import { Verification_Email_Template } from "../templates/verficationEmailOtp.js";
+import { Welcome_Email_Template } from "../templates/wellcomeEmailTemplate.js";
 
-async function sendMail(to, subject, text, html) {
+export const SendVerificationCode = async (email, verificationCode) => {
     try {
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
+        const html =
+            typeof Verification_Email_Template === "function"
+                ? Verification_Email_Template(verificationCode)
+                : String(Verification_Email_Template);
 
-        const info = await transporter.sendMail({
-            from: process.env.EMAIL_USER, // sender address
-            to,
-            subject,
-            text,
+        const response = await transporter.sendMail({
+            from: `"EventCraft" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: "Verify your email",
             html,
         });
 
-        console.log("Email sent:", info.messageId)
+        console.log("Email sent successfully", response);
+    } catch (error) {
+        console.log("Error sending verification", error);
+        throw new Error(`Error sending verification email: ${error}`);
     }
-    catch (error) {
-        console.log("Email error:", error);
-    }
-}
+};
 
-export default sendMail;
+export const WellcomeEmail = async (email, firstname, lastname) => {
+    try {
+        const template =
+            typeof Welcome_Email_Template === "function"
+                ? Welcome_Email_Template()
+                : String(Welcome_Email_Template);
+
+        const html = template
+            .replace("{firstname}", firstname)
+            .replace("{lastname}", lastname);
+
+        const response = await transporter.sendMail({
+            from: `"EventCraft" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: "Wellcome To Our Community",
+            text: "Wellcome To Our Community",
+            html,
+        });
+
+        console.log("Email send Successfully", response);
+    } catch (error) {
+        console.log("Email Error", error);
+    }
+};

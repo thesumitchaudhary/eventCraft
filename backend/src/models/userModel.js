@@ -14,7 +14,8 @@ const userSchema = mongoose.Schema({
         default: "customer",
         require: true,
     },
-
+    verificationCode: String,
+    verified_at: Date,
 },
     { timestamps: true }
 )
