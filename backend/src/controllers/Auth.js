@@ -38,7 +38,6 @@ export const register = async (req, res) => {
             isVerified: false
         });
 
-        await SendVerificationCode(email, verificationCode);
 
         const token = jwt.sign(
             {
@@ -57,6 +56,7 @@ export const register = async (req, res) => {
             sameSite: "Strict",
             maxAge: 1 * 24 * 60 * 60 * 1000, // 1 days
         });
+        await SendVerificationCode(email, verificationCode);
 
         res.status(201).json({
             success: true,
@@ -84,7 +84,7 @@ export const verifyEmail = async (req, res) => {
             if (!user) {
                 return res.status(400).json({ success: false, message: "Invalid or Expired Code" })
             }
-            user.verified_at= Date.now();  // Changed from verified_at to isVerified
+            user.verified_at = Date.now();  // Changed from verified_at to isVerified
             user.verificationCode = undefined;  // Fixed typo here too
             await user.save();
             await WellcomeEmail(user.email, user.firstname, user.lastname)

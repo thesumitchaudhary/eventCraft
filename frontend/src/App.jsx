@@ -24,6 +24,7 @@ import Customers from "./components/adminSide/Customers";
 import Employees from "./components/adminSide/Employees";
 import Revenue from "./components/adminSide/Revenue";
 import Tasks from "./components/adminSide/Tasks";
+import AddTheme from "./components/adminSide/AddTheme";
 
 // this is for employee side location  of the website
 import EmployeeDashboard from "./components/employeeSide/Dashboard";
@@ -63,6 +64,7 @@ function App() {
         <Route path="/admin/Employees" element={<Employees />} />
         <Route path="/admin/Revenue" element={<Revenue />} />
         <Route path="/admin/Tasks" element={<Tasks />} />
+        <Route path="/admin/AddTheme" element={<AddTheme />} />
 
         <Route path="/employee/Dashboard" element={<EmployeeDashboard />} />
         <Route path="/employee/Completed" element={<Completed />} />

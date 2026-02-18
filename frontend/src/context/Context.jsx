@@ -7,6 +7,7 @@ export const ContextProvider = (props) => {
   const [lastname, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
   const [phone, setPhone] = useState("");
   const [designation, setDesignation] = useState("");
   return (
@@ -20,10 +21,12 @@ export const ContextProvider = (props) => {
         setEmail,
         password,
         setPassword,
+        otp,
+        setOtp,
         phone,
         setPhone,
         designation,
-        setDesignation
+        setDesignation,
       }}
     >
       {props.children}

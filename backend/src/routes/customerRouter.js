@@ -7,6 +7,9 @@ import { register, verifyEmail, login, logout } from "../controllers/Auth.js"
 // import authmiddleware for show user
 import authMiddleware from "../Middleware/authMiddleware.js";
 
+// import userModel 
+import userModel from "../models/userModel.js";
+
 
 const router = express.Router();
 
@@ -16,7 +19,7 @@ router.get("/", (req, res) => {
 
 router.get("/me", authMiddleware, async (req, res) => {
     try {
-        const user = await customerModel
+        const user = await userModel
             .findById(req.user.id)
             .select("-password");
 

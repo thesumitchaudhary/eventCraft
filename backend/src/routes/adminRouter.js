@@ -5,6 +5,8 @@ import jwt from "jsonwebtoken"
 // import admin model
 import adminModel from "../models/adminModel.js";
 
+// import  event Theme model
+import eventThemeModel from "../models/eventThemeModel.js";
 
 const router = express.Router();
 
@@ -56,6 +58,49 @@ router.post("/login", async (req, res) => {
         res.json(error);
     }
 })
+
+router.get("/getAllEventTheme", async (req, res) => {
+    try {
+        const getEventThemes = await eventThemeModel.find();
+
+        if (!getEventThemes) {
+            res.json("there was not theme available")
+        }
+
+        res.json(getEventThemes);
+    } catch (error) {
+        res.json({ message: error })
+    }
+})
+
+router.post("/addEventTheme", async (req, res) => {
+    try {
+        const { themeName, themeType, themePrice } = req.body;
+        const eventThemeCreated = await eventThemeModel.create({
+            themeName,
+            themeType,
+            themePrice
+        })
+        res.json(eventThemeCreated)
+    }
+    catch (error) {
+        res.json({ message: error })
+    }
+})
+
+router.delete("/deleteEventTheme/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deleted = await eventThemeModel.findByIdAndDelete(id);
+
+        if (!deleted) {
+            return res.status(404).json({ message: "Theme not found" });
+        }
+        res.json({ message: "Deleted successfully", deleted });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 
 router.get("/logout", (req, res) => {

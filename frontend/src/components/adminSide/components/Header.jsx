@@ -5,6 +5,7 @@ import {
   Settings,
   LogOut,
   ChartColumn,
+  Palette,
   TrendingUp,
   Users,
   CircleUser,
@@ -18,7 +19,7 @@ const Header = () => {
   const [openProfileModal, setOpenProfileModal] = useState(false);
 
   const closeProfileModel = () => {
-    setOpenProfileModal(false)
+    setOpenProfileModal(false);
   };
   return (
     <>
@@ -32,11 +33,16 @@ const Header = () => {
             <p className="mx-8">Welcome, Chaudhary sumit</p>
           </div>
           <div className="flex gap-5 pr-9">
-            <button onClick={(e) => setOpenProfileModal(true)} className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 min-h-sm border border-gray-300">
+            <button
+              onClick={(e) => setOpenProfileModal(true)}
+              className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 min-h-sm border border-gray-300"
+            >
               <Settings className="" />
               <span>Profile</span>
             </button>
-            {openProfileModal && <ProfileModal closeProfileModel={closeProfileModel}/>}
+            {openProfileModal && (
+              <ProfileModal closeProfileModel={closeProfileModel} />
+            )}
             <button className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 border border-gray-300">
               <Link className="flex gap-1" to={"/"}>
                 <LogOut />
@@ -84,6 +90,15 @@ const Header = () => {
               >
                 <Calendar className="max-h-5 max-w-4 font-semibold" />
                 <span className="text-sm font-medium">Bookings</span>
+              </NavLink>
+              <NavLink
+                className={({ isActive }) =>
+                  `flex gap-2 px-3 py-2 rounded-xl transition ${isActive ? "bg-white text-black shadow" : "hover:bg-gray-200"}`
+                }
+                to={"/admin/AddTheme"}
+              >
+                <Palette className="max-h-5 max-w-4 font-semibold" />
+                <span className="text-sm font-medium">Add Themes</span>
               </NavLink>
               <NavLink
                 className={({ isActive }) =>
