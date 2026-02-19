@@ -9,7 +9,7 @@ const eventThemeSchema = new mongoose.Schema(
 
         themeType: {
             type: String,
-            enum: ["Wedding", "birthday", "corporate"],
+            enum: ["Wedding", "Birthday", "Corporate", "Anniversary"],
             default: "Wedding"
         },
 
