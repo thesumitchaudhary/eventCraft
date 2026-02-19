@@ -5,19 +5,17 @@ const eventThemeSchema = new mongoose.Schema(
         themeName: {
             type: String,
             required: true,
-            trim: true
         },
 
         themeType: {
             type: String,
-            enum: ["wedding", "birthday", "corporate"],
-            default: "wedding"
+            enum: ["Wedding", "birthday", "corporate"],
+            default: "Wedding"
         },
 
         themePrice: {
-            type: Number,
+            type: String,
             required: true,
-            min: 0
         }
     },
     {

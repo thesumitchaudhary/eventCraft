@@ -33,7 +33,7 @@ export const AddThemeModel = ({ closeAddThemeModel }) => {
   const themeMutation = useMutation({
     mutationFn: () => createTheme({ themeName, themeType, themePrice }),
     onSuccess: (data) => {
-      console.log("success", data);
+      console.log("success");
     },
     onError: (error) => {
       console.log("error", error);
@@ -47,7 +47,7 @@ export const AddThemeModel = ({ closeAddThemeModel }) => {
       <div className="w-[1000px] h-[500px] bg-white rounded-xl shadow-lg flex flex-col">
         <div className="fixed top-35 left-100 min-w-sm max-w-xl border border-gray-400 bg-white rounded-2xl p-2">
           <div className="flex justify-between">
-            <h1>Add Event</h1>
+            <h1 className="2xl font-bold">Add New Event Theme</h1>
             <button onClick={closeAddThemeModel}>
               <X />
             </button>

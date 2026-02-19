@@ -8,6 +8,9 @@ import adminModel from "../models/adminModel.js";
 // import  event Theme model
 import eventThemeModel from "../models/eventThemeModel.js";
 
+// import middleware for protecting routes
+import authMiddleware from "../Middleware/authMiddleware.js"
+
 const router = express.Router();
 
 router.get("/", (req, res) => {
@@ -102,6 +105,33 @@ router.delete("/deleteEventTheme/:id", async (req, res) => {
     }
 });
 
+router.put("/updateEventTheme/:id", async (req, res) => {
+    try {
+        const { themeName, themeType, themePrice } = req.body;
+        const { id } = req.params;
+
+        const updatedTheme = await eventThemeModel.findByIdAndUpdate(
+            id,
+            {
+                themeName,
+                themeType,
+                themePrice
+            },
+            { new: true }
+        );
+
+        if (!updatedTheme) {
+            return res.status(400).json({ message: "Theme does not exist" });
+        }
+
+        res.status(200).json({
+            message: "Theme is updated successfully",
+            data: updatedTheme
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 
 router.get("/logout", (req, res) => {
     res.cookie("token", "");
