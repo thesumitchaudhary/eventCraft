@@ -78,7 +78,6 @@ const AddTheme = () => {
     },
   });
 
-
   // this is delete usemutation
   const themeDeleteMutation = useMutation({
     mutationFn: (themeId) => deleteUser(themeId),

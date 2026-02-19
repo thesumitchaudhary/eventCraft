@@ -14,6 +14,6 @@ export default async (req, res, next) => {
 
         next();
     } catch (err) {
-        res.redirect("/api/customer")
+        // res.redirect("/api/customer")
     }
 }

@@ -15,8 +15,22 @@ import Header from "./header-footer components/Header";
 import Footer from "./header-footer components/Footer";
 import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 import { NavLink, Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+
+const API_URL = import.meta.env.VITE_BACKEND_URL;
+console.log(API_URL);
+
+const fetcher = (url) =>
+  fetcher(url, {
+    credentials: "include",
+  }).then((res) => res.json());
 
 const EventThemes = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ["eventThemesDetails"],
+    queryFn: () => fetcher(),
+  });
+
   return (
     <div className="bg-[#eeeeef] min-h-screen">
       <Header />

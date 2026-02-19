@@ -109,7 +109,7 @@ export const verifyEmail = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await customerModel.findOne({ email });
+        const user = await userModel.findOne({ email });
 
         if (!user) {
             res.status(404).json({ message: "something is wrong" })
