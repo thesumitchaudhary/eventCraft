@@ -132,6 +132,7 @@ const EventRegistrationModal = ({ close }) => {
           <div className="flex flex-col my-2 mx-2">
             <label className="font-medium my-1">Select Theme</label>
             <select
+            disabled={!eventType}
               value={selectTheme}
               onChange={(e) => setSelectTheme(e.target.value)}
               name="Select a Theme"
@@ -145,7 +146,7 @@ const EventRegistrationModal = ({ close }) => {
               <option value="id">5</option>
             </select>
           </div>
-          <div className="flex gap-10 mx-2">
+          <div className="grid grid-cols-3 gap-5 my-4">
             <div className="flex flex-col">
               <label className="font-medium"> Date</label>
               <input
@@ -159,14 +160,14 @@ const EventRegistrationModal = ({ close }) => {
               <label className="font-medium">Venue</label>
               <input
                 type="text"
-                className="border"
+                className="border border-gray-400 p-1"
                 value={venue}
                 onChange={(e) => setVenue(e.target.value)}
                 placeholder="e.g. Grand Hotel"
               />
             </div>
           </div>
-          <div className="flex gap-10 mx-2">
+          <div className="grid grid-cols-3 gap-5 my-4">
             <div className="flex flex-col">
               <label className="font-medium">Guest Count</label>
               <input

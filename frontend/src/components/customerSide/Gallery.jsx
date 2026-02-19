@@ -14,6 +14,7 @@ import {
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import Header from "./header-footer components/Header";
 import Footer from "./header-footer components/Footer";
+import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 
 // this is for import image
 import wedding from "../../images/wedding.jpg";
@@ -104,6 +105,9 @@ const Gallery = () => {
               </div>
             </div>
           </div>
+        </section>
+        <section className="flex justify-end mr-4">
+          <LiveIcon />
         </section>
       </main>
       <Footer />

@@ -23,17 +23,17 @@ import EventRegistrationModal from "./popupmodals/EventRegistrationModal";
 const MyBookings = () => {
   const [openEventModel, setOpenEventModel] = useState(false);
 
-useEffect(() => {
-  if (openEventModel) {
-    document.body.style.overflowY = "hidden";
-  } else {
-    document.body.style.overflowY = "scroll";
-  }
+  useEffect(() => {
+    if (openEventModel) {
+      document.body.style.overflowY = "hidden";
+    } else {
+      document.body.style.overflowY = "scroll";
+    }
 
-  return () => {
-    document.body.style.overflowY = "scroll";
-  };
-}, [openEventModel]);
+    return () => {
+      document.body.style.overflowY = "scroll";
+    };
+  }, [openEventModel]);
 
   // for close EventRegistration modal
   const close = () => {
@@ -64,15 +64,15 @@ useEffect(() => {
                 <p>Wedding - Classic Elegant</p>
               </div>
               <div className="flex gap-3 mt-4">
-                <button className=" bg-black h-5 w-19 text-xs rounded-md text-white">
+                <span className=" bg-black max-h-max max-w-max px-3 text-xs rounded-md text-white">
                   in-progress
-                </button>
-                <button className="bg-[#dbeafe] h-5 w-19 text-xs rounded-md text-[#193cba]">
+                </span>
+                <span className="bg-[#dbeafe] max-h-max max-w-max px-4 text-xs rounded-md text-[#193cba]">
                   partial
-                </button>
+                </span>
               </div>
             </div>
-            <div className="flex gap-50 my-3">
+            <div className="grid grid-cols-4 my-3">
               <div>
                 <span>Date</span>
                 <p>2026-02-14</p>
@@ -82,7 +82,7 @@ useEffect(() => {
                 <h3>Grand Hotel Ballroom</h3>
               </div>
             </div>
-            <div className="flex gap-50 my-3">
+            <div className="grid grid-cols-4 my-3">
               <div>
                 <span>Guest Count</span>
                 <h3>200 guests</h3>
@@ -95,8 +95,10 @@ useEffect(() => {
             <div className="">
               <div className="relative">
                 <p>Event Progress</p>
-                <p className="">60%</p>
-                <p className="rounded-xl border border-black w-300 h-3"></p>
+                <p className="">90%</p>
+                <div className="max-w-7xl h-3 border border-black rounded-xl overflow-hidden">
+                  <div className="h-full bg-black" style={{ width: "90%" }} />
+                </div>
               </div>
             </div>
           </div>
@@ -107,15 +109,15 @@ useEffect(() => {
                 <p>Wedding - Classic Elegant</p>
               </div>
               <div className="flex gap-3 mt-4">
-                <button className=" bg-black h-5 w-19 text-xs rounded-md text-white">
+                <span className=" bg-black max-h-max max-w-max px-3 text-xs rounded-md text-white">
                   in-progress
-                </button>
-                <button className="bg-[#dbeafe] h-5 w-19 text-xs rounded-md text-[#193cba]">
+                </span>
+                <span className="bg-[#dbeafe] max-h-max max-w-max px-4 text-xs rounded-md text-[#193cba]">
                   partial
-                </button>
+                </span>
               </div>
             </div>
-            <div className="flex gap-50 my-3">
+            <div className="grid grid-cols-4 my-3">
               <div>
                 <span>Date</span>
                 <p>2026-02-14</p>
@@ -125,7 +127,7 @@ useEffect(() => {
                 <h3>Grand Hotel Ballroom</h3>
               </div>
             </div>
-            <div className="flex gap-50 my-3">
+            <div className="grid grid-cols-4 my-3">
               <div>
                 <span>Guest Count</span>
                 <h3>200 guests</h3>
@@ -138,8 +140,10 @@ useEffect(() => {
             <div className="">
               <div className="relative">
                 <p>Event Progress</p>
-                <p className="">60%</p>
-                <p className="rounded-xl border border-black w-300 h-3"></p>
+                <p className="">70%</p>
+                <div className="max-w-7xl h-3 border border-black rounded-xl overflow-hidden">
+                  <div className="h-full bg-black" style={{ width: "70%" }} />
+                </div>
               </div>
             </div>
           </div>
@@ -150,15 +154,15 @@ useEffect(() => {
                 <p>Wedding - Classic Elegant</p>
               </div>
               <div className="flex gap-3 mt-4">
-                <button className=" bg-black h-5 w-19 text-xs rounded-md text-white">
+                <span className=" bg-black max-h-max max-w-max px-3 text-xs rounded-md text-white">
                   in-progress
-                </button>
-                <button className="bg-[#dbeafe] h-5 w-19 text-xs rounded-md text-[#193cba]">
+                </span>
+                <span className="bg-[#dbeafe] max-h-max max-w-max px-4 text-xs rounded-md text-[#193cba]">
                   partial
-                </button>
+                </span>
               </div>
             </div>
-            <div className="flex gap-50 my-3">
+            <div className="grid grid-cols-4 my-3">
               <div>
                 <span>Date</span>
                 <p>2026-02-14</p>
@@ -168,7 +172,7 @@ useEffect(() => {
                 <h3>Grand Hotel Ballroom</h3>
               </div>
             </div>
-            <div className="flex gap-50 my-3">
+            <div className="grid grid-cols-4 my-3">
               <div>
                 <span>Guest Count</span>
                 <h3>200 guests</h3>
@@ -181,8 +185,10 @@ useEffect(() => {
             <div className="">
               <div className="relative">
                 <p>Event Progress</p>
-                <p className="">60%</p>
-                <p className="rounded-xl border border-black w-300 h-3"></p>
+                <p className="">80%</p>
+                <div className="max-w-7xl h-3 border border-black rounded-xl overflow-hidden">
+                  <div className="h-full bg-black" style={{ width: "80%" }} />
+                </div>
               </div>
             </div>
           </div>
