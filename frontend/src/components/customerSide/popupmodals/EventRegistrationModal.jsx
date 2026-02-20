@@ -1,11 +1,24 @@
 import React, { useState, useEffect, useContext } from "react";
 import { X } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { Select, TextInput, Button } from "@mantine/core";
+import { DateInput } from "@mantine/dates";
+import dayjs from "dayjs";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 import { EventContext } from "../../../context/EventContext";
 
 const API_URL_EVENT_BOOKING = import.meta.env
   .VITE_CUSTOMER_EVENT_BOOKING_BACKEND_URL;
+
+const API_URL = import.meta.env.VITE_BACKEND_URL;
+
+const fetcher = async (url) => {
+  const res = await fetch(url, { credentials: "include" });
+  if (!res.ok) {
+    throw new Error(`Request failed: ${res.status}`);
+  }
+  return res.json();
+};
 
 const EventBooking = async ({
   eventName,
@@ -26,7 +39,7 @@ const EventBooking = async ({
       eventName,
       eventType,
       theme: selectTheme,
-      eventDate: date,
+      eventDate: date ? dayjs(date).format("YYYY-MM-DD") : null,
       venue,
       guestCount: Number(guestCount),
       totalAmount: Number(budget),
@@ -59,6 +72,22 @@ const EventRegistrationModal = ({ close }) => {
     setBudget,
   } = useContext(EventContext);
 
+  const [focusedEventname, setFocusedEventname] = useState(false);
+  const [focusedDate, setFocusedDate] = useState(false);
+  const [focusedVenue, setFocusedVenue] = useState(false);
+  const [focusedGuestCount, setFocusedGuestCount] = useState(false);
+  const [focusedBudget, setFocusedBudget] = useState(false);
+  const [focusedEventType, setFocusedEventType] = useState(false);
+  const [focusedSelectTheme, setFocusedSelectTheme] = useState(false);
+
+  const floatingEventname = focusedEventname || eventName?.length > 0;
+  const floatingDate = focusedDate || !!date;
+  const floatingVenue = focusedVenue || venue?.length > 0;
+  const floatingGuestCount = focusedGuestCount || guestCount?.length > 0;
+  const floatingBudget = focusedBudget || budget?.length > 0;
+  const floatingEventType = focusedEventType || eventType?.length > 0;
+  const floatingSelectTheme = focusedSelectTheme || selectTheme?.length > 0;
+
   const eventBookingMutation = useMutation({
     mutationFn: () =>
       EventBooking({
@@ -72,12 +101,54 @@ const EventRegistrationModal = ({ close }) => {
       }),
     onSuccess: (data) => {
       console.log("Booking Success:", data);
-      close(); // ✅ auto close modal
+      close();
     },
     onError: (error) => {
       console.error("Booking Error:", error.message);
     },
   });
+
+  const { data: themesData = [], isPending, isLoading,isError, error } = useQuery({
+    queryKey: ["eventThemesDetails", API_URL],
+    enabled: Boolean(API_URL), 
+    queryFn: () => fetcher(`${API_URL}/admin/getAllEventTheme`),
+    select: (response) => {
+      // normalize possible backend shapes
+      if (Array.isArray(response)) return response;
+      if (Array.isArray(response?.data)) return response.data;
+      if (Array.isArray(response?.themes)) return response.themes;
+      return [];
+    },
+  });
+
+  // Optional debug
+  // console.log("API_URL:", API_URL);
+  // console.log("themesData:", themesData);
+  // if (isError) console.error("themes query error:", error);
+
+  // Safe options for Mantine Select (must always have string value)
+  const eventTypeOptions = [
+    ...new Map(
+      themesData
+        .filter(
+          (item) =>
+            typeof item?.eventType === "string" && item.eventType.trim() !== ""
+        )
+        .map((item) => [
+          item.eventType,
+          { value: item.eventType, label: item.eventType },
+        ])
+    ).values(),
+  ];
+
+  const themeOptions = themesData
+    .filter(
+      (item) =>
+        item?.eventType === eventType &&
+        typeof item?.theme === "string" &&
+        item.theme.trim() !== ""
+    )
+    .map((item) => ({ value: item.theme, label: item.theme }));
 
   return (
     <>
@@ -104,98 +175,162 @@ const EventRegistrationModal = ({ close }) => {
           </div>
           <div className="flex gap-10 my-2 mx-2">
             <div className="flex flex-col">
-              <label className="font-medium my-1">Event Name</label>
-              <input
-                type="text"
-                className="border border-gray-400 min-h-7 pl-1"
-                placeholder="e.g., Johnson Wedding"
+              <TextInput
+                label="Event Name"
+                placeholder={focusedEventname ? "e.g. Johnson Wedding" : ""}
                 value={eventName}
-                onChange={(e) => setEventName(e.target.value)}
+                onChange={(e) => setEventName(e.currentTarget.value)}
+                onFocus={() => setFocusedEventname(true)}
+                onBlur={() => setFocusedEventname(false)}
+                classNames={{
+                  root: "relative mt-1",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                    floatingEventname
+                      ? "-translate-y-5 text-xs text-gray-900"
+                      : ""
+                  }`,
+                }}
               />
             </div>
             <div className="flex flex-col">
-              <label className="font-medium my-1">Event Type</label>
-              <select
+              <Select
                 value={eventType}
-                onChange={(e) => setEventType(e.target.value)}
-                name="Select Type"
-                className="border border-gray-400 text-gray-500 focus:text-gray-900 py-1 min-w-50"
-              >
-                <option value="Select Type">Select Type</option>
-                <option value="Wedding">Wedding</option>
-                <option value="Corporate">Corporate</option>
-                <option value="Birthday">Birthday</option>
-                <option value="Anniversary">Anniversary</option>
-              </select>
+                onChange={setEventType}
+                label="Select Type"
+                placeholder={focusedEventType ? "Select Type" : ""}
+                data={isLoading ? [] : eventTypeOptions}
+                onFocus={() => setFocusedEventType(true)}
+                onBlur={() => setFocusedEventType(false)}
+                classNames={{
+                  root: "relative mt-1",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                    floatingEventType
+                      ? "-translate-y-5 text-xs text-gray-900"
+                      : ""
+                  }`,
+                }}
+              />
             </div>
           </div>
-          <div className="flex flex-col my-2 mx-2">
-            <label className="font-medium my-1">Select Theme</label>
-            <select
-            disabled={!eventType}
-              value={selectTheme}
-              onChange={(e) => setSelectTheme(e.target.value)}
-              name="Select a Theme"
-              className="border border-gray-400 text-gray-500 focus:text-gray-900 py-1"
-            >
-              <option value="Select a Theme">Select a Theme</option>
-              <option value="Wedding">Wedding</option>
-              <option value="Corporate">Corporate</option>
-              <option value="Birthday">Birthday</option>
-              <option value="id">4</option>
-              <option value="id">5</option>
-            </select>
+          <div className="flex flex-col my-3 mx-2">
+            {
+              <Select
+                disabled={!eventType}
+                value={selectTheme}
+                onChange={setSelectTheme}
+                label="Select Theme"
+                placeholder={focusedSelectTheme ? "Select Theme" : ""}
+                data={themeOptions}
+                onFocus={() => setFocusedSelectTheme(true)}
+                onBlur={() => setFocusedSelectTheme(false)}
+                classNames={{
+                  root: "relative mt-1",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                    floatingSelectTheme
+                      ? "-translate-y-5 text-xs text-gray-900"
+                      : ""
+                  }`,
+                }}
+              />
+            }
           </div>
           <div className="grid grid-cols-3 gap-5 my-4">
             <div className="flex flex-col">
-              <label className="font-medium"> Date</label>
-              <input
-                type="date"
+              <DateInput
+                clearable
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="border border-gray-400 p-1"
+                onChange={setDate}
+                defaultValue={dayjs().toDate()}
+                label="Select Date"
+                placeholder={focusedDate ? "yyyy-mm-dd" : ""}
+                onFocus={() => setFocusedDate(true)}
+                onBlur={() => setFocusedDate(false)}
+                classNames={{
+                  root: "relative mt-3",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 pointer-events-none text-sm text-gray-400 transition-all duration-150 ${
+                    focusedDate || date
+                      ? "-translate-y-5 text-xs text-gray-900"
+                      : "top-2"
+                  }`,
+                }}
               />
             </div>
             <div className="flex flex-col">
-              <label className="font-medium">Venue</label>
-              <input
-                type="text"
-                className="border border-gray-400 p-1"
+              <TextInput
+                label="Venue"
+                placeholder={focusedVenue ? "e.g. Grand Hotel" : ""}
                 value={venue}
-                onChange={(e) => setVenue(e.target.value)}
-                placeholder="e.g. Grand Hotel"
+                onChange={(e) => setVenue(e.currentTarget.value)}
+                onFocus={() => setFocusedVenue(true)}
+                onBlur={() => setFocusedVenue(false)}
+                classNames={{
+                  root: "relative mt-1",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                    floatingVenue ? "-translate-y-5 text-xs text-gray-900" : ""
+                  }`,
+                }}
               />
             </div>
           </div>
           <div className="grid grid-cols-3 gap-5 my-4">
             <div className="flex flex-col">
-              <label className="font-medium">Guest Count</label>
-              <input
+              <TextInput
                 type="number"
-                className="border"
+                label="Guest Count"
+                placeholder={focusedGuestCount ? "Guest Count" : ""}
                 value={guestCount}
-                onChange={(e) => setGuestCount(e.target.value)}
-                placeholder="Number of guests"
+                onChange={(e) => setGuestCount(e.currentTarget.value)}
+                onFocus={() => setFocusedGuestCount(true)}
+                onBlur={() => setFocusedGuestCount(false)}
+                classNames={{
+                  root: "relative mt-1",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                    floatingGuestCount
+                      ? "-translate-y-5 text-xs text-gray-900"
+                      : ""
+                  }`,
+                }}
               />
             </div>
             <div className="flex flex-col">
-              <label className="font-medium">Budget ($)</label>
-              <input
+              <TextInput
                 type="number"
-                className="border"
+                label="Budget ($)"
+                placeholder={focusedBudget ? "Budget" : ""}
                 value={budget}
-                onChange={(e) => setBudget(e.target.value)}
-                placeholder="Total budget"
+                onChange={(e) => setBudget(e.currentTarget.value)}
+                onFocus={() => setFocusedBudget(true)}
+                onBlur={() => setFocusedBudget(false)}
+                classNames={{
+                  root: "relative mt-1",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                    floatingBudget ? "-translate-y-5 text-xs text-gray-900" : ""
+                  }`,
+                }}
               />
             </div>
           </div>
-          <button
+          <Button
             disabled={eventBookingMutation.isPending}
             onClick={() => eventBookingMutation.mutate()}
             className="border w-full p-1 rounded-md disabled:opacity-50"
           >
             {eventBookingMutation.isPending ? "Booking..." : "Create Booking"}
-          </button>
+          </Button>
         </div>
       </div>
     </>

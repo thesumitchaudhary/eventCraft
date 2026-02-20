@@ -20,10 +20,9 @@ import Footer from "./header-footer components/Footer";
 import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 
 const fetcher = async (url) => {
-  const res = await fetch(url, {
+  return await fetch(url, {
     credentials: "include",
-  });
-  return res.json();
+  }).then((res) =>res.json());
 };
 
 const Dashboard = () => {
@@ -31,7 +30,7 @@ const Dashboard = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ["details"],
-    queryFn: () => fetcher("http://localhost:4041/api/index/my-bookings"),
+    queryFn: async () => await fetcher("http://localhost:4041/api/index/my-bookings"),
   });
 
   console.log(data);

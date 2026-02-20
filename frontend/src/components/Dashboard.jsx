@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AuthModal from "./AuthModal";
 import {
   Calendar,
@@ -21,6 +21,17 @@ import { Link, useNavigate } from "react-router-dom";
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signup");
+
+  useEffect(() => {
+    if (AuthModal) {
+      document.body.style.overflowY = "hidden";
+    } else {
+      document.body.style.overflowY = "scroll";
+    }
+    return () => {
+      document.body.style.overflowY = "scroll";
+    };
+  }, [AuthModal]);
 
   const navigate = useNavigate();
   return (

@@ -16,7 +16,7 @@ router.get("/", (req, res) => {
 router.get("/my-bookings", authMiddleware, async (req, res) => {
     try {
         const customerId = req.user.id;
-        const bookings = await eventBookingModel.find({userId: customerId}).populate("userId", "firstname lastname email phone")
+        const bookings = await eventBookingModel.find({ userId: customerId }).populate("userId", "firstname lastname email phone")
             .sort({ createdAt: -1 });
 
         res.status(200).json({
