@@ -1,8 +1,7 @@
 import React, { useContext, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { Input } from "@mantine/core";
-import { Button } from "@mantine/core";
+import { TextInput, Button } from "@mantine/core";
 
 import { Context } from "../context/Context";
 
@@ -34,14 +33,10 @@ const verifyCode = async ({ code }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        code,
-      }),
+      body: JSON.stringify({ code }),
     });
 
-    if (!res.ok) {
-      throw new Error("Internal server Error");
-    }
+    if (!res.ok) throw new Error("Internal server Error");
     return res.json();
   } catch (error) {
     console.log("Fetch error:", error);
@@ -70,110 +65,173 @@ const SignupForm = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showVerifyFunctionality, setShowVerifyFunctionality] = useState(false);
 
+  const [focusedFirstname, setFocusedFirstname] = useState(false);
+  const [focusedLastname, setFocusedLastname] = useState(false);
+  const [focusedEmail, setFocusedEmail] = useState(false);
+  const [focusedPassword, setFocusedPassword] = useState(false);
+  const [focusedPhone, setFocusedPhone] = useState(false);
+  const [focusedOtp, setFocusedOtp] = useState(false);
+
+  const floatingFirstname = focusedFirstname || firstname?.length > 0;
+  const floatingLastname = focusedLastname || lastname?.length > 0;
+  const floatingEmail = focusedEmail || email?.length > 0;
+  const floatingPassword = focusedPassword || password?.length > 0;
+  const floatingPhone = focusedPhone || phone?.length > 0;
+  const floatingOtp = focusedOtp || otp?.length > 0;
+
   const userMutation = useMutation({
     mutationFn: () =>
       userCreate({ firstname, lastname, email, password, phone }),
-    onSuccess: (data) => {
-      // console.log("User created", data);
+    onSuccess: () => {
       setErrorMessage("");
+      setShowVerifyFunctionality(true);
     },
     onError: (error) => {
       console.log("error", error);
-      setErrorMessage("Email already exists or another error occurred."); // Set error message
+      setErrorMessage("Email already exists or another error occurred.");
     },
   });
 
-  const CodeMutation = useMutation({
+  const codeMutation = useMutation({
     mutationFn: () => verifyCode({ code: otp }),
-    onSuccess: (data) => {
-      // console.log("User created", data);
+    onSuccess: () => {
       setErrorMessage("");
       navigate("/customerDashboard");
     },
     onError: (error) => {
       console.log("error", error);
-      setErrorMessage("There was problem in verification code"); // Set error message
+      setErrorMessage("There was a problem verifying the code.");
     },
   });
 
   const handleSubmit = () => {
-    // Simple email validation
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
       setErrorMessage("Please enter a valid email address.");
       return;
     }
     userMutation.mutate();
-    setShowVerifyFunctionality(true);
   };
 
   return (
-    <div className="w-100">
-      {errorMessage && (
-        <div className="error-message text-red-500">{errorMessage}</div>
-      )}
-      <div className="flex flex-col gap-3">
-        <Input
-          type="text"
-          className="border p-1 rounded-md"
-          placeholder="Enter Your First Name"
-          value={firstname}
-          onChange={(e) => setFirstname(e.target.value)}
-        />
-        <Input
-          type="text"
-          className="border p-1 rounded-md"
-          placeholder="Enter Your Last Name"
-          value={lastname}
-          onChange={(e) => setLastname(e.target.value)}
-        />
-        <Input
-          type="email"
-          className="border p-1 rounded-md"
-          placeholder="Enter Your Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Input
-          type="password"
-          className="border p-1 rounded-md"
-          placeholder="Enter Your Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+    <div className="flex flex-col gap-3">
+      <TextInput
+        label="FirstName"
+        value={firstname}
+        onChange={(e) => setFirstname(e.currentTarget.value)}
+        onFocus={() => setFocusedFirstname(true)}
+        onBlur={() => setFocusedFirstname(false)}
+        classNames={{
+          root: "relative mt-1",
+          input:
+            "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+          label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+            floatingFirstname ? "-translate-y-5 text-xs text-gray-900" : ""
+          }`,
+        }}
+      />
 
-        <Input
-          type="number"
-          className="border p-1 rounded-md"
-          placeholder="Enter Your Phone"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
+      <TextInput
+        label="LastName"
+        value={lastname}
+        onChange={(e) => setLastname(e.currentTarget.value)}
+        onFocus={() => setFocusedLastname(true)}
+        onBlur={() => setFocusedLastname(false)}
+        classNames={{
+          root: "relative mt-1",
+          input:
+            "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+          label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+            floatingLastname ? "-translate-y-5 text-xs text-gray-900" : ""
+          }`,
+        }}
+      />
+
+      <TextInput
+        label="Email"
+        value={email}
+        onChange={(e) => setEmail(e.currentTarget.value)}
+        onFocus={() => setFocusedEmail(true)}
+        onBlur={() => setFocusedEmail(false)}
+        classNames={{
+          root: "relative mt-1",
+          input:
+            "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+          label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+            floatingEmail ? "-translate-y-5 text-xs text-gray-900" : ""
+          }`,
+        }}
+      />
+
+      <TextInput
+        label="Password"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.currentTarget.value)}
+        onFocus={() => setFocusedPassword(true)}
+        onBlur={() => setFocusedPassword(false)}
+        classNames={{
+          root: "relative mt-1",
+          input:
+            "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+          label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+            floatingPassword ? "-translate-y-5 text-xs text-gray-900" : ""
+          }`,
+        }}
+      />
+
+      <TextInput
+        label="Phone"
+        value={phone}
+        onChange={(e) => setPhone(e.currentTarget.value)}
+        onFocus={() => setFocusedPhone(true)}
+        onBlur={() => setFocusedPhone(false)}
+        classNames={{
+          root: "relative mt-1",
+          input:
+            "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+          label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+            floatingPhone ? "-translate-y-5 text-xs text-gray-900" : ""
+          }`,
+        }}
+      />
+
+      {showVerifyFunctionality && (
+        <span className="text-sm font-bold">Verify Your OTP</span>
+      )}
+
+      {showVerifyFunctionality && (
+        <TextInput
+          label="OTP"
+          value={otp}
+          onChange={(e) => setOtp(e.currentTarget.value)}
+          onFocus={() => setFocusedOtp(true)}
+          onBlur={() => setFocusedOtp(false)}
+          classNames={{
+            root: "relative mt-1",
+            input:
+              "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+            label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+              floatingOtp ? "-translate-y-5 text-xs text-gray-900" : ""
+            }`,
+          }}
         />
-        {showVerifyFunctionality && (
-          <span className="text-sm font-bold">Verify Your OTP</span>
-        )}
-        {showVerifyFunctionality && (
-          <Input
-            type="password"
-            className="border p-1 rounded-md"
-            placeholder="Enter Your OTP"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-          />
-        )}
-        {showVerifyFunctionality === false ? (
-          <Button onClick={handleSubmit} className="border w-40 p-1 rounded-md">
-            Create Account
-          </Button>
-        ) : (
-          <Button
-            onClick={(e) => CodeMutation.mutate()}
-            className="border w-40 p-1 rounded-md"
-          >
-            Verify OTP
-          </Button>
-        )}
-      </div>
+      )}
+
+      {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
+
+      {!showVerifyFunctionality ? (
+        <Button onClick={handleSubmit} className="border w-40 p-1 rounded-md">
+          Create Account
+        </Button>
+      ) : (
+        <Button
+          onClick={() => codeMutation.mutate()}
+          className="border w-40 p-1 rounded-md"
+        >
+          Verify OTP
+        </Button>
+      )}
     </div>
   );
 };
