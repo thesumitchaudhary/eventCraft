@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Palette } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
@@ -59,6 +59,18 @@ const AddTheme = () => {
   const [openThemeModel, setOpenThemeModel] = useState(false);
   const [editRow, setEditRow] = useState(null);
   const { id } = useParams();
+
+  useEffect(() => {
+    if (AddThemeModel) {
+      document.body.style.overflowY = "hidden";
+    } else {
+      document.body.style.overflowY = "scroll";
+    }
+
+    return () => {
+      document.body.style.overflowY = "scroll";
+    };
+  }, [AddThemeModel]);
 
   const queryClient = useQueryClient();
 
@@ -253,7 +265,7 @@ const AddTheme = () => {
                               themePrice: editRow.themePrice,
                             })
                           }
-                          className="bg-yellow-400 disabled:opacity-50"
+                          // className="bg-yellow-400 disabled:opacity-50"
                         >
                           Update
                         </button>

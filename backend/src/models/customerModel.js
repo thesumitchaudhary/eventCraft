@@ -4,8 +4,12 @@ const customerSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
     },
+    events: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "EventBooking",
+    }],
     phone: String,
     address: String,
   },

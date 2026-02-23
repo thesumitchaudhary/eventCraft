@@ -58,6 +58,14 @@ export const register = async (req, res) => {
         });
         await SendVerificationCode(email, verificationCode);
 
+        if (user.role === "customer") {
+            await customerModel.create({
+                userId: user._id,
+                phone: req.body.phone,
+                address: req.body.address,
+            });
+        }
+
         res.status(201).json({
             success: true,
             message: 'Registration successful. Please verify your email.',

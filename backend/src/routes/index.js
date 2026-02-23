@@ -5,6 +5,7 @@ import isLoggedin from "../Middleware/isLoggedin.js"
 import authMiddleware from "../Middleware/authMiddleware.js"
 
 // this is for import the collection file
+import customerModel from "../models/customerModel.js";
 import eventBookingModel from "../models/eventBookingModel.js";
 
 const router = express.Router();
@@ -15,26 +16,35 @@ router.get("/", (req, res) => {
 
 router.get("/my-bookings", authMiddleware, async (req, res) => {
     try {
-        const customerId = req.user.id;
-        const bookings = await eventBookingModel.find({ userId: customerId }).populate("userId", "firstname lastname email phone")
-            .sort({ createdAt: -1 });
+        const userId = req.user.id;
+
+        const customer = await customerModel.findOne({ userId }).populate("events");
+
+        if (!customer) {
+            return res.status(404).json({ message: "Customer not found" });
+        }
 
         res.status(200).json({
             success: true,
-            data: bookings,
+            data: customer.events,
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        res.status(500).json({ success: false, message: error.message });
     }
-})
+});
 
-router.post("/createEvent", async (req, res) => {
+router.post("/createEvent", authMiddleware, async (req, res) => {
     try {
+        const userId = req.user.id;
         const { eventName, eventType, theme, eventDate, venue, guestCount, totalAmount } = req.body;
+
+        const customer = await customerModel.findOne({ userId });
+        if (!user) {
+            return res.status(404).json({ message: "Customer not found" });
+        }
+
         const eventBooked = await eventBookingModel.create({
+            customerId: customer._id,
             eventName,
             eventType,
             theme,
@@ -42,11 +52,21 @@ router.post("/createEvent", async (req, res) => {
             venue,
             guestCount,
             totalAmount
-        })
-        res.json({ message: eventBooked })
-    } catch (error) {
-        res.json(error)
-    }
-})
+        });
 
+        await customerModel.updateOne(
+            { _id: user._id },
+            { $push: { events: eventBooked._id } }
+        );
+        // user.events.push(eventBooked._id)
+        // await user.save()
+
+        res.status(201).json({
+            success: true,
+            data: eventBooked
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message, message: "Error" });
+    }
+});
 export default router

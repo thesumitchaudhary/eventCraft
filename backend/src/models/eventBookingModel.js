@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 const eventBookingSchema = new mongoose.Schema(
   {
-    userId: {
+    customerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Customer",
     },

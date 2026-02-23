@@ -22,16 +22,6 @@ const Dashboard = () => {
   const [open, setOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signup");
 
-  useEffect(() => {
-    if (AuthModal) {
-      document.body.style.overflowY = "hidden";
-    } else {
-      document.body.style.overflowY = "scroll";
-    }
-    return () => {
-      document.body.style.overflowY = "scroll";
-    };
-  }, [AuthModal]);
 
   const navigate = useNavigate();
   return (

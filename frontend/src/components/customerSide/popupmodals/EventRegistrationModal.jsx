@@ -108,47 +108,37 @@ const EventRegistrationModal = ({ close }) => {
     },
   });
 
-  const { data: themesData = [], isPending, isLoading,isError, error } = useQuery({
+  const { data: themesData = [], isPending, isError, error } = useQuery({
     queryKey: ["eventThemesDetails", API_URL],
-    enabled: Boolean(API_URL), 
+    enabled: !!API_URL,
     queryFn: () => fetcher(`${API_URL}/admin/getAllEventTheme`),
     select: (response) => {
-      // normalize possible backend shapes
       if (Array.isArray(response)) return response;
-      if (Array.isArray(response?.data)) return response.data;
-      if (Array.isArray(response?.themes)) return response.themes;
       return [];
     },
   });
 
-  // Optional debug
-  // console.log("API_URL:", API_URL);
-  // console.log("themesData:", themesData);
-  // if (isError) console.error("themes query error:", error);
+  const getEventType = (item) =>
+    String(
+      item?.themeType ?? item?.eventType ?? item?.event_type ?? item?.type ?? ""
+    ).trim();
 
-  // Safe options for Mantine Select (must always have string value)
   const eventTypeOptions = [
     ...new Map(
       themesData
-        .filter(
-          (item) =>
-            typeof item?.eventType === "string" && item.eventType.trim() !== ""
-        )
-        .map((item) => [
-          item.eventType,
-          { value: item.eventType, label: item.eventType },
-        ])
+        .map((item) => getEventType(item))
+        .filter(Boolean)
+        .map((type) => [type.toLowerCase(), { value: type, label: type }])
     ).values(),
   ];
 
   const themeOptions = themesData
     .filter(
-      (item) =>
-        item?.eventType === eventType &&
-        typeof item?.theme === "string" &&
-        item.theme.trim() !== ""
+      (item) => getEventType(item).toLowerCase() === String(eventType).toLowerCase()
     )
-    .map((item) => ({ value: item.theme, label: item.theme }));
+    .map((item) => String(item?.themeName ?? item?.theme ?? "").trim())
+    .filter(Boolean)
+    .map((theme) => ({ value: theme, label: theme }));
 
   return (
     <>
@@ -200,7 +190,8 @@ const EventRegistrationModal = ({ close }) => {
                 onChange={setEventType}
                 label="Select Type"
                 placeholder={focusedEventType ? "Select Type" : ""}
-                data={isLoading ? [] : eventTypeOptions}
+                data={eventTypeOptions}
+                disabled={isPending || isError}
                 onFocus={() => setFocusedEventType(true)}
                 onBlur={() => setFocusedEventType(false)}
                 classNames={{
