@@ -12,7 +12,6 @@ const userSchema = mongoose.Schema({
         type: String,
         enum: ["admin", "employee", "customer"],
         default: "customer",
-        require: true,
     },
     verificationCode: String,
     verified_at: Date,

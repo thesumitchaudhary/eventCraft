@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx nodemon src/app.js",
-    "seeddb":"node src/seedThemes.js"
+    "seeddb":"node src/seedThemes.js",
+    "seed:Admin": "node src/seedCreateAdmin.js"
   },
   "type": "module",
   "keywords": [],

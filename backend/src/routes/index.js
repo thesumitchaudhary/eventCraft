@@ -14,7 +14,7 @@ router.get("/", (req, res) => {
     res.send("hey it's working fine");
 })
 
-router.get("/my-bookings", authMiddleware, async (req, res) => {
+router.get("/my-booking", authMiddleware, async (req, res) => {
     try {
         const userId = req.user.id;
 
@@ -39,7 +39,7 @@ router.post("/createEvent", authMiddleware, async (req, res) => {
         const { eventName, eventType, theme, eventDate, venue, guestCount, totalAmount } = req.body;
 
         const customer = await customerModel.findOne({ userId });
-        if (!user) {
+        if (!customer) {
             return res.status(404).json({ message: "Customer not found" });
         }
 
@@ -55,11 +55,9 @@ router.post("/createEvent", authMiddleware, async (req, res) => {
         });
 
         await customerModel.updateOne(
-            { _id: user._id },
+            { _id: customer._id },
             { $push: { events: eventBooked._id } }
         );
-        // user.events.push(eventBooked._id)
-        // await user.save()
 
         res.status(201).json({
             success: true,

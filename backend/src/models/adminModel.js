@@ -2,33 +2,14 @@ import mongoose from "mongoose";
 
 const adminSchema = new mongoose.Schema(
   {
-    firstName: {
-      type: String,
-      // required: true,
-      // trim: true
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
     },
-    lastName: {
-      type: String,
-      // required: true,
-      // trim: true
+    lastLogin: {
+      type: Date,
+      default: null,
     },
-    email: {
-      type: String,
-      // required: true,
-      // unique: true,
-      // lowercase: true
-    },
-
-    password: {
-      type: String,
-      // required: true
-    },
-
-    role: {
-      type: String,
-      enum: ["admin"],
-      default: "admin"
-    }
   },
   {
     timestamps: true

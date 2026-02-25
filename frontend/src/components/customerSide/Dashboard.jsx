@@ -20,20 +20,29 @@ import Footer from "./header-footer components/Footer";
 import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 
 const fetcher = async (url) => {
-  return await fetch(url, {
+  const res = await fetch(url, {
     credentials: "include",
-  }).then((res) =>res.json());
+  });
+
+  const body = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body?.message || "Request failed");
+  }
+
+  return body;
 };
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["details"],
-    queryFn: async () => await fetcher("http://localhost:4041/api/index/my-bookings"),
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["my-bookings"],
+    queryFn: async() => await fetcher("http://localhost:4041/api/index/my-booking"),
   });
 
-// console.log(data)
+console.log("query data:", data);
+console.log("query error:", error);
 
   return (
     <div className="bg-[#eeeeef] min-h-screen relative">
