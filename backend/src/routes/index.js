@@ -4,6 +4,9 @@ import express from "express";
 import isLoggedin from "../Middleware/isLoggedin.js"
 import authMiddleware from "../Middleware/authMiddleware.js"
 
+// import eventbook mail funtion
+import { SendEventBookingMail } from "../helpers/sendMail.js"
+
 // this is for import the collection file
 import customerModel from "../models/customerModel.js";
 import eventBookingModel from "../models/eventBookingModel.js";
@@ -36,9 +39,12 @@ router.get("/my-booking", authMiddleware, async (req, res) => {
 router.post("/createEvent", authMiddleware, async (req, res) => {
     try {
         const userId = req.user.id;
-        const { eventName, eventType, theme, eventDate, venue, guestCount, totalAmount } = req.body;
+        const userFirstname = req.user.firstname;
+        const userLastname = req.user.lastname;
 
+        const { eventName, eventType, theme, eventDate, venue, guestCount, totalAmount } = req.body;
         const customer = await customerModel.findOne({ userId });
+
         if (!customer) {
             return res.status(404).json({ message: "Customer not found" });
         }
@@ -58,6 +64,19 @@ router.post("/createEvent", authMiddleware, async (req, res) => {
             { _id: customer._id },
             { $push: { events: eventBooked._id } }
         );
+
+        await SendEventBookingMail(
+            req.user.email,                 
+            req.user.firstname,
+            req.user.lastname,
+            eventBooked.eventType,
+            eventBooked.theme,              
+            eventBooked.eventDate,          
+            eventBooked.guestCount,
+            eventBooked.totalAmount,
+            eventBooked.paymentStatus,
+            eventBooked.bookingStatus
+        )
 
         res.status(201).json({
             success: true,

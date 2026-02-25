@@ -1,6 +1,7 @@
 import transporter from "./sendVerificationMail.js";
 import { Verification_Email_Template } from "../templates/verficationEmailOtp.js";
 import { Welcome_Email_Template } from "../templates/wellcomeEmailTemplate.js";
+import { Event_Book_Template } from "../templates/EventBookTemplate.js";
 
 export const SendVerificationCode = async (email, verificationCode) => {
     try {
@@ -43,6 +44,50 @@ export const WellcomeEmail = async (email, firstname, lastname) => {
         });
 
         console.log("Email send Successfully", response);
+    } catch (error) {
+        console.log("Email Error", error);
+    }
+};
+
+export const SendEventBookingMail = async (
+    email,
+    firstname,
+    lastname,
+    eventType,
+    eventTheme,
+    bookingDate,
+    guestCount,
+    totalAmount,
+    paymentStatus,
+    bookingStatus
+) => {
+    try {
+        const template =
+            typeof Event_Book_Template === "function"
+                ? Event_Book_Template()
+                : String(Event_Book_Template);
+
+        const html = template
+            .replaceAll("{firstname}", firstname)
+            .replaceAll("{lastname}", lastname)
+            .replaceAll("{email}", email)
+            .replaceAll("{eventType}", eventType)
+            .replaceAll("{eventTheme}", eventTheme)
+            .replaceAll("{bookingDate}", bookingDate)
+            .replaceAll("{guestCount}", guestCount)
+            .replaceAll("{totalAmount}", totalAmount)
+            .replaceAll("{paymentStatus}", paymentStatus)
+            .replaceAll("{bookingStatus}", bookingStatus);
+
+        const response = await transporter.sendMail({
+            from: `"EventCraft" <${process.env.EMAIL_USER}>`,
+            to: process.env.EMAIL_USER, // or process.env.EMAIL_USER if admin-only mail is intended
+            subject: "Welcome To Our Community",
+            text: "Welcome To Our Community",
+            html,
+        });
+
+        console.log("Event booking email sent successfully", response);
     } catch (error) {
         console.log("Email Error", error);
     }
