@@ -101,6 +101,16 @@ const MyBookings = () => {
                 </div>
               </div>
             </div>
+            <hr className="mt-4" />
+            <div className="flex justify-between mt-2">
+              <div className="flex flex-col">
+                <span className="text-sm text-gray-500">Payment</span>
+                <span className="font-semibold text-sm">$25,000 / $50,000</span>
+              </div>
+              <button className="bg-black p-2">
+                <span className="text-white">Make Payment</span>
+              </button>
+            </div>
           </div>
           <div className="left-4 p-2 my-4 rounded-xl w-310 bg-gray-50">
             <div className="flex justify-between">
