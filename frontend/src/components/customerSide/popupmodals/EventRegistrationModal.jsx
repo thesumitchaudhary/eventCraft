@@ -81,7 +81,7 @@ const EventRegistrationModal = ({ close }) => {
   const [focusedSelectTheme, setFocusedSelectTheme] = useState(false);
 
   const floatingEventname = focusedEventname || eventName?.length > 0;
-  const floatingDate = focusedDate || !!date;
+  const floatingDate = focusedDate || date?.length > 0;
   const floatingVenue = focusedVenue || venue?.length > 0;
   const floatingGuestCount = focusedGuestCount || guestCount?.length > 0;
   const floatingBudget = focusedBudget || budget?.length > 0;
@@ -108,7 +108,12 @@ const EventRegistrationModal = ({ close }) => {
     },
   });
 
-  const { data: themesData = [], isPending, isError, error } = useQuery({
+  const {
+    data: themesData = [],
+    isPending,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["eventThemesDetails", API_URL],
     enabled: !!API_URL,
     queryFn: () => fetcher(`${API_URL}/admin/getAllEventTheme`),
@@ -120,7 +125,11 @@ const EventRegistrationModal = ({ close }) => {
 
   const getEventType = (item) =>
     String(
-      item?.themeType ?? item?.eventType ?? item?.event_type ?? item?.type ?? ""
+      item?.themeType ??
+        item?.eventType ??
+        item?.event_type ??
+        item?.type ??
+        "",
     ).trim();
 
   const eventTypeOptions = [
@@ -128,13 +137,14 @@ const EventRegistrationModal = ({ close }) => {
       themesData
         .map((item) => getEventType(item))
         .filter(Boolean)
-        .map((type) => [type.toLowerCase(), { value: type, label: type }])
+        .map((type) => [type.toLowerCase(), { value: type, label: type }]),
     ).values(),
   ];
 
   const themeOptions = themesData
     .filter(
-      (item) => getEventType(item).toLowerCase() === String(eventType).toLowerCase()
+      (item) =>
+        getEventType(item).toLowerCase() === String(eventType).toLowerCase(),
     )
     .map((item) => String(item?.themeName ?? item?.theme ?? "").trim())
     .filter(Boolean)

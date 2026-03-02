@@ -10,6 +10,7 @@ export const ContextProvider = (props) => {
   const [otp, setOtp] = useState("");
   const [phone, setPhone] = useState("");
   const [designation, setDesignation] = useState("");
+  const [address, setAddress] = useState("");
   return (
     <Context.Provider
       value={{
@@ -21,6 +22,8 @@ export const ContextProvider = (props) => {
         setEmail,
         password,
         setPassword,
+        address,
+        setAddress,
         otp,
         setOtp,
         phone,

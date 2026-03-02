@@ -2,7 +2,11 @@ import express from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 
+import userModel from "../models/userModel.js";
 import employeeModel from "../models/employeeModel.js";
+
+import adminMiddelware from "../Middleware/adminMiddleware.js"
+import authMiddelware from "../Middleware/authMiddleware.js"
 
 const router = express.Router();
 
@@ -10,28 +14,32 @@ router.get("/", (req, res) => {
     res.json("hey it's working")
 })
 
-router.post("/create", async (req, res) => {
+router.post("/create", authMiddelware, adminMiddelware, async (req, res) => {
     try {
         const { firstname, lastname, email, password, phone, designation } = req.body;
-        
 
-        const existingEmployee = await employeeModel.findOne({ email });
-        if (existingEmployee) {
+
+        const existingUser = await userModel.findOne({ email });
+        if (existingUser) {
             return res.status(400).json({ error: "Email already exists" });
         }
-        
+
         bcrypt.genSalt(10, function (err, salt) {
             bcrypt.hash(password, salt, async function (err, hash) {
                 try {
-                    const employeeCreated = await employeeModel.create({
+                    const userCreated = await userModel.create({
                         firstname,
                         lastname,
                         email,
                         password: hash,
                         phone,
-                        designation
                     });
-                    const token = jwt.sign({ email }, "shhhhhh")
+
+                    await employeeModel.create({
+                        userId: userCreated._id,
+                        designation
+                    })
+                    const token = jwt.sign({ email, firstname, lastname }, "shhhhhh")
                     res.cookie("token", token);
                     res.json(employeeCreated);
                 } catch (createError) {

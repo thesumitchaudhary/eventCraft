@@ -12,7 +12,7 @@ import {
   CircleQuestionMark,
 } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 // this is for import pages
 import Header from "./header-footer components/Header";

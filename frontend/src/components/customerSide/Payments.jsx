@@ -1,17 +1,8 @@
 import React, { useState } from "react";
-import {
-  Bell,
-  Calendar,
-  Settings,
-  LogOut,
-  Palette,
-  CreditCard,
-  Image,
-  Star,
-  CircleQuestionMark,
-  TrendingUp,
-} from "lucide-react";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+
+// import file from header-footer componenets
 import Header from "./header-footer components/Header";
 import Footer from "./header-footer components/Footer";
 import LiveIcon from "./header-footer components/live icon components/LiveIcon";
@@ -66,7 +57,9 @@ const Payments = () => {
                       <span className="text-xs font-bold">Pay Now</span>
                     </button>
                   </td>
-                    {openPaymentModal && <MakePaymentModal closePaymentModal={closePaymentModal} />} 
+                  {openPaymentModal && (
+                    <MakePaymentModal closePaymentModal={closePaymentModal} />
+                  )}
                 </tr>
 
                 <tr className="border-b border-black">

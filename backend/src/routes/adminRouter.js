@@ -12,7 +12,8 @@ import eventBookingModel from "../models/eventBookingModel.js";
 import eventThemeModel from "../models/eventThemeModel.js";
 
 // import middleware for protecting routes
-import authMiddleware from "../Middleware/authMiddleware.js"
+import authMiddleware from "../Middleware/authMiddleware.js";
+import adminMiddleware from "../Middleware/adminMiddleware.js";
 
 const router = express.Router();
 
@@ -44,7 +45,7 @@ router.post("/login", async (req, res) => {
 
 // this is all routes for eventbook action
 
-router.put("/updateStatus/:id", async (req, res) => {
+router.put("/updateStatus/:id", authMiddleware,adminMiddleware, async (req, res) => {
     try {
         const { bookingStatus } = req.body;
         console.log(bookingStatus)
@@ -66,7 +67,7 @@ router.put("/updateStatus/:id", async (req, res) => {
 
 // this is all routes for the eventtheme
 
-router.get("/getAllEventTheme", async (req, res) => {
+router.get("/getAllEventTheme", authMiddleware, async (req, res) => {
     try {
         const getEventThemes = await eventThemeModel.find();
 
@@ -80,7 +81,7 @@ router.get("/getAllEventTheme", async (req, res) => {
     }
 })
 
-router.post("/addEventTheme", async (req, res) => {
+router.post("/addEventTheme", authMiddleware,adminMiddleware, async (req, res) => {
     try {
         const { themeName, themeType, themePrice } = req.body;
         const eventThemeCreated = await eventThemeModel.create({
@@ -95,7 +96,7 @@ router.post("/addEventTheme", async (req, res) => {
     }
 })
 
-router.delete("/deleteEventTheme/:id", async (req, res) => {
+router.delete("/deleteEventTheme/:id", authMiddleware,adminMiddleware, async (req, res) => {
     try {
         const { id } = req.params;
         const deleted = await eventThemeModel.findByIdAndDelete(id);
@@ -109,7 +110,7 @@ router.delete("/deleteEventTheme/:id", async (req, res) => {
     }
 });
 
-router.put("/updateEventTheme/:id", async (req, res) => {
+router.put("/updateEventTheme/:id", authMiddleware,adminMiddleware, async (req, res) => {
     try {
         const { themeName, themeType, themePrice } = req.body;
         const { id } = req.params;
