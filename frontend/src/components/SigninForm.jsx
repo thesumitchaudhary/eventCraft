@@ -1,8 +1,8 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { Context } from "../context/Context";
-import { Input, Button, TextInput } from "@mantine/core";
+import { Button, TextInput } from "@mantine/core";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -11,15 +11,19 @@ const loginUser = async ({ email, password, role }) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email: email.trim(), password }),
   });
 
-  if (!res.ok) throw new Error("Login failed");
-  return res.json();
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data?.message || "Login failed");
+  }
+
+  return data;
 };
 
 const SigninForm = () => {
-  const [value, setValue] = useState("");
   const [focusedEmail, setFocusedEmail] = useState(false);
   const [focusedPassword, setFocusedPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -28,11 +32,9 @@ const SigninForm = () => {
   const location = useLocation();
   const { email, setEmail, password, setPassword } = useContext(Context);
 
-  // this is for labelfloting
   const floatingEmail = focusedEmail || email.length > 0;
   const floatingPassword = focusedPassword || password.length > 0;
 
-  // 🔑 ROLE decided by URL
   const role = location.pathname.startsWith("/admin")
     ? "admin"
     : location.pathname.startsWith("/employee")
@@ -40,29 +42,35 @@ const SigninForm = () => {
       : "customer";
 
   const userMutation = useMutation({
-    mutationFn: () => loginUser({ email, password, role }),
+    mutationFn: loginUser,
     onSuccess: () => {
+      setEmail("");
+      setPassword("");
       if (role === "admin") navigate("/admin/Dashboard");
       if (role === "employee") navigate("/employeeDashboard");
       if (role === "customer") navigate("/customerDashboard");
     },
-    onError: () => {
-      setErrorMessage("Invalid email or password");
+    onError: (err) => {
+      setErrorMessage(err.message || "Invalid email or password");
     },
   });
 
   const handleSubmit = () => {
+    const cleanEmail = email.trim();
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailPattern.test(email)) {
+    if (!emailPattern.test(cleanEmail)) {
       setErrorMessage("Please enter a valid email address.");
       return;
     }
 
+    if (!password) {
+      setErrorMessage("Password is required.");
+      return;
+    }
+
     setErrorMessage("");
-    userMutation.mutate();
-    setEmail("");
-    setPassword("");
+    userMutation.mutate({ email: cleanEmail, password, role });
   };
 
   return (
@@ -85,6 +93,7 @@ const SigninForm = () => {
         />
 
         <TextInput
+          type="password"
           label="Password"
           value={password}
           onChange={(e) => setPassword(e.currentTarget.value)}
@@ -92,28 +101,17 @@ const SigninForm = () => {
           onBlur={() => setFocusedPassword(false)}
           classNames={{
             root: "relative mt-1",
-            input: `
-          bg-transparent
-          border-0 border-b-2 border-gray-300
-          rounded-none px-0 pt-5 pb-1
-          focus:outline-none focus:border-gray-900
-        `,
-            label: `
-          absolute left-0 top-2 z-10 pointer-events-none
-          text-sm font-normal text-gray-400
-          transition-all duration-100 ease-in-out
-          ${floatingPassword ? "-translate-y-5 text-xs text-gray-900" : ""}
-        `,
+            input:
+              "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+            label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+              floatingPassword ? "-translate-y-5 text-xs text-gray-900" : ""
+            }`,
           }}
         />
 
         {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
 
-        <Button
-          onClick={handleSubmit}
-          color="black"
-          loading={userMutation.isPending}
-        >
+        <Button onClick={handleSubmit} color="black" loading={userMutation.isPending}>
           Sign In
         </Button>
       </div>

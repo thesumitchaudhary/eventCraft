@@ -5,6 +5,9 @@ import jwt from "jsonwebtoken"
 // import admin model
 import adminModel from "../models/adminModel.js";
 
+// import eventbooking model
+import eventBookingModel from "../models/eventBookingModel.js";
+
 // import  event Theme model
 import eventThemeModel from "../models/eventThemeModel.js";
 
@@ -38,6 +41,30 @@ router.post("/login", async (req, res) => {
         res.json(error);
     }
 })
+
+// this is all routes for eventbook action
+
+router.put("/updateStatus/:id", async (req, res) => {
+    try {
+        const { bookingStatus } = req.body;
+        console.log(bookingStatus)
+        const id = req.params.id;
+
+        const eventBookStatusAction = await eventBookingModel.findByIdAndUpdate(
+            id,
+            {
+                bookingStatus
+            },
+        )
+
+        res.json(eventBookStatusAction)
+    }
+    catch (error) {
+        res.json(error);
+    }
+})
+
+// this is all routes for the eventtheme
 
 router.get("/getAllEventTheme", async (req, res) => {
     try {

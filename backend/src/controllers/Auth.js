@@ -117,25 +117,65 @@ export const verifyEmail = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await userModel.findOne({ email });
 
-        if (!user) {
-            res.status(404).json({ message: "something is wrong" })
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Email and password are required",
+            });
         }
 
-        bcrypt.compare(password, user.password, function (err, result) {
-            if (result) {
-                const token = jwt.sign({ email: user.email, id: user._id, firstName: user.firstName, lastName: user.lastName }, process.env.JWT_SECRET);
-                res.cookie("token", token);
-                res.json(token);
-            } else {
-                res.json({ message: "something went wrong" })
-            }
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid credentials",
+            });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        // FIX: reject only when password does NOT match
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid credentials",
+            });
+        }
+
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Login successful",
+            token,
+            user: {
+                id: user._id,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                email: user.email,
+                role: user.role,
+            },
         });
     } catch (error) {
-        res.json(error)
+        console.error("Login error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error",
+        });
     }
-}
+};
 
 export const logout = (req, res) => {
     res.cookie("token", "")

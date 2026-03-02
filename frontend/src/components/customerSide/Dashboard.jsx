@@ -41,8 +41,8 @@ const Dashboard = () => {
     queryFn: async() => await fetcher("http://localhost:4041/api/index/my-booking"),
   });
 
-console.log("query data:", data);
-console.log("query error:", error);
+// console.log("query data:", data);
+// console.log("query error:", error);
 
   return (
     <div className="bg-[#eeeeef] min-h-screen relative">

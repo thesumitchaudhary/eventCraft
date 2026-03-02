@@ -51,7 +51,7 @@ const eventBookingSchema = new mongoose.Schema(
 
     bookingStatus: {
       type: String,
-      enum: ["requested", "confirmed", "cancelled", "completed"],
+      enum: ["requested", "accepted", "rejected", "completed"],
       default: "requested",
     },
   },
