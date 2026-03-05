@@ -10,6 +10,7 @@ import { SendEventBookingMail } from "../helpers/sendMail.js"
 // this is for import the collection file
 import customerModel from "../models/customerModel.js";
 import eventBookingModel from "../models/eventBookingModel.js";
+// import paymentModel from "../models/paymentModel.js";
 
 const router = express.Router();
 
@@ -66,12 +67,12 @@ router.post("/createEvent", authMiddleware, async (req, res) => {
         );
 
         await SendEventBookingMail(
-            req.user.email,                 
+            req.user.email,
             req.user.firstname,
             req.user.lastname,
             eventBooked.eventType,
-            eventBooked.theme,              
-            eventBooked.eventDate,          
+            eventBooked.theme,
+            eventBooked.eventDate,
             eventBooked.guestCount,
             eventBooked.totalAmount,
             eventBooked.paymentStatus,
@@ -86,4 +87,17 @@ router.post("/createEvent", authMiddleware, async (req, res) => {
         res.status(500).json({ error: error.message, message: "Error" });
     }
 });
+
+// this is for payment
+
+// router.post("/payment", authMiddleware, async (req, res) => {
+//     try {
+//         const { paymentAmount, cardDetails } = req.body;
+//         const makePayment = await paymentModel.create({
+//             paymentAmount,
+//             cardDetails
+//         })
+//     }
+// })
+
 export default router

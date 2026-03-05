@@ -14,7 +14,7 @@ router.get("/", (req, res) => {
     res.json("hey it's working")
 })
 
-router.post("/create", authMiddelware, adminMiddelware, async (req, res) => {
+router.post("/create", async (req, res) => {
     try {
         const { firstname, lastname, email, password, phone, designation } = req.body;
 
@@ -41,7 +41,7 @@ router.post("/create", authMiddelware, adminMiddelware, async (req, res) => {
                     })
                     const token = jwt.sign({ email, firstname, lastname }, "shhhhhh")
                     res.cookie("token", token);
-                    res.json(employeeCreated);
+                    res.json(userCreated);
                 } catch (createError) {
                     res.status(400).json({ error: createError.message });
                 }

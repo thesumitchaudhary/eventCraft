@@ -46,9 +46,13 @@ const SigninForm = () => {
     onSuccess: () => {
       setEmail("");
       setPassword("");
-      if (role === "admin") navigate("/admin/Dashboard");
-      if (role === "employee") navigate("/employeeDashboard");
-      if (role === "customer") navigate("/customerDashboard");
+      if (role === "admin") {
+        navigate("/admin/Dashboard");
+      } else if (role === "employee") {
+        navigate("/employee/Dashboard");
+      } else {
+        navigate("/customerDashboard");
+      }
     },
     onError: (err) => {
       setErrorMessage(err.message || "Invalid email or password");
@@ -111,7 +115,11 @@ const SigninForm = () => {
 
         {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
 
-        <Button onClick={handleSubmit} color="black" loading={userMutation.isPending}>
+        <Button
+          onClick={handleSubmit}
+          color="black"
+          loading={userMutation.isPending}
+        >
           Sign In
         </Button>
       </div>

@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 
 // import admin model
-import adminModel from "../models/adminModel.js";
+import userModel from "../models/userModel.js";
 
 // import eventbooking model
 import eventBookingModel from "../models/eventBookingModel.js";
@@ -24,15 +24,15 @@ router.get("/", (req, res) => {
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
-        const admin = await adminModel.findOne({ email });
+        const user = await userModel.findOne({ email });
 
-        if (!admin) {
+        if (!user) {
             res.json({ message: "Something were wrong" });
         }
 
-        bcrypt.compare(password, admin.passowrd, function (err, result) {
+        bcrypt.compare(password, user.passowrd, function (err, result) {
             if (result) {
-                const token = jwt.sign({ email }, "shhhhhh");
+                const token = jwt.sign({ id: user._id, email: user.email, role: user.role, firstname: user.firstname, lastname: user.lastname }, process.env.JWT_SECRET);
                 res.cookie("token", token);
                 res.json({ message: "hey the admin is login successfully" })
             }
@@ -45,7 +45,7 @@ router.post("/login", async (req, res) => {
 
 // this is all routes for eventbook action
 
-router.put("/updateStatus/:id", authMiddleware,adminMiddleware, async (req, res) => {
+router.put("/updateStatus/:id", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const { bookingStatus } = req.body;
         console.log(bookingStatus)
@@ -81,7 +81,7 @@ router.get("/getAllEventTheme", authMiddleware, async (req, res) => {
     }
 })
 
-router.post("/addEventTheme", authMiddleware,adminMiddleware, async (req, res) => {
+router.post("/addEventTheme", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const { themeName, themeType, themePrice } = req.body;
         const eventThemeCreated = await eventThemeModel.create({
@@ -96,7 +96,7 @@ router.post("/addEventTheme", authMiddleware,adminMiddleware, async (req, res) =
     }
 })
 
-router.delete("/deleteEventTheme/:id", authMiddleware,adminMiddleware, async (req, res) => {
+router.delete("/deleteEventTheme/:id", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const { id } = req.params;
         const deleted = await eventThemeModel.findByIdAndDelete(id);
@@ -110,7 +110,7 @@ router.delete("/deleteEventTheme/:id", authMiddleware,adminMiddleware, async (re
     }
 });
 
-router.put("/updateEventTheme/:id", authMiddleware,adminMiddleware, async (req, res) => {
+router.put("/updateEventTheme/:id", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const { themeName, themeType, themePrice } = req.body;
         const { id } = req.params;

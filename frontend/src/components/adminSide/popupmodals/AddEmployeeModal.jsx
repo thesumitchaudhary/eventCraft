@@ -1,8 +1,7 @@
 import React, { useState, useContext } from "react";
 import { X } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-import { Input } from "@mantine/core";
-import { Button } from "@mantine/core";
+import { TextInput, Button, Input } from "@mantine/core";
 
 import { Context } from "../../../context/Context";
 
@@ -57,6 +56,20 @@ const AddEmployeeModal = ({ closeAddEmployeeModal }) => {
     setDesignation,
   } = useContext(Context);
 
+  const [focusedFirstname, setFocusedFirstname] = useState(false);
+  const [focusedLastname, setFocusedLastname] = useState(false);
+  const [focusedEmail, setFocusedEmail] = useState(false);
+  const [focusedPassword, setFocusedPassword] = useState(false);
+  const [focusedPhone, setFocusedPhone] = useState(false);
+  const [focusedDesignation, setFocusedDesignation] = useState(false);
+
+  const floatingFirstname = focusedFirstname || firstname?.length > 0;
+  const floatingLastname = focusedLastname || lastname?.length > 0;
+  const floatingEmail = focusedEmail || email?.length > 0;
+  const floatingPassword = focusedPassword || password?.length > 0;
+  const floatingPhone = focusedPhone || phone?.length > 0;
+  const floatingDesignation = focusedDesignation || designation?.length > 0;
+
   const employeeMutation = useMutation({
     mutationFn: () =>
       EmployeeCreate({
@@ -82,7 +95,7 @@ const AddEmployeeModal = ({ closeAddEmployeeModal }) => {
           className="fixed left-0 right-0 bottom-0 top-0 bg-gray-200"
           onClick={close}
         ></div>
-        <div className="fixed top-35 left-100 min-w-sm max-w-xl border border-gray-400 bg-white rounded-2xl p-2">
+        <div className="fixed top-30 left-100 min-w-sm max-w-xl border border-gray-400 bg-white rounded-2xl p-2">
           <div className="flex justify-between">
             <div>
               <h1 className="text-base font-bold">Add New Employee</h1>
@@ -92,63 +105,131 @@ const AddEmployeeModal = ({ closeAddEmployeeModal }) => {
               <X />
             </button>
           </div>
-          <div>
+          <div className="flex flex-col gap-5">
             <div>
-              <label htmlFor="">Firstname</label>
-              <Input
-                placeholder="Enter Your firstname"
-                value={firstname}
-                onChange={(e) => setFirstname(e.target.value)}
+              <TextInput
+                label="First Name"
+                placeholder={focusedFirstname ? "e.g. Johnson Employee" : ""}
+                value={setFirstname}
+                onChange={(e) => setFirstname(e.currentTarget.value)}
+                onFocus={() => setFocusedFirstname(true)}
+                onBlur={() => setFocusedFirstname(false)}
+                classNames={{
+                  root: "relative mt-1 mt-5",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                    floatingFirstname
+                      ? "-translate-y-5 text-xs text-gray-900"
+                      : ""
+                  }`,
+                }}
               />
             </div>
             <div>
-              <label htmlFor="">Lastname</label>
-              <Input
-                placeholder="Enter Your lastname"
+              <TextInput
+                label="Last Name"
+                placeholder={focusedLastname ? "e.g. Johnson Wedding" : ""}
                 value={lastname}
-                onChange={(e) => setLastname(e.target.value)}
+                onChange={(e) => setLastname(e.currentTarget.value)}
+                onFocus={() => setFocusedLastname(true)}
+                onBlur={() => setFocusedLastname(false)}
+                classNames={{
+                  root: "relative mt-1",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                    floatingLastname
+                      ? "-translate-y-5 text-xs text-gray-900"
+                      : ""
+                  }`,
+                }}
               />
             </div>
             <div>
-              <label htmlFor="">Email</label>
-              <Input
-                placeholder="Enter Your email"
+              <TextInput
+                label="Email"
+                placeholder={focusedEmail ? "employee@gmail.com" : ""}
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.currentTarget.value)}
+                onFocus={() => setFocusedEmail(true)}
+                onBlur={() => setFocusedEmail(false)}
+                classNames={{
+                  root: "relative mt-1",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                    floatingEmail ? "-translate-y-5 text-xs text-gray-900" : ""
+                  }`,
+                }}
               />
             </div>
             <div>
-              <label htmlFor="">Password</label>
-              <Input
-                placeholder="Enter Your password"
+              <TextInput
+                label="Password"
+                placeholder={focusedPassword ? "employee@gmail.com" : ""}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.currentTarget.value)}
+                onFocus={() => setFocusedPassword(true)}
+                onBlur={() => setFocusedPassword(false)}
+                classNames={{
+                  root: "relative mt-1",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                    floatingPassword
+                      ? "-translate-y-5 text-xs text-gray-900"
+                      : ""
+                  }`,
+                }}
               />
             </div>
             <div>
-              <label htmlFor="">Phone</label>
-              <Input
-                placeholder="Enter Your phone"
+              <TextInput
+                label="Phone"
+                placeholder={focusedPhone ? "employee@gmail.com" : ""}
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(e.currentTarget.value)}
+                onFocus={() => setFocusedPhone(true)}
+                onBlur={() => setFocusedPhone(false)}
+                classNames={{
+                  root: "relative mt-1",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                    floatingPhone ? "-translate-y-5 text-xs text-gray-900" : ""
+                  }`,
+                }}
               />
             </div>
             <div>
-              <label htmlFor="">Designation</label>
-              <Input
-                placeholder="Enter Your designation"
+              <TextInput
+                label="Designation"
+                placeholder={focusedDesignation ? "employee@gmail.com" : ""}
                 value={designation}
-                onChange={(e) => setDesignation(e.target.value)}
+                onChange={(e) => setDesignation(e.currentTarget.value)}
+                onFocus={() => setFocusedDesignation(true)}
+                onBlur={() => setFocusedDesignation(false)}
+                classNames={{
+                  root: "relative mt-1",
+                  input:
+                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                    floatingDesignation
+                      ? "-translate-y-5 text-xs text-gray-900"
+                      : ""
+                  }`,
+                }}
               />
             </div>
             <div className="w-full my-1">
               <Button
-                onClick={(e) => employeeMutation.mutate()}
+                onClick={() => employeeMutation.mutate()}
                 className="w-full"
                 variant="filled"
                 color="black"
               >
-                Button
+                Add Employee
               </Button>
             </div>
           </div>

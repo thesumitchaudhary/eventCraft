@@ -30,6 +30,7 @@ const EventThemes = () => {
     queryFn: async () => await fetcher(`${API_URL}/admin/getAllEventTheme`),
   });
 
+
   return (
     <div className="bg-[#eeeeef] min-h-screen">
       <Header />
@@ -42,7 +43,7 @@ const EventThemes = () => {
             {isLoading ? (
               <p>Loading themes...</p>
             ) : (
-              data.map((theme) => (
+              data?.map((theme) => (
                 <div
                   key={theme._id}
                   className="border border-gray-400 min-w-sm py-5 px-4 flex flex-col gap-4 justify-between rounded-2xl"
