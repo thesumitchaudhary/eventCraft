@@ -14,6 +14,29 @@ router.get("/", (req, res) => {
     res.json("hey it's working")
 })
 
+router.get("/me", authMiddelware, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const user = await userModel.findOne({ userId });
+
+        if (!user) {
+            res.send("User is not Exist")
+        }
+
+        res.status(200).json({
+            id: user._id,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            role: user.role
+        })
+    }
+    catch (error) {
+
+    }
+})
+
 router.post("/create", async (req, res) => {
     try {
         const { firstname, lastname, email, password, phone, designation } = req.body;
@@ -56,15 +79,15 @@ router.post("/create", async (req, res) => {
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
-        const employee = await employeeModel.findOne({ email });
+        const user = await userModel.findOne({ email });
 
-        if (!employee) {
+        if (!user) {
             res.json("something were wrong");
         }
 
-        bcrypt.compare(password, employee.password, function (err, result) {
+        bcrypt.compare(password, user.password, function (err, result) {
             if (result) {
-                const token = jwt.sign({ email }, "shhhhhh");
+                const token = jwt.sign({ id: user._id, email: user.email, firstname: user.firstname, lastname: user.lastname }, "shhhhhh");
                 res.cookie("token", token);
                 res.json("employee is login successfully");
             }

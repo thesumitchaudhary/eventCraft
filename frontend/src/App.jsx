@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import "./App.css";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 // this is main dashboard of the website
 import Dashboard from "./components/Dashboard";
@@ -26,28 +26,25 @@ import Revenue from "./components/adminSide/Revenue";
 import Tasks from "./components/adminSide/Tasks";
 import AddTheme from "./components/adminSide/AddTheme";
 
-// this is for employee side location  of the website
+// this is for employee side location of the website
 import EmployeeDashboard from "./components/employeeSide/Dashboard";
 import Completed from "./components/employeeSide/Completed";
 import InProgress from "./components/employeeSide/InProgress";
 import Pending from "./components/employeeSide/Pending";
 
 function App() {
-  const [open, setOpen] = useState(false);
   return (
     <>
       <Routes>
         {/* this is the main dashboard */}
         <Route path="/" element={<Dashboard />} />
 
-        
-      {/* auth (same UI, role decided by route) */}
-      <Route path="/login" element={<AuthModal />} />
-      <Route path="/admin/login" element={<AuthModal />} />
-      <Route path="/employee/login" element={<AuthModal />} />
+        {/* auth (same UI, role decided by route) */}
+        <Route path="/login" element={<AuthModal />} />
+        <Route path="/admin/login" element={<AuthModal />} />
+        <Route path="/employee/login" element={<AuthModal />} />
 
         {/* this routes for the customer side */}
-
         <Route path="/customerDashboard" element={<CustomerDashboard />} />
         <Route path="/MyBookings" element={<MyBookings />} />
         <Route path="/EventThemes" element={<EventThemes />} />
@@ -66,11 +63,11 @@ function App() {
         <Route path="/admin/Tasks" element={<Tasks />} />
         <Route path="/admin/AddTheme" element={<AddTheme />} />
 
+        {/* this routes for the employee side */}
         <Route path="/employee/Dashboard" element={<EmployeeDashboard />} />
         <Route path="/employee/Completed" element={<Completed />} />
         <Route path="/employee/InProgress" element={<InProgress />} />
         <Route path="/employee/Pending" element={<Pending />} />
-
       </Routes>
     </>
   );

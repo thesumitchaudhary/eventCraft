@@ -35,24 +35,23 @@ const SigninForm = () => {
   const floatingEmail = focusedEmail || email.length > 0;
   const floatingPassword = focusedPassword || password.length > 0;
 
-  const role = location.pathname.startsWith("/admin")
+  const pathname = location.pathname.toLowerCase();
+  const role = pathname.includes("/admin")
     ? "admin"
-    : location.pathname.startsWith("/employee")
+    : pathname.includes("/employee")
       ? "employee"
       : "customer";
 
   const userMutation = useMutation({
     mutationFn: loginUser,
-    onSuccess: () => {
+    onSuccess: (data) => {
       setEmail("");
       setPassword("");
-      if (role === "admin") {
-        navigate("/admin/Dashboard");
-      } else if (role === "employee") {
-        navigate("/employee/Dashboard");
-      } else {
-        navigate("/customerDashboard");
-      }
+
+      const loggedInRole = data?.role || role;
+      if (loggedInRole === "admin") navigate("/admin/Dashboard");
+      else if (loggedInRole === "employee") navigate("/employee/Dashboard");
+      else navigate("/customerDashboard");
     },
     onError: (err) => {
       setErrorMessage(err.message || "Invalid email or password");

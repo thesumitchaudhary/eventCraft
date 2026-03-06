@@ -3,6 +3,7 @@ import express from "express";
 // this is for the create protected route
 import isLoggedin from "../Middleware/isLoggedin.js"
 import authMiddleware from "../Middleware/authMiddleware.js"
+import adminMiddelware from "../Middleware/adminMiddleware.js"
 
 // import eventbook mail funtion
 import { SendEventBookingMail } from "../helpers/sendMail.js"

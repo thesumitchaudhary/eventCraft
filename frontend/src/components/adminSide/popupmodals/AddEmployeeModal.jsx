@@ -110,7 +110,7 @@ const AddEmployeeModal = ({ closeAddEmployeeModal }) => {
               <TextInput
                 label="First Name"
                 placeholder={focusedFirstname ? "e.g. Johnson Employee" : ""}
-                value={setFirstname}
+                value={firstname}
                 onChange={(e) => setFirstname(e.currentTarget.value)}
                 onFocus={() => setFocusedFirstname(true)}
                 onBlur={() => setFocusedFirstname(false)}
