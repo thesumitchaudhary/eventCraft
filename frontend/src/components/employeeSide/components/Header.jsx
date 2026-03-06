@@ -60,7 +60,7 @@ const Header = () => {
               // onClick={() => logoutMutation.mutate()}
               className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 border border-gray-300"
             >
-              <Link to={"/"}>
+              <Link className="flex gap-2" to={"/"}>
               <LogOut />
               <span>Logout</span>
               </Link>

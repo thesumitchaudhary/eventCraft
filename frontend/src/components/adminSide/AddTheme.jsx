@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
+import LiveIcon from "./components/LiveIcon";
+
 // import add theme model
 import { AddThemeModel } from "./popupmodals/AddThemeModel";
 
@@ -284,6 +286,9 @@ const AddTheme = () => {
               </tbody>
             </table>
           </div>
+        </section>
+        <section className="flex justify-end mr-15">
+          <LiveIcon />
         </section>
       </main>
       <Footer />

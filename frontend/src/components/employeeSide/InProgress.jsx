@@ -3,6 +3,8 @@ import React from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
+import LiveIcon from "./components/LiveIcon";
+
 const InProgress = () => {
   return (
     <div className="bg-[#ededed]">
@@ -30,9 +32,14 @@ const InProgress = () => {
             </div>
             <div className="flex justify-between mt-5">
               <span>Due: 2026-01-25</span>
-              <button className="bg-black text-white p-2 rounded-2xl">Update Progress</button>
+              <button className="bg-black text-white p-2 rounded-2xl">
+                Update Progress
+              </button>
             </div>
           </div>
+        </section>
+        <section className="flex justify-end mr-15">
+          <LiveIcon />
         </section>
       </main>
       <Footer />

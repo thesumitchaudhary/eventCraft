@@ -1,8 +1,12 @@
 import React from "react";
-import { CircleCheck } from "lucide-react";
+import { CircleCheck, MessageCircle } from "lucide-react";
 
+// import header and footer
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+
+// import LiveModal
+import LiveIcon from "./components/LiveIcon";
 
 const Completed = () => {
   return (
@@ -32,6 +36,9 @@ const Completed = () => {
               </span>
             </div>
           </div>
+        </section>
+        <section className="flex justify-end mr-15">
+            <LiveIcon />
         </section>
       </main>
       <Footer />
