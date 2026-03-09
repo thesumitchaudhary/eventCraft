@@ -97,7 +97,7 @@ router.put("/updateStatus/:id", authMiddleware, adminMiddleware, async (req, res
 
 // this is all routes for the eventtheme
 
-router.get("/getAllEventTheme", authMiddleware, adminMiddleware, async (req, res) => {
+router.get("/getAllEventTheme", authMiddleware, async (req, res) => {
     try {
         const getEventThemes = await eventThemeModel.find();
 

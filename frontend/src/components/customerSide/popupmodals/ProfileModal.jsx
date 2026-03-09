@@ -50,14 +50,15 @@ const ProfileModal = ({ closeProfileModal }) => {
   });
 
   useEffect(() => {
-    if (data?.data) {
-      setFirstname(data.data.firstName ?? "");
-      setLastname(data.data.lastName ?? "");
-      setPhone(data.data.phone ?? "");
-      setAddress(data.data.address ?? "");
-      setEmail(data.data.email ?? "");
-    }
-  }, [data, setFirstname, setLastname, setEmail, setPhone, setAddress]);
+    const user = data?.user ?? data?.data?.user ?? data?.data ?? null;
+    if (!user) return;
+
+    setFirstname(user.firstName ?? user.firstname ?? "");
+    setLastname(user.lastName ?? user.lastname ?? "");
+    setPhone(user.phone ?? "");
+    setAddress(user.address ?? "");
+    setEmail(user.email ?? "");
+  }, [data, setFirstname, setLastname, setPhone, setAddress, setEmail]);
 
   return (
     <>
@@ -87,7 +88,7 @@ const ProfileModal = ({ closeProfileModal }) => {
               <TextInput
                 label="First Name"
                 placeholder={focusedFirstname ? "e.g. Johnson Wedding" : ""}
-                value={data?.data?.firstName}
+                value={firstname ?? ""}
                 onChange={(e) => setFirstname(e.currentTarget.value)}
                 onFocus={() => setFocusedFirstname(true)}
                 onBlur={() => setFocusedFirstname(false)}
@@ -98,7 +99,7 @@ const ProfileModal = ({ closeProfileModal }) => {
                   label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
                     floatingFirstname
                       ? "-translate-y-5 text-xs text-gray-900"
-                      : ""
+                      : "-translate-y-5 text-xs text-gray-900"
                   }`,
                 }}
               />
@@ -107,7 +108,7 @@ const ProfileModal = ({ closeProfileModal }) => {
               <TextInput
                 label="Last Name"
                 placeholder={focusedLastname ? "e.g. Johnson Wedding" : ""}
-                value={lastname}
+                value={lastname ?? ""}
                 onChange={(e) => setLastname(e.currentTarget.value)}
                 onFocus={() => setFocusedLastname(true)}
                 onBlur={() => setFocusedLastname(false)}
@@ -127,7 +128,7 @@ const ProfileModal = ({ closeProfileModal }) => {
               <TextInput
                 label="Phone"
                 placeholder={focusedPhone ? "e.g. Johnson Wedding" : ""}
-                value={phone}
+                value={phone ?? ""}
                 onChange={(e) => setPhone(e.currentTarget.value)}
                 onFocus={() => setFocusedPhone(true)}
                 onBlur={() => setFocusedPhone(false)}
@@ -145,7 +146,7 @@ const ProfileModal = ({ closeProfileModal }) => {
               <TextInput
                 label="Address"
                 placeholder={focusedAddress ? "e.g. Johnson Wedding" : ""}
-                value={address}
+                value={address ?? ""}
                 onChange={(e) => setAddress(e.currentTarget.value)}
                 onFocus={() => setFocusedAddress(true)}
                 onBlur={() => setFocusedAddress(false)}
@@ -166,7 +167,7 @@ const ProfileModal = ({ closeProfileModal }) => {
                 disabled
                 label="Email @ReadOnly"
                 placeholder={focusedEmail ? "e.g. Johnson Wedding" : ""}
-                value={"chaudharysumit9325@gmail.com"}
+                value={email ?? ""}
                 onChange={(e) => setEmail(e.currentTarget.value)}
                 onFocus={() => setFocusedEmail(true)}
                 onBlur={() => setFocusedEmail(false)}

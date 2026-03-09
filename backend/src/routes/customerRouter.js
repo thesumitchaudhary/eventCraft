@@ -48,6 +48,10 @@ router.post("/verifyEmail", verifyEmail);
 
 router.post("/login", login);
 
+router.put("/updateProfile", async (req,res) =>{
+
+})
+
 router.get("/logout", logout);
 
 export default router;

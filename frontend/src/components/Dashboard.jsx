@@ -21,9 +21,37 @@ import { Link, useNavigate } from "react-router-dom";
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
   const [authMode, setAuthMode] = useState("signup");
-
+  const [animatedText, setAnimatedText] = useState("Wedding Events");
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const words = ["Wedding Events", "Birthday Events", "Corporates Events"];
+    let timeoutIds = [];
+
+    const textLoad = () => {
+      timeoutIds = [
+        setTimeout(() => setAnimatedText(words[0]), 0),
+        setTimeout(() => setAnimatedText(words[1]), 4000),
+        setTimeout(() => setAnimatedText(words[2]), 8000),
+      ];
+    };
+
+    textLoad();
+    const intervalId = setInterval(textLoad, 12000);
+
+    return () => {
+      timeoutIds.forEach(clearTimeout);
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  const wordWidths = {
+    "Wedding Events": 565,
+    "Birthday Events": 548,
+    "Corporates Events": 648,
+  };
+
   return (
     <>
       <div className="relative h-50">
@@ -38,7 +66,7 @@ const Dashboard = () => {
               <Link to={"/admin/Dashboard"}>Admin</Link>
               <Link to={"/employee/Dashboard"}>Employee</Link>
               <button
-                onClick={(e) => {
+                onClick={() => {
                   setOpen(true);
                   setAuthMode("signin");
                 }}
@@ -47,7 +75,7 @@ const Dashboard = () => {
                 Sign In
               </button>
               <button
-                onClick={(e) => {
+                onClick={() => {
                   setOpen(true);
                   setAuthMode("signup");
                 }}
@@ -64,10 +92,20 @@ const Dashboard = () => {
       )}
       <main>
         <section className="flex flex-col gap-5 max-h-fit">
-          <h2 className="text-6xl font-bold flex justify-center gap-3">
-            Create Unforgettable
-            <span className="font-bold bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
-              Events
+          <h2 className="relative mr-2 text-7xl text-nowrap font-bold flex justify-center">
+            <span className="flex flex-col mt-5">
+              <span className="h-20">Create Unforgettable</span>
+              <div className="bg-gray-100 backdrop-blur-md p-1 rounded-xl inline-block w-2xl mx-auto">
+                <span
+                  key={animatedText}
+                  className="bg-gray-100 h-20 typing-mask font-semibold bg-linear-to-r/srgb from-indigo-500 to-teal-400 bg-clip-text text-transparent"
+                  style={{
+                    "--word-px": `${wordWidths[animatedText] || 500}px`,
+                  }} // adjust multiplier as needed
+                >
+                  {animatedText}
+                </span>
+              </div>
             </span>
           </h2>
           <p className="max-w-4xl mx-auto text-gray-600 text-lg text-center">
