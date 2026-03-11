@@ -10,6 +10,7 @@ import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 import EventRegistrationModal from "./popupmodals/EventRegistrationModal";
 import MakePaymentModal from "./popupmodals/MakePaymentModal";
 
+// this is for the show booked events
 const fetcher = async (url) => {
   const res = await fetch(url, { credentials: "include" });
 
@@ -23,6 +24,7 @@ const fetcher = async (url) => {
 const MyBookings = () => {
   const [openEventModel, setOpenEventModel] = useState(false);
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
 
   useEffect(() => {
     if (openEventModel) {
@@ -41,7 +43,7 @@ const MyBookings = () => {
     queryFn: () => fetcher("http://localhost:4041/api/index/my-booking"),
   });
 
-  console.log({ data });
+  console.log(data?.events)
 
   // for close EventRegistration modal
   const close = () => {
@@ -51,6 +53,17 @@ const MyBookings = () => {
   // for close payment modal
   const closePaymentModal = () => {
     setOpenPaymentModal(false);
+    setSelectedBookingId(null);
+  };
+
+  const handleOpenPaymentModal = (bookingId) => {
+    if (!bookingId) {
+      console.error("Missing bookingId");
+      return;
+    }
+
+    setSelectedBookingId(bookingId);
+    setOpenPaymentModal(true);
   };
 
   return (
@@ -70,9 +83,9 @@ const MyBookings = () => {
             </button>
             {openEventModel && <EventRegistrationModal close={close} />}
           </div>
-          <div className="left-4 p-2 my-4 rounded-xl w-310 bg-gray-50">
-            {data?.data?.map((booking) => (
-              <div key={booking.id} className="mb-4">
+          <div className="left-4 p-2 my-4 rounded-xl w-310">
+            {data?.events?.map((booking) => (
+              <div key={booking._id} className="mb-4 bg-gray-50 p-3 rounded-xl">
                 <div className="flex justify-between">
                   <div>
                     <h2 className="font-bold text-xl">{booking.eventName}</h2>
@@ -123,19 +136,16 @@ const MyBookings = () => {
                 <div className="flex justify-between mt-2">
                   <div className="flex flex-col">
                     <span className="text-sm text-gray-500">Payment</span>
-                    <span className="font-semibold text-sm">
-                      $0 / $50,000
-                    </span>
+                    <span className="font-semibold text-sm">${booking.totalPaid} / $50,000</span>
                   </div>
+
                   <button
-                    onClick={(e) => setOpenEventModel(true)}
-                    className="bg-black p-2"
+                    type="button"
+                    onClick={() => handleOpenPaymentModal(booking?._id)}
+                    className="bg-black rounded-xl p-2"
                   >
                     <span className="text-white">Make Payment</span>
                   </button>
-                  {openPaymentModal && (
-                    <MakePaymentModal closePaymentModal={closePaymentModal} />
-                  )}
                 </div>
               </div>
             ))}
@@ -146,6 +156,12 @@ const MyBookings = () => {
         </section>
       </main>
       <Footer />
+      {openPaymentModal && (
+        <MakePaymentModal
+          closePaymentModal={closePaymentModal}
+          bookingId={selectedBookingId}
+        />
+      )}
     </div>
   );
 };

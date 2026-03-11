@@ -1,9 +1,34 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
 import { TextInput } from "@mantine/core";
+import { useMutation } from "@tanstack/react-query";
 
-const MakePaymentModal = ({ closePaymentModal }) => {
-  // this is for floating and also focused state for field designs
+const API_URL = import.meta.env.VITE_BACKEND_URL;
+
+const makePayment = async ({ bookingId, paymentAmount, cardDetails }) => {
+  const res = await fetch(`${API_URL}/index/payment`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      bookingId,
+      paymentAmount,
+      cardDetails,
+    }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok || data?.success === false) {
+    throw new Error(data?.message || "Payment request failed");
+  }
+
+  return data;
+};
+
+const MakePaymentModal = ({ closePaymentModal, bookingId }) => {
   const [focusedTotalBudget, setFocusedTotalBudget] = useState(false);
   const [focusedAlreadyPaid, setFocusedAlreadyPaid] = useState(false);
   const [focusedCardNumber, setFocusedCardNumber] = useState(false);
@@ -11,7 +36,6 @@ const MakePaymentModal = ({ closePaymentModal }) => {
   const [focusedPaymentAmount, setFocusedPaymentAmount] = useState(false);
   const [focusedCvv, setFocusedCvv] = useState(false);
 
-  // this is for state change in form fields
   const [totalBudget, setTotalBudget] = useState("$50,000");
   const [alreadyPaid, setAlreadyPaid] = useState("$25,000");
   const [paymentAmount, setPaymentAmount] = useState("");
@@ -26,6 +50,51 @@ const MakePaymentModal = ({ closePaymentModal }) => {
   const floatingPaymentAmount =
     focusedPaymentAmount || paymentAmount?.length > 0;
   const floatingCvv = focusedCvv || cvv?.length > 0;
+
+  const parseExpiry = (value) => {
+    const [mm, yy] = String(value || "").split("/");
+    const expiryMonth = Number(mm);
+    const twoDigitYear = Number(yy);
+
+    if (!expiryMonth || expiryMonth < 1 || expiryMonth > 12 || Number.isNaN(twoDigitYear)) {
+      return null;
+    }
+
+    const expiryYear = twoDigitYear < 100 ? 2000 + twoDigitYear : twoDigitYear;
+    return { expiryMonth, expiryYear };
+  };
+
+  const paymentMutation = useMutation({
+    mutationFn: () => {
+      if (!bookingId) throw new Error("bookingId is required");
+      if (!paymentAmount) throw new Error("paymentAmount is required");
+
+      const normalizedCardNumber = cardNumber.replace(/\D/g, ""); // remove spaces/dashes
+      const normalizedCvv = cvv.replace(/\D/g, "");
+      const expiry = parseExpiry(expiryDate);
+
+      if (!expiry) throw new Error("Expiry must be in MM/YY format");
+      if (normalizedCardNumber.length < 12) throw new Error("Invalid card number");
+      if (normalizedCvv.length < 3) throw new Error("Invalid CVV");
+
+      return makePayment({
+        bookingId,
+        paymentAmount,
+        cardDetails: {
+          cardNumber: normalizedCardNumber,
+          expiryMonth: expiry.expiryMonth,
+          expiryYear: expiry.expiryYear,
+          cvv: normalizedCvv,
+        },
+      });
+    },
+    onSuccess: () => {
+      closePaymentModal();
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
 
   return (
     <>
@@ -42,92 +111,81 @@ const MakePaymentModal = ({ closePaymentModal }) => {
               <X />
             </button>
           </div>
+
           <div className="flex flex-col gap-7 mt-5">
-            <div>
-              <TextInput
-                disabled
-                label="Total Budget"
-                placeholder={focusedTotalBudget ? "$50,000" : ""}
-                value={totalBudget}
-                onChange={(e) => setTotalBudget(e.currentTarget.value)}
-                onFocus={() => setFocusedTotalBudget(true)}
-                onBlur={() => setFocusedTotalBudget(true)}
-                classNames={{
-                  root: "relative mt-1",
-                  input:
-                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
-                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
-                    floatingTotalBudget
-                      ? "-translate-y-7 text-xs text-gray-900"
-                      : ""
-                  }`,
-                }}
-              />
-            </div>
-            <div>
-              <TextInput
-                disabled
-                label="Already Paid"
-                placeholder={focusedAlreadyPaid ? "$50,000" : ""}
-                value={alreadyPaid}
-                onChange={(e) => setAlreadyPaid(e.currentTarget.value)}
-                onFocus={() => setFocusedAlreadyPaid(true)}
-                onBlur={() => setFocusedAlreadyPaid(true)}
-                classNames={{
-                  root: "relative mt-1",
-                  input:
-                    "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
-                  label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
-                    floatingAlreadyPaid
-                      ? "-translate-y-7 text-xs text-gray-900"
-                      : ""
-                  }`,
-                }}
-              />
-            </div>
-          </div>
-          <div>
             <TextInput
-              label="Payment Amount"
-              placeholder={focusedPaymentAmount ? "$25,000" : ""}
-              value={paymentAmount}
-              onChange={(e) => setPaymentAmount(e.currentTarget.value)}
-              onFocus={() => setFocusedPaymentAmount(true)}
-              onBlur={() => setFocusedPaymentAmount(false)}
+              disabled
+              label="Total Budget"
+              placeholder={focusedTotalBudget ? "$50,000" : ""}
+              value={totalBudget}
+              onChange={(e) => setTotalBudget(e.currentTarget.value)}
+              onFocus={() => setFocusedTotalBudget(true)}
+              onBlur={() => setFocusedTotalBudget(false)}
               classNames={{
                 root: "relative mt-1",
                 input:
                   "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
                 label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
-                  floatingPaymentAmount
-                    ? "-translate-y-5 text-xs text-gray-900"
-                    : ""
+                  floatingTotalBudget ? "-translate-y-7 text-xs text-gray-900" : ""
                 }`,
               }}
             />
-          </div>
-          <div>
+
             <TextInput
-              label="Card Number"
-              placeholder={focusedCardNumber ? "1234 5678 3456" : ""}
-              value={cardNumber}
-              onChange={(e) => setCardNumber(e.currentTarget.value)}
-              onFocus={() => setFocusedCardNumber(true)}
-              onBlur={() => setFocusedCardNumber(false)}
+              disabled
+              label="Already Paid"
+              placeholder={focusedAlreadyPaid ? "$25,000" : ""}
+              value={alreadyPaid}
+              onChange={(e) => setAlreadyPaid(e.currentTarget.value)}
+              onFocus={() => setFocusedAlreadyPaid(true)}
+              onBlur={() => setFocusedAlreadyPaid(false)}
               classNames={{
                 root: "relative mt-1",
                 input:
                   "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
                 label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
-                  floatingCardNumber
-                    ? "-translate-y-5 text-xs text-gray-900"
-                    : ""
+                  floatingAlreadyPaid ? "-translate-y-7 text-xs text-gray-900" : ""
                 }`,
               }}
             />
           </div>
-          <div className="flex justify-between">
-            <div>
+
+          <TextInput
+            label="Payment Amount"
+            placeholder={focusedPaymentAmount ? "$25,000" : ""}
+            value={paymentAmount}
+            onChange={(e) => setPaymentAmount(e.currentTarget.value)}
+            onFocus={() => setFocusedPaymentAmount(true)}
+            onBlur={() => setFocusedPaymentAmount(false)}
+            classNames={{
+              root: "relative mt-1",
+              input:
+                "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+              label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                floatingPaymentAmount ? "-translate-y-5 text-xs text-gray-900" : ""
+              }`,
+            }}
+          />
+
+          <TextInput
+            label="Card Number"
+            placeholder={focusedCardNumber ? "1234 5678 3456" : ""}
+            value={cardNumber}
+            onChange={(e) => setCardNumber(e.currentTarget.value)}
+            onFocus={() => setFocusedCardNumber(true)}
+            onBlur={() => setFocusedCardNumber(false)}
+            classNames={{
+              root: "relative mt-1",
+              input:
+                "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+              label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                floatingCardNumber ? "-translate-y-5 text-xs text-gray-900" : ""
+              }`,
+            }}
+          />
+
+          <div className="flex justify-between gap-4">
+            <div className="w-full">
               <TextInput
                 label="Expiry Date"
                 placeholder={focusedExpiryDate ? "MM/YY" : ""}
@@ -140,14 +198,13 @@ const MakePaymentModal = ({ closePaymentModal }) => {
                   input:
                     "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
                   label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
-                    floatingExpireDate
-                      ? "-translate-y-5 text-xs text-gray-900"
-                      : ""
+                    floatingExpireDate ? "-translate-y-5 text-xs text-gray-900" : ""
                   }`,
                 }}
               />
             </div>
-            <div>
+
+            <div className="w-full">
               <TextInput
                 label="CVV"
                 placeholder={focusedCvv ? "123" : ""}
@@ -166,7 +223,16 @@ const MakePaymentModal = ({ closePaymentModal }) => {
               />
             </div>
           </div>
-          <button className="bg-black text-white p-2 rounded-xl"> <span className="font-bold text-sm"> Process Payment</span></button>
+
+          <button
+            onClick={() => paymentMutation.mutate()}
+            disabled={!bookingId || paymentMutation.isPending}
+            className="bg-black text-white p-2 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span className="font-bold text-sm">
+              {paymentMutation.isPending ? "Processing..." : "Make Payment"}
+            </span>
+          </button>
         </div>
       </div>
     </>
@@ -174,3 +240,4 @@ const MakePaymentModal = ({ closePaymentModal }) => {
 };
 
 export default MakePaymentModal;
+

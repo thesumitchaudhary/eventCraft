@@ -41,7 +41,7 @@ const Dashboard = () => {
     queryFn: async() => await fetcher("http://localhost:4041/api/index/my-booking"),
   });
 
-// console.log("query data:", data);
+console.log("query data:", data);
 // console.log("query error:", error);
 
   return (
@@ -91,14 +91,15 @@ const Dashboard = () => {
                   </tr>
                 )}
 
-                {data?.data?.map((booking) => (
+                {data?.events?.map((booking) => (
                   <tr key={booking._id} className="border-b border-black">
                     <td className="py-2">{booking.eventName}</td>
                     <td>{new Date(booking.eventDate).toLocaleDateString()}</td>
                     <td>{booking.theme}</td>
                     <td>{booking.bookingStatus}</td>
                     <td>
-                      {booking.bookingStatus === "completed" ? "100%" : "60%"}
+                      {/* {booking.bookingStatus === "completed" ? "100%" : "60%"} */}
+                      0%
                     </td>
                   </tr>
                 ))}

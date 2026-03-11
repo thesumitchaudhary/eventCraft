@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
 const PaymentSchema = new mongoose.Schema({
-    eventId: {
+    bookingId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Event",
+        ref: "EventBooking",
         required: true
     },
 
@@ -16,7 +16,7 @@ const PaymentSchema = new mongoose.Schema({
         cardNumber: {
             type: String,
             required: true,
-            match: /^[0-9]{12,16}$/ // allows common card lengths
+            match: /^[0-9]{12,16}$/
         },
 
         expiryMonth: {
@@ -40,14 +40,16 @@ const PaymentSchema = new mongoose.Schema({
 
     paymentMethod: {
         type: String,
-        enum: ["credit card",
+        enum: [
+            "credit card",
             "debit card",
             "upi",
             "net banking",
             "wallet",
             "cash on delivery",
-            "paypal"],
-        default: "Credit card"
+            "paypal"
+        ],
+        default: "credit card"
     },
 
     status: {
@@ -61,3 +63,5 @@ const PaymentSchema = new mongoose.Schema({
         default: Date.now
     }
 });
+
+export default mongoose.model("Payment", PaymentSchema);
