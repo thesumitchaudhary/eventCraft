@@ -38,11 +38,12 @@ const Dashboard = () => {
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["my-bookings"],
-    queryFn: async() => await fetcher("http://localhost:4041/api/index/my-booking"),
+    queryFn: async () =>
+      await fetcher("http://localhost:4041/api/index/my-booking"),
   });
 
-console.log("query data:", data);
-// console.log("query error:", error);
+  // console.log("query data:", data);
+  // console.log("query error:", error);
 
   return (
     <div className="bg-[#eeeeef] min-h-screen relative">
@@ -53,15 +54,21 @@ console.log("query data:", data);
           <div className="flex gap-4">
             <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-xl">
               <p>Total Bookings</p>
-              <h3 className="text-2xl font-bold">2</h3>
+              <h3 className="text-2xl font-bold">{data?.events.length}</h3>
             </div>
             <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-xl">
               <p>Upcoming Events</p>
-              <h3 className="text-2xl font-bold">1</h3>
+              <h3 className="text-2xl font-bold">
+                {
+                  data?.events.filter(
+                    (event) => event.bookingStatus == "accepted",
+                  ).length
+                }{" "}
+              </h3>
             </div>
             <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-xl">
               <p>Total Spent</p>
-              <h3 className="text-2xl font-bold">$40,000</h3>
+              <h3 className="text-2xl font-bold">$ {data?.events.reduce((total, event) => total + event.totalPaid, 0)}</h3>
             </div>
           </div>
         </section>

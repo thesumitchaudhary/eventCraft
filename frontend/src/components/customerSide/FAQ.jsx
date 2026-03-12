@@ -257,7 +257,7 @@ const FAQ = () => {
             </div>
           </div>
         </section>
-        <section className="flex justify-end mr-4">
+        <section className="flex justify-end mr-4 my-10">
           <LiveIcon />
         </section>
       </main>

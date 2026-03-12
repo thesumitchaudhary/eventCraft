@@ -43,7 +43,7 @@ const MyBookings = () => {
     queryFn: () => fetcher("http://localhost:4041/api/index/my-booking"),
   });
 
-  console.log(data?.events)
+  // console.log(data?.events)
 
   // for close EventRegistration modal
   const close = () => {
@@ -136,7 +136,7 @@ const MyBookings = () => {
                 <div className="flex justify-between mt-2">
                   <div className="flex flex-col">
                     <span className="text-sm text-gray-500">Payment</span>
-                    <span className="font-semibold text-sm">${booking.totalPaid} / $50,000</span>
+                    <span className="font-semibold text-sm">${booking.totalPaid} / {booking.totalAmount}</span>
                   </div>
 
                   <button

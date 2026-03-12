@@ -9,12 +9,29 @@ import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 
 import MakePaymentModal from "./popupmodals/MakePaymentModal";
 
+const fetcher = async (url) => {
+  const res = await fetch(url, { credentials: "include" });
+
+  if (!res.ok) {
+    throw new Error("There was problem");
+  }
+
+  return res.json();
+};
+
 const Payments = () => {
   const [openPaymentModal, setOpenPaymentModal] = useState(false);
 
   const closePaymentModal = () => {
     setOpenPaymentModal(false);
   };
+
+  const { data } = useQuery({
+    queryKey: ["my-bookings"],
+    queryFn: () => fetcher("http://localhost:4041/api/index/my-booking"),
+  });
+
+  console.log(data);
 
   return (
     <div className="bg-[#eeeeef] min-h-screen">
@@ -37,7 +54,35 @@ const Payments = () => {
                   <th className="py-2">Action</th>
                 </tr>
               </thead>
-
+              <tbody>
+                {data?.events.map((event) => (
+                  <tr key={event._id} className="border-b border-black">
+                    <td className="py-2">{event.eventName}</td>
+                    <td className="py-2">{event.totalAmount}</td>
+                    <td className="py-2">{event.totalPaid}</td>
+                    <td className="py-2">
+                      {event.totalAmount - event.totalPaid}
+                    </td>
+                    <td className="py-2 text-xs">
+                      <span className="text-blue-800 font-medium rounded-sm bg-[#dbeafe] p-1">
+                        partial
+                      </span>
+                    </td>
+                    <td className="py-2">
+                    <button
+                      onClick={(e) => setOpenPaymentModal(true)}
+                      className="text-black border border-gray-300 px-3 hover:bg-gray-200 py-2 rounded-xl"
+                    >
+                      <span className="text-xs font-bold">Pay Now</span>
+                    </button>
+                  </td>
+                  {openPaymentModal && (
+                    <MakePaymentModal closePaymentModal={closePaymentModal} />
+                  )}
+                  </tr>
+                ))}
+              </tbody>
+              {/* 
               <tbody>
                 <tr className="border-b border-black">
                   <td className="py-2">Johnson Wedding</td>
@@ -74,7 +119,7 @@ const Payments = () => {
                   </td>
                   <td className="py-2"></td>
                 </tr>
-              </tbody>
+              </tbody> */}
             </table>
           </div>
         </section>
