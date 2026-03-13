@@ -42,6 +42,7 @@ router.get("/me", authMiddleware, async (req, res) => {
         return res.status(500).json({ message: "Server error" });
     }
 });
+
 router.post("/create", register);
 
 router.post("/verifyEmail", verifyEmail);

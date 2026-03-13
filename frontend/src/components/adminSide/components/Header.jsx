@@ -14,6 +14,18 @@ import {
   DollarSign,
 } from "lucide-react";
 import ProfileModal from "../popupmodals/ProfileModal";
+import { useQuery } from "@tanstack/react-query";
+
+const fetcher = async (url) => {
+  const res = await fetch(url, { credentials: "include" });
+  const body = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body.message || "Request Failed");
+  }
+
+  return body;
+};
 
 const Header = () => {
   const [openProfileModal, setOpenProfileModal] = useState(false);
@@ -21,6 +33,14 @@ const Header = () => {
   const closeProfileModel = () => {
     setOpenProfileModal(false);
   };
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["userInformation"],
+    queryFn: () => fetcher("http://localhost:4041/api/customer/me"),
+  });
+
+  console.log(data?.user.firstName)
+
   return (
     <>
       <header className="h-fit w-full ">
@@ -30,7 +50,7 @@ const Header = () => {
               <Calendar className="text-purple-500" />
               <h1>Admin Portal</h1>
             </div>
-            <p className="mx-8">Welcome, Chaudhary sumit</p>
+            <p className="mx-8">Welcome, {data?.user.firstName} {data?.user.lastName}</p>
           </div>
           <div className="flex gap-5 pr-9">
             <button

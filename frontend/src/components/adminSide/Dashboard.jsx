@@ -26,7 +26,7 @@ const Dashboard = () => {
     queryFn: () => fetcher("http://localhost:4041/api/admin/showBookedEvent"),
   });
 
-  console.log(data?.customers.flatMap((customer) => customer?.events));
+  // console.log(data?.customers.flatMap((customer) => customer?.events));
   // console.log(data?.customers.flatMap((customer) => customer?.events.map((data) => data?.eventName)))
   // console.log(data?.customers.flatMap((customer) => customer?.events.map((data) => data?.eventType)))
 

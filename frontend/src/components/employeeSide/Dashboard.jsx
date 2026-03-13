@@ -1,12 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import { CircleAlert, Upload } from "lucide-react";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 import LiveIcon from "./components/LiveIcon";
+import UpdateTaskModal from "./popupModals/UpdateTaskModal";
 
 const Dashboard = () => {
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+
+  const closeUpdateModal = () => {
+    setOpenUpdateModal(false);
+  };
+
   return (
     <div className="bg-[#ededed]">
       <Header />
@@ -15,7 +22,7 @@ const Dashboard = () => {
           <div className="bg-gray-50 p-5 rounded-2xl grid grid-rows-2">
             <div className="flex flex-col gap-1">
               <div className="flex justify-between">
-                <h1>Setup Wedding Venue Decorations</h1>
+                <h4 className="text-lg ">Setup Wedding Venue Decorations</h4>
                 <div className="flex gap-5">
                   <span className="text-sm text-red-500 bg-red-200 px-3 p-1 rounded-full">
                     high
@@ -23,10 +30,25 @@ const Dashboard = () => {
                   <span className="text-sm ">in-progress</span>
                 </div>
               </div>
-              <p>
+              <p className="text-gray-400">
                 Arrange floral decorations for the Johnson wedding at Grand
                 Hotel
               </p>
+            </div>
+            <div className="p-4 bg-purple-100 rounded-md border border-purple-500">
+              <div>
+                <span>Event Details</span>
+              </div>
+              <div>
+                <p className="grid grid-cols-2">
+                  <span className="text-gray-600">
+                    Event: <span className="text-black ">Johnson Wedding</span>
+                  </span>
+                  <span className="text-gray-600">
+                    Progress: <span className="text-blackl">0%</span>
+                  </span>
+                </p>
+              </div>
             </div>
             <div className="grid grid-cols-3 mt-7">
               <div>
@@ -51,11 +73,15 @@ const Dashboard = () => {
               </span>
             </div>
             <div className="my-5 flex justify-end">
-              <button className="flex p-2 rounded-2xl bg-black text-white">
+              <button
+                onClick={() => setOpenUpdateModal(true)}
+                className="flex p-2 rounded-2xl bg-black text-white"
+              >
                 <Upload />
                 <span>update Statues</span>
               </button>
             </div>
+            {openUpdateModal && <UpdateTaskModal closeUpdateModal={closeUpdateModal} />}
           </div>
         </section>
         <section className="my-10 mx-5">
@@ -98,7 +124,7 @@ const Dashboard = () => {
               </span>
             </div>
             <div className="my-5 flex justify-end">
-              <button className="flex p-2 rounded-2xl bg-black text-white">
+              <button onClick={() => setOpenUpdateModal(true)} className="flex p-2 rounded-2xl bg-black text-white">
                 <Upload />
                 <span>update Statues</span>
               </button>

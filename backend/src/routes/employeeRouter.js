@@ -7,34 +7,12 @@ import employeeModel from "../models/employeeModel.js";
 
 import adminMiddelware from "../Middleware/adminMiddleware.js"
 import authMiddelware from "../Middleware/authMiddleware.js"
+import employeeMiddleware from "../Middleware/employeeMiddleware.js"
 
 const router = express.Router();
 
 router.get("/", (req, res) => {
     res.json("hey it's working")
-})
-
-router.get("/me", authMiddelware, async (req, res) => {
-    try {
-        const userId = req.user.id;
-
-        const user = await userModel.findOne({ userId });
-
-        if (!user) {
-            res.send("User is not Exist")
-        }
-
-        res.status(200).json({
-            id: user._id,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            email: user.email,
-            role: user.role
-        })
-    }
-    catch (error) {
-
-    }
 })
 
 router.post("/create", async (req, res) => {
@@ -56,13 +34,14 @@ router.post("/create", async (req, res) => {
                         email,
                         password: hash,
                         phone,
+                        role: "employee"
                     });
 
                     await employeeModel.create({
                         userId: userCreated._id,
                         designation
                     })
-                    const token = jwt.sign({ email, firstname, lastname }, "shhhhhh")
+                    const token = jwt.sign({ id: userCreated._id, email: userCreated.email, firstname: userCreated.firstname, lastname: userCreated.lastname }, "shhhhhh")
                     res.cookie("token", token);
                     res.json(userCreated);
                 } catch (createError) {
@@ -82,19 +61,28 @@ router.post("/login", async (req, res) => {
         const user = await userModel.findOne({ email });
 
         if (!user) {
-            res.json("something were wrong");
+            return res.status(401).json({ error: "Invalid credentials" });
         }
 
         bcrypt.compare(password, user.password, function (err, result) {
-            if (result) {
-                const token = jwt.sign({ id: user._id, email: user.email, firstname: user.firstname, lastname: user.lastname }, "shhhhhh");
-                res.cookie("token", token);
-                res.json("employee is login successfully");
+            if (err) {
+                return res.status(500).json({ error: "Internal server error" });
             }
+
+            if (!result) {
+                return res.status(401).json({ error: "Invalid credentials" });
+            }
+
+            const token = jwt.sign(
+                { id: user._id, email: user.email, firstname: user.firstname, lastname: user.lastname },
+                "shhhhhh"
+            );
+
+            res.cookie("token", token);
+            return res.json("employee is login successfully");
         });
-    }
-    catch (error) {
-        res.json(error);
+    } catch (error) {
+        return res.status(500).json({ error: "Internal server error" });
     }
 })
 
@@ -103,6 +91,9 @@ router.get("/logout", (req, res) => {
     res.cookie("token", "");
     res.send("Employee is logout successfully")
 })
+
+
+
 
 
 export default router;

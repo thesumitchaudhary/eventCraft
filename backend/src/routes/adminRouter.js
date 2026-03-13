@@ -14,6 +14,9 @@ import customerModel from "../models/customerModel.js";
 // import  event Theme model
 import eventThemeModel from "../models/eventThemeModel.js";
 
+// import assignTask model
+import assignTaskModel from "../models/assignTaskModel.js"
+
 // import middleware for protecting routes
 import authMiddleware from "../Middleware/authMiddleware.js";
 import adminMiddleware from "../Middleware/adminMiddleware.js";
@@ -76,13 +79,34 @@ router.post("/login", async (req, res) => {
     }
 })
 
+// this is for task section
+
+router.post("/createTask", async (req, res) => {
+    try {
+        const { selectedEventId, taskTile, description, assginTo, priority, selectDate } = req.body;
+        const assignTask = await assignTaskModel.create({
+            eventId: selectedEventId,
+            taskTile,
+            description,
+            assginTo,
+            priority,
+            selectDate
+        });
+
+        res.json({ assignTask })
+    }
+    catch (error) {
+        res.json({ message: error.message })
+    }
+})
+
 // this is all routes for eventbook action
 
 // this is for admin to show booked event by the customer
 
 router.get("/showBookedEvent", authMiddleware, async (req, res) => {
     try {
-        const customers = await customerModel.find().populate("userId","firstname lastname email role").populate("events");
+        const customers = await customerModel.find().populate("userId", "firstname lastname email role").populate("events");
 
         if (!customers || customers.length === 0) {
             return res.status(404).json({ message: "no booked events found" });

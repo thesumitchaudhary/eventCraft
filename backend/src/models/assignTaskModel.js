@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const assignTaskSchema = new mongoose.Schema({
   taskTitle: {
     type: String,
-    required: true
+    // required: true
   },
 
   taskDescription: {
@@ -13,24 +13,24 @@ const assignTaskSchema = new mongoose.Schema({
   eventId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Event",
-    required: true
+    // required: true
   },
 
   assignTo: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true
+    // required: true
   },
 
   priority: {
     type: String,
-    enum: ["low", "medium", "high"],
+    enum: ["Low", "Medium", "High"],
     default: "medium"
   },
 
   selectedDate: {
     type: Date,
-    required: true
+    // required: true
   },
 
   status: {

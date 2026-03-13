@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   Calendar,
@@ -28,6 +28,18 @@ const logoutUser = async () => {
   return res.json();
 };
 
+// const fetcher = async (url) =>{
+//   const res = fetch(url,{credentials:"include"});
+
+//   const body = res.json();
+
+//   if(!res.ok){
+//     throw new Error(body.message || "Request Failed")
+//   }
+
+//   return body;
+// }
+
 const Header = () => {
   const logoutMutation = useMutation({
     mutationFn: () => logoutUser(),
@@ -39,6 +51,14 @@ const Header = () => {
       console.log("Error", error);
     },
   });
+
+  // const {data} = useQuery({
+  //   queryKey: ["employeeDetails"],
+  //   queryFn: () => fetcher("http://localhost:4041/api/employee/me")
+  // })
+
+
+  // console.log(data)
 
   return (
     <>
@@ -57,13 +77,11 @@ const Header = () => {
               <span>Profile</span>
             </button>
             <button
-              // onClick={() => logoutMutation.mutate()}
+              onClick={() => logoutMutation.mutate()}
               className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 border border-gray-300"
             >
-              <Link className="flex gap-2" to={"/"}>
               <LogOut />
               <span>Logout</span>
-              </Link>
             </button>
           </div>
         </div>
