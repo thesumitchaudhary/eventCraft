@@ -28,17 +28,17 @@ const logoutUser = async () => {
   return res.json();
 };
 
-// const fetcher = async (url) =>{
-//   const res = fetch(url,{credentials:"include"});
+const fetcher = async (url) =>{
+  const res = await fetch(url,{credentials:"include"});
 
-//   const body = res.json();
+  const body = await res.json();
 
-//   if(!res.ok){
-//     throw new Error(body.message || "Request Failed")
-//   }
+  if(!res.ok){
+    throw new Error(body.message || "Request Failed")
+  }
 
-//   return body;
-// }
+  return body;
+}
 
 const Header = () => {
   const logoutMutation = useMutation({
@@ -52,13 +52,13 @@ const Header = () => {
     },
   });
 
-  // const {data} = useQuery({
-  //   queryKey: ["employeeDetails"],
-  //   queryFn: () => fetcher("http://localhost:4041/api/employee/me")
-  // })
+  const {data} = useQuery({
+    queryKey: ["employeeDetails"],
+    queryFn: () => fetcher("http://localhost:4041/api/customer/me")
+  })
 
 
-  // console.log(data)
+  // console.log(data?.user?.firstName)
 
   return (
     <>
@@ -69,7 +69,7 @@ const Header = () => {
               <Calendar className="text-purple-500" />
               <h1>Employee Portal</h1>
             </div>
-            <p className="mx-8">Welcome, Sarah Johnson</p>
+            <p className="mx-8">Welcome,{data?.user?.firstName} {data?.user?.lastName}</p>
           </div>
           <div className="flex gap-5 pr-9">
             <button className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 min-h-sm border border-gray-300">

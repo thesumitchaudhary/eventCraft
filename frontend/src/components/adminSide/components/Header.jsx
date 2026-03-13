@@ -39,8 +39,6 @@ const Header = () => {
     queryFn: () => fetcher("http://localhost:4041/api/customer/me"),
   });
 
-  console.log(data?.user.firstName)
-
   return (
     <>
       <header className="h-fit w-full ">
