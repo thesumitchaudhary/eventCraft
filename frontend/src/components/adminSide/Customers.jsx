@@ -3,8 +3,30 @@ import { Search } from "lucide-react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import LiveIcon from "./components/LiveIcon";
+import { useQuery } from "@tanstack/react-query";
+
+const fetcher = async (url) => {
+  const res = await fetch(url, {
+    credentials: "include",
+  });
+
+  const body = res.json();
+
+  if (!res.ok) {
+    throw new Error(body?.message || "Request Failed");
+  }
+
+  return body;
+};
 
 const Customers = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ["showbookings"],
+    queryFn: () => fetcher("http://localhost:4041/api/admin/showBookedEvent"),
+  });
+
+  console.log(data?.customers.flatMap((customer) => customer));
+
   return (
     <div className="bg-[#f0f1f3]">
       <Header />
@@ -12,7 +34,9 @@ const Customers = () => {
         <section className="my-5 mx-5 flex justify-between">
           <div>
             <h2>Customer Management</h2>
-            <p>Total customers: 1</p>
+            <p>
+              Total customers : <span className="font-semibold">{data?.customers.length}</span>
+            </p>
           </div>
           <div className="flex">
             <Search className="h-7 w-7 p-1 border rounded-l" />
@@ -28,36 +52,31 @@ const Customers = () => {
                   <th className="py-2">Email</th>
                   <th className="py-2">Phone</th>
                   <th className="py-2">Address</th>
-                  <th className="py-2">Booking s</th>
+                  <th className="py-2">Bookings</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b border-gray-300">
-                  <td className="py-2 border-b border-gray-300 p-1">
-                    John Doe
-                  </td>
-                  <td className="border-b border-gray-300 p-1">
-                    customer@example.com
-                  </td>
-                  <td className="border-b border-gray-300 p-1">+1234567891</td>
-                  <td className="border-b border-gray-300 p-1">
-                    123 Main St, New York, NY
-                  </td>
-                  <td>2</td>
-                </tr>
-                <tr className="border-b border-gray-300">
-                  <td className="py-2 border-b border-gray-300 p-1">
-                    John Doe
-                  </td>
-                  <td className="border-b border-gray-300 p-1">
-                    customer@example.com
-                  </td>
-                  <td className="border-b border-gray-300 p-1">+1234567891</td>
-                  <td className="border-b border-gray-300 p-1">
-                    123 Main St, New York, NY
-                  </td>
-                  <td>2</td>
-                </tr>
+                {data?.customers.flatMap((customer) => (
+                  <tr key={customer._id} className="border-b border-gray-300">
+                    <td className="py-2 border-b border-gray-300 p-1">
+                      {customer?.userId?.firstname} {customer?.userId?.lastname}
+                    </td>
+                    <td className="border-b border-gray-300 p-1">
+                      {customer?.userId?.email}
+                    </td>
+                    <td className="border-b border-gray-300 p-1">
+                      {customer?.phone}
+                    </td>
+                    <td className="border-b border-gray-300 p-1">
+                      123 Main St, New York, NY
+                    </td>
+                    <td>
+                      <span className="bg-black mx-5 rounded-md px-2 py-1 text-white">
+                        {customer?.events.length}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

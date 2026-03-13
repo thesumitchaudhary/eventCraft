@@ -2,7 +2,6 @@ import express from "express";
 import mongoose from "mongoose";
 
 // this is for the create protected route
-import isLoggedin from "../Middleware/isLoggedin.js"
 import authMiddleware from "../Middleware/authMiddleware.js"
 import adminMiddelware from "../Middleware/adminMiddleware.js"
 
@@ -20,7 +19,9 @@ router.get("/", (req, res) => {
     res.send("hey it's working fine");
 })
 
-// this is do direct operation in mongodb engine
+
+
+// this is do direct operation in mongodb engine this  is also for customer side
 
 // router.get("/my-booking", authMiddleware, async (req, res) => {
 //   try {
@@ -89,61 +90,61 @@ router.get("/", (req, res) => {
 //   }
 // });
 
-// this is for manual operation using js
+// this is for manual operation using js. this is also for customer side
 
 router.get("/my-booking", authMiddleware, async (req, res) => {
-  try {
-    const userId = req.user.id;
+    try {
+        const userId = req.user.id;
 
-    const customer = await customerModel
-      .findOne({ userId })
-      .populate("events");
+        const customer = await customerModel
+            .findOne({ userId })
+            .populate("events");
 
-    if (!customer) {
-      return res.status(404).json({ message: "Customer not found" });
+        if (!customer) {
+            return res.status(404).json({ message: "Customer not found" });
+        }
+
+        const bookingIds = customer.events.map(event => event._id);
+
+        const payments = await paymentModel.aggregate([
+            {
+                $match: {
+                    bookingId: { $in: bookingIds }
+                }
+            },
+            {
+                $group: {
+                    _id: "$bookingId",
+                    totalPaid: { $sum: "$paymentAmount" }
+                }
+            }
+        ]);
+
+        // Convert payments array to lookup object
+        const paymentMap = {};
+        payments.forEach(p => {
+            paymentMap[p._id.toString()] = p.totalPaid;
+        });
+
+        // Attach payment to events
+        const eventsWithPayment = customer.events.map(event => ({
+            ...event.toObject(),
+            totalPaid: paymentMap[event._id.toString()] || 0
+        }));
+
+        res.status(200).json({
+            success: true,
+            customer: {
+                name: customer.name,
+                email: customer.email,
+                phone: customer.phone
+            },
+            events: eventsWithPayment
+        });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
-
-    const bookingIds = customer.events.map(event => event._id);
-
-    const payments = await paymentModel.aggregate([
-      {
-        $match: {
-          bookingId: { $in: bookingIds }
-        }
-      },
-      {
-        $group: {
-          _id: "$bookingId",
-          totalPaid: { $sum: "$paymentAmount" }
-        }
-      }
-    ]);
-
-    // Convert payments array to lookup object
-    const paymentMap = {};
-    payments.forEach(p => {
-      paymentMap[p._id.toString()] = p.totalPaid;
-    });
-
-    // Attach payment to events
-    const eventsWithPayment = customer.events.map(event => ({
-      ...event.toObject(),
-      totalPaid: paymentMap[event._id.toString()] || 0
-    }));
-
-    res.status(200).json({
-      success: true,
-      customer: {
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone
-      },
-      events: eventsWithPayment
-    });
-
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
 });
 
 router.post("/createEvent", authMiddleware, async (req, res) => {

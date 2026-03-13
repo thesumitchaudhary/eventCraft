@@ -38,13 +38,20 @@ const AssignTaskModal = ({ closeTaskModal }) => {
   const floatingDueDate = focusedDueDate || !!dueDate;
 
   const { data, isLoading } = useQuery({
-    queryKey: ["my-bookings"],
-    queryFn: () => fetcher(`http://localhost:4041/api/index/my-booking`),
+    queryKey: ["showbookings"],
+    queryFn: () => fetcher(`http://localhost:4041/api/admin/showBookedEvent`),
   });
 
-  const selectedEvent = data?.data?.find(
-    (event) => event._id === selectedEventId,
+  console.log(
+    data?.customers.flatMap((customer) =>
+      customer?.events.map((data) => data._id),
+    ),
   );
+
+  const selectedEvent =
+    data?.customers
+      ?.flatMap((customer) => customer?.events ?? [])
+      ?.find((event) => event?._id === selectedEventId) ?? null;
 
   return (
     <div>
@@ -52,7 +59,7 @@ const AssignTaskModal = ({ closeTaskModal }) => {
         className="fixed left-0 right-0 bottom-0 top-0 bg-gray-200/60"
         onClick={closeTaskModal}
       />
-      <div className="fixed top-15 left-100 w-md border border-gray-400 bg-white rounded-2xl p-2">
+      <div className="fixed top-15 left-100 w-md border border-gray-400 bg-white rounded-2xl p-2 max-h-[70vh] overflow-hidden flex flex-col">
         <div className="flex justify-between">
           <div>
             <h1>Assign New Task</h1>
@@ -65,7 +72,7 @@ const AssignTaskModal = ({ closeTaskModal }) => {
           </button>
         </div>
 
-        <div className="flex flex-col h-100 gap-5">
+        <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-5">
           <div className="flex flex-col">
             <Select
               value={selectedEventId}
@@ -73,10 +80,12 @@ const AssignTaskModal = ({ closeTaskModal }) => {
               label="Related Event"
               placeholder={focusedselectedEventId ? "Select Event" : ""}
               data={
-                data?.data?.map((event) => ({
-                  value: event._id, // or event.eventName if unique
-                  label: event.eventName,
-                })) ?? []
+                data?.customers.flatMap((customer) =>
+                  customer?.events.map((data) => ({
+                    value: data._id,
+                    label: data.eventName,
+                  })),
+                ) ?? []
               }
               onFocus={() => setFocusedselectedEventId(true)}
               onBlur={() => setFocusedselectedEventId(false)}
@@ -91,66 +100,65 @@ const AssignTaskModal = ({ closeTaskModal }) => {
                 }`,
               }}
             />
-          </div>
-          <div>
-            {selectedEvent && (
-              <div className="mt-4 p-3 border bg-blue-100 rounded">
-                <h4 className="text-md font-medium text-blue-800">
-                  Event Details
-                </h4>
-                <div className="grid grid-cols-2">
-                  <div className="flex flex-col mt-2">
-                    <span className="text-xs text-gray-500">Event Name</span>
-                    <span className="text-sm text-black font-medium">
-                      {selectedEvent.eventName}
-                    </span>
-                  </div>
-                  <div className="flex flex-col mt-2">
-                    <span className="text-xs text-gray-500">Type</span>
-                    <span className="text-sm text-black font-medium">
-                      {selectedEvent.eventType}
-                    </span>
-                  </div>
-                  <div className="flex flex-col mt-2">
-                    <span className="text-xs text-gray-500">Theme:</span>
-                    <span className="text-sm text-black font-medium">
-                      {selectedEvent.theme}
-                    </span>
-                  </div>
-                  <div className="flex flex-col mt-2">
-                    <span className="text-xs text-gray-500">Date:</span>
-                    <span className="text-sm text-black font-medium">
-                      {new Date(selectedEvent.eventDate).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="flex flex-col mt-2">
-                    <span className="text-xs text-gray-500">Venue:</span>
-                    <span className="text-sm text-black font-medium">
-                      {selectedEvent.venue}
-                    </span>
-                  </div>
-                  <div className="flex flex-col mt-2">
-                    <span className="text-xs text-gray-500">Guest:</span>
-                    <span className="text-sm text-black font-medium">
-                      {selectedEvent.guestCount}
-                    </span>
-                  </div>
-                  <div className="flex flex-col mt-2">
-                    <span className="text-xs text-gray-500">Budget:</span>
-                    <span className="text-sm text-black font-medium">
-                      ${selectedEvent?.totalAmount }
-                    </span>
-                  </div>
-                  <div className="flex flex-col mt-2">
-                    <span className="text-xs text-gray-500">progress:</span>
-                    <span className="text-sm text-black font-medium">
-                      60%
-                    </span>
+            <div>
+              {selectedEvent && (
+                <div className="mt-4 p-3 border bg-blue-100 rounded">
+                  <h4 className="text-md font-medium text-blue-800">
+                    Event Details
+                  </h4>
+                  <div className="grid grid-cols-2">
+                    <div className="flex flex-col mt-2">
+                      <span className="text-xs text-gray-500">Event Name</span>
+                      <span className="text-sm text-black font-medium">
+                        {selectedEvent.eventName}
+                      </span>
+                    </div>
+                    <div className="flex flex-col mt-2">
+                      <span className="text-xs text-gray-500">Type</span>
+                      <span className="text-sm text-black font-medium">
+                        {selectedEvent.eventType}
+                      </span>
+                    </div>
+                    <div className="flex flex-col mt-2">
+                      <span className="text-xs text-gray-500">Theme:</span>
+                      <span className="text-sm text-black font-medium">
+                        {selectedEvent.theme}
+                      </span>
+                    </div>
+                    <div className="flex flex-col mt-2">
+                      <span className="text-xs text-gray-500">Date:</span>
+                      <span className="text-sm text-black font-medium">
+                        {new Date(selectedEvent.eventDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex flex-col mt-2">
+                      <span className="text-xs text-gray-500">Venue:</span>
+                      <span className="text-sm text-black font-medium">
+                        {selectedEvent.venue}
+                      </span>
+                    </div>
+                    <div className="flex flex-col mt-2">
+                      <span className="text-xs text-gray-500">Guest:</span>
+                      <span className="text-sm text-black font-medium">
+                        {selectedEvent.guestCount}
+                      </span>
+                    </div>
+                    <div className="flex flex-col mt-2">
+                      <span className="text-xs text-gray-500">Budget:</span>
+                      <span className="text-sm text-black font-medium">
+                        ${selectedEvent?.totalAmount}
+                      </span>
+                    </div>
+                    <div className="flex flex-col mt-2">
+                      <span className="text-xs text-gray-500">progress:</span>
+                      <span className="text-sm text-black font-medium">0%</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
+
           <div className="flex flex-col">
             <TextInput
               label="Task Title"

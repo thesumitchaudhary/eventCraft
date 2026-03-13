@@ -62,17 +62,17 @@ const AddTheme = () => {
   const [editRow, setEditRow] = useState(null);
   const { id } = useParams();
 
-  useEffect(() => {
-    if (AddThemeModel) {
-      document.body.style.overflowY = "hidden";
-    } else {
-      document.body.style.overflowY = "scroll";
-    }
+  // useEffect(() => {
+  //   if (AddThemeModel) {
+  //     document.body.style.overflowY = "hidden";
+  //   } else {
+  //     document.body.style.overflowY = "scroll";
+  //   }
 
-    return () => {
-      document.body.style.overflowY = "scroll";
-    };
-  }, [AddThemeModel]);
+  //   return () => {
+  //     document.body.style.overflowY = "scroll";
+  //   };
+  // }, [AddThemeModel]);
 
   const queryClient = useQueryClient();
 

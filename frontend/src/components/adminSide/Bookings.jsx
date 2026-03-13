@@ -52,9 +52,12 @@ const Bookings = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["showbookings"],
     queryFn: async () =>
-      await fetcher("http://localhost:4041/api/index/my-booking"),
+      await fetcher("http://localhost:4041/api/admin/showBookedEvent"),
   });
 
+  // console.log(data?.customers?.map((data) => data?.events))
+  console.log(data?.customers?.flatMap((customer) => customer?.events.length))
+  
   const eventBookActionMutation = useMutation({
     mutationFn: ({ id, bookingStatus }) =>
       updateEventBookStatus(id, bookingStatus),
@@ -74,7 +77,7 @@ const Bookings = () => {
           <div className="flex justify-between">
             <div>
               <h1>Booking Management</h1>
-              <p>Total bookings: 2</p>
+              <p>Total bookings: {data?.customers?.flatMap((customer) => customer?.events.length)}</p>
             </div>
             <div className="flex">
               <Search className="border h-10 w-10 p-1" />
@@ -129,7 +132,7 @@ const Bookings = () => {
                     </td>
                   </tr>
                 )}
-                {data?.data?.map((booking) => (
+                {data?.customers?.flatMap((customer) => customer?.events.map((booking) => (
                   <tr key={booking._id} className="border-b border-gray-300">
                     <td className="py-2 px-2">{booking.eventName}</td>
                     <td className="py-2 px-2">{booking.eventType}</td>
@@ -202,7 +205,7 @@ const Bookings = () => {
                       </Menu>
                     </td>
                   </tr>
-                ))}
+                )))}
               </tbody>
             </table>
           </div>

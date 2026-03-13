@@ -1,13 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Users, Calendar, CircleUser, DollarSign } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 import LiveIcon from "./components/LiveIcon";
 
+const fetcher = async (url) => {
+  const res = await fetch(url, { credentials: "include" });
+
+  const body = res.json();
+
+  if (!res.ok) {
+    throw new Error(body.message || "Request Failed");
+  }
+
+  return body;
+};
+
 const Dashboard = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ["showbookings"],
+    queryFn: () => fetcher("http://localhost:4041/api/admin/showBookedEvent"),
+  });
+
+  console.log(data?.customers.flatMap((customer) => customer?.events));
+  // console.log(data?.customers.flatMap((customer) => customer?.events.map((data) => data?.eventName)))
+  // console.log(data?.customers.flatMap((customer) => customer?.events.map((data) => data?.eventType)))
+
   return (
     <div className="bg-[#f0f1f3]">
       <Header />
@@ -19,14 +41,16 @@ const Dashboard = () => {
                 <Users className="h-5 w-5 text-[#155dfc]" />
                 <p className="text-[#7e7a82]">Total Customers</p>
               </div>
-              <h4 className="text-3xl font-bold">1</h4>
+              <h4 className="text-3xl font-bold">{data?.customers.length}</h4>
             </div>
             <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300">
               <div className="flex gap-3">
                 <Calendar className="h-5 w-5 text-[#9810fa]" />
                 <p className="text-[#7e7a82]">Active Bookings</p>
               </div>
-              <h4 className="text-3xl font-bold">1</h4>
+              <h4 className="text-3xl font-bold">
+                {data?.customers.flatMap((customer) => customer?.events.length)}
+              </h4>
             </div>
             <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300">
               <div className="flex gap-3">
@@ -117,20 +141,29 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b border-black">
-                  <td className="py-2 border-b border-gray-300 p-1">
-                    Johnson Wedding
-                  </td>
-                  <td className="border-b border-gray-300 p-1">Wedding</td>
-                  <td className="border-b border-gray-300 p-1">2026-02-14</td>
-                  <td className="border-b border-gray-300 p-1">
-                    <span className="bg-black text-white text-xs p-1 rounded-md">
-                      in-progress
-                    </span>
-                  </td>
-                  <td className="border-b border-gray-300 p-1">$25,000</td>
-                </tr>
-                <tr>
+                {data?.customers.flatMap((customer) =>
+                  customer?.events.map((data) => (
+                    <tr key={data._id} className="border-b border-black">
+                      <td className="py-2 border-b border-gray-300 p-1">
+                        {data?.eventName}
+                      </td>
+                      <td className="border-b border-gray-300 p-1">
+                        {data?.eventType}
+                      </td>
+                      <td className="border-b border-gray-300 p-1">
+                        {new Date(data?.eventDate).toLocaleDateString()}
+                      </td>
+                      <td className="border-b border-gray-300 p-1">
+                        <span className="bg-black text-white text-xs p-1 rounded-md">
+                          {data?.bookingStatus}
+                        </span>
+                      </td>
+                      <td className="border-b border-gray-300 p-1">${data?.totalAmount}</td>
+                    </tr>
+                  )),
+                )}
+
+                {/* <tr>
                   <td className="border-b border-gray-300 p-1">
                     Johnson Wedding
                   </td>
@@ -142,7 +175,7 @@ const Dashboard = () => {
                     </span>
                   </td>
                   <td className="border-b border-gray-300 p-1">$25,000</td>
-                </tr>
+                </tr> */}
               </tbody>
             </table>
           </div>

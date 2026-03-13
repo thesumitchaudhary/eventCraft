@@ -8,6 +8,9 @@ import userModel from "../models/userModel.js";
 // import eventbooking model
 import eventBookingModel from "../models/eventBookingModel.js";
 
+// import customer model
+import customerModel from "../models/customerModel.js";
+
 // import  event Theme model
 import eventThemeModel from "../models/eventThemeModel.js";
 
@@ -75,10 +78,25 @@ router.post("/login", async (req, res) => {
 
 // this is all routes for eventbook action
 
+// this is for admin to show booked event by the customer
+
+router.get("/showBookedEvent", authMiddleware, async (req, res) => {
+    try {
+        const customers = await customerModel.find().populate("userId","firstname lastname email role").populate("events");
+
+        if (!customers || customers.length === 0) {
+            return res.status(404).json({ message: "no booked events found" });
+        }
+
+        return res.status(200).json({ customers });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+})
+
 router.put("/updateStatus/:id", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const { bookingStatus } = req.body;
-        console.log(bookingStatus)
         const id = req.params.id;
 
         const eventBookStatusAction = await eventBookingModel.findByIdAndUpdate(
