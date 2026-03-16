@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { UserPlus } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -8,12 +9,58 @@ import LiveIcon from "./components/LiveIcon";
 
 import AddEmployeeModal from "./popupmodals/AddEmployeeModal";
 
+const fetcher = async (url) => {
+  const res = await fetch(url, { credentials: "include" });
+
+  const body = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body.message || "Request Failed");
+  }
+
+  return body;
+};
+
 const Employees = () => {
   const [openEmployeeModal, setOpenEmployeeModal] = useState(false);
 
   const closeAddEmployeeModal = () => {
     setOpenEmployeeModal(false);
   };
+
+  const { data } = useQuery({
+    queryKey: ["showemployee"],
+    queryFn: () => fetcher("http://localhost:4041/api/employee/findEmployee"),
+  });
+
+  // normalize response safely
+  const users = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.users)
+      ? data.users
+      : [];
+  const details = Array.isArray(data?.details) ? data.details : [];
+
+  // merge users + details (match by userId if available, else by index)
+  const employees = users.map((user, index) => {
+    const detail =
+      details.find((d) => d.userId === user._id || d.user?._id === user._id) ||
+      details[index] ||
+      {};
+
+    return {
+      ...user,
+      ...detail,
+    };
+  });
+
+  // console.log(users.map((user) => user.firstname));
+  // console.log(
+  //   details.flatMap((detail) =>
+  //     detail?.tasks?.map((taskDetail) => taskDetail?.taskDescription),
+  //   ),
+  // );
+
   return (
     <div className="bg-[#f0f1f3]">
       <Header />
@@ -37,11 +84,11 @@ const Employees = () => {
           <div className="flex gap-5">
             <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300">
               <p>Total Employees</p>
-              <h3>2</h3>
+              <h3>{employees.length}</h3>
             </div>
             <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300">
               <p>Active Tasks</p>
-              <h3>2</h3>
+              <h3>{employees?.tasks?.length}</h3>
             </div>
             <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300">
               <p>Completed Tasks</p>
@@ -63,38 +110,41 @@ const Employees = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b border-black">
-                  <td className="py-2 border-b border-gray-300 p-1">
-                    Sarah Johnson
-                  </td>
-                  <td className="border-b border-gray-300 p-1">
-                    employee@eventify.com
-                  </td>
-                  <td className="border-b border-gray-300 p-1">+1234567892</td>
-                  <td className="border-b border-gray-300 p-1"></td>
-                  <td className="border-b border-gray-300 p-1">
-                    Event Coordinator
-                  </td>
-                  <td className="border-b border-gray-300 p-1">2024-01-15</td>
-                  <td className="border-b border-gray-300 p-1">
-                    <span>2</span>
-                  </td>
-                </tr>
-                <tr className="border-b border-black">
-                  <td className="py-2 border-b border-gray-300 p-1">
-                    Mike Davis
-                  </td>
-                  <td className="border-b border-gray-300 p-1">
-                    employee2@eventify.com
-                  </td>
-                  <td className="border-b border-gray-300 p-1">+1234567893</td>
-                  <td className="border-b border-gray-300 p-1"></td>
-                  <td className="border-b border-gray-300 p-1">Decorator</td>
-                  <td className="border-b border-gray-300 p-1">2024-03-20</td>
-                  <td className="border-b border-gray-300 p-1">
-                    <span>1</span>
-                  </td>
-                </tr>
+                {employees?.length ? (
+                  employees.map((employee, index) => (
+                    <tr
+                      key={employee?._id || employee?.userId || `emp-${index}`}
+                      className="border-b border-black"
+                    >
+                      <td className="py-2 border-b border-gray-300 p-1">
+                        {[employee?.firstname, employee?.lastname]
+                          .filter(Boolean)
+                          .join(" ") || "N/A"}
+                      </td>
+                      <td className="border-b border-gray-300 p-1">
+                        {employee?.email || "N/A"}
+                      </td>
+                      <td className="border-b border-gray-300 p-1">
+                        {employee?.phone || "N/A"}
+                      </td>
+                      <td className="border-b border-gray-300 p-1">
+                        {employee?.designation || "Event Coordinator"}
+                      </td>
+                      <td className="border-b border-gray-300 p-1">
+                        {employee?.joiningDate || "2024-01-15"}
+                      </td>
+                      <td className="border-b border-gray-300 p-1">
+                        <span>{employee?.tasks.length}</span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="py-4 t ext-center text-gray-500">
+                      No employees found
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

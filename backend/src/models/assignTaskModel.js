@@ -1,44 +1,29 @@
 import mongoose from "mongoose";
 
 const assignTaskSchema = new mongoose.Schema({
-  taskTitle: {
-    type: String,
-    // required: true
-  },
-
-  taskDescription: {
-    type: String
-  },
-
   eventId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Event",
-    // required: true
+    ref: "EventBooking",
+    required: true,
   },
-
+  taskTitle: { type: String, required: true, trim: true },
+  taskDescription: { type: String, required: true, trim: true },
   assignTo: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    // required: true
+    ref: "Employee", // must store Employee._id here
+    required: true,
   },
-
   priority: {
     type: String,
     enum: ["Low", "Medium", "High"],
-    default: "medium"
+    default: "Medium",
   },
-
-  selectedDate: {
-    type: Date,
-    // required: true
-  },
-
+  selectDate: { type: Date, required: true },
   status: {
     type: String,
     enum: ["pending", "in-progress", "completed"],
-    default: "pending"
-  }
-
+    default: "pending",
+  },
 }, { timestamps: true });
 
 export default mongoose.model("AssignTask", assignTaskSchema);

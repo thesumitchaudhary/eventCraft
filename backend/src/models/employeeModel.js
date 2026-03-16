@@ -6,6 +6,11 @@ const employeeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
     },
+    tasks: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "AssignTask",
+    }],
+    phone: Number,
     department: String,
     joiningDate: Date,
     designation: String,

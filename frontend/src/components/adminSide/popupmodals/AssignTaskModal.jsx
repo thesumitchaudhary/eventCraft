@@ -2,14 +2,55 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import { Select, TextInput, Button } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 const fetcher = async (url) => {
   const res = await fetch(url, { credentials: "include" });
-  const body = await res.json(); // await was missing
+
+  let body;
+  try {
+    body = await res.json();
+  } catch {
+    throw new Error("Invalid JSON response");
+  }
 
   if (!res.ok) {
     throw new Error(body?.message || "Request failed");
+  }
+
+  return body;
+};
+
+const assignTask = async ({
+  eventId,
+  taskTitle,
+  taskDescription,
+  assignTo,
+  priority,
+  selectDate,
+}) => {
+  const res = await fetch(`${API_URL}/admin/createTask`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      eventId,
+      taskTitle,
+      taskDescription,
+      assignTo,
+      priority,
+      selectDate,
+    }),
+  });
+
+  const body = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body?.message || "There was a problem");
   }
 
   return body;
@@ -37,16 +78,42 @@ const AssignTaskModal = ({ closeTaskModal }) => {
   const floatingPriority = focusedPriority || !!priority;
   const floatingDueDate = focusedDueDate || !!dueDate;
 
+  const taskMutation = useMutation({
+    mutationFn: () =>
+      assignTask({
+        eventId: selectedEventId,
+        taskTitle: taskTitle.trim(),
+        taskDescription: description.trim(),
+        assignTo,
+        priority: priority || "Medium",
+        selectDate: dueDate ? new Date(dueDate).toISOString() : null,
+      }),
+    onSuccess: (data) => {
+      console.log("Success", data);
+    },
+    onError: (error) => {
+      console.log("Error", error.message);
+    },
+  });
+
   const { data, isLoading } = useQuery({
     queryKey: ["showbookings"],
     queryFn: () => fetcher(`http://localhost:4041/api/admin/showBookedEvent`),
   });
 
-  console.log(
-    data?.customers.flatMap((customer) =>
-      customer?.events.map((data) => data._id),
-    ),
-  );
+  // console.log(
+  //   data?.customers.flatMap((customer) =>
+  //     customer?.events.map((data) => data._id),
+  //   ),
+  // );
+
+  const { data: empData } = useQuery({
+    queryKey: ["showemployee"],
+    queryFn: () => fetcher(`http://localhost:4041/api/employee/findEmployee`),
+  });
+
+  // console.log(empData?.users?.map((employee) => employee.firstname));
+  // console.log(empData?.details?.map((details) => details.phone ));
 
   const selectedEvent =
     data?.customers
@@ -207,7 +274,15 @@ const AssignTaskModal = ({ closeTaskModal }) => {
               onChange={setAssignTo}
               label="Assign To"
               placeholder={focusedAssignTo ? "Select Employee" : ""}
-              data={["Hardik", "Mihir"]}
+              data={
+                Array.isArray(empData?.users)
+                  ? empData.users.map((employee) => ({
+                      value: String(employee?._id ?? ""),
+                      label:
+                        `${employee?.firstname ?? ""} ${employee?.lastname ?? ""}`.trim(),
+                    }))
+                  : []
+              }
               onFocus={() => setFocusedAssignTo(true)}
               onBlur={() => setFocusedAssignTo(false)}
               classNames={{
@@ -265,6 +340,7 @@ const AssignTaskModal = ({ closeTaskModal }) => {
 
           <div>
             <Button
+              onClick={() => taskMutation.mutate()}
               type="button"
               variant="filled"
               className="w-full border"

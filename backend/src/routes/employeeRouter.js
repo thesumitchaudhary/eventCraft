@@ -15,6 +15,54 @@ router.get("/", (req, res) => {
     res.json("hey it's working")
 })
 
+router.get("/findEmployee", authMiddelware, async (req, res) => {
+    try {
+        const employeess = await userModel.find({ role: "employee" }).select("-password");
+
+        const employeeIds = employeess.map(emp => emp._id);
+
+        const employeessdetail = await employeeModel.find({
+            userId: { $in: employeeIds }
+        }).populate("tasks")
+
+        return res.status(200).json({
+            users: employeess,
+            details: employeessdetail
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+})
+
+// router.get("/myTask", authMiddelware, async (req, res) => {
+//     try {
+//         const userId = req.user.id;
+
+//         const employee = await employeeModel
+//             .findOne({ userId })
+//             .populate("assignTasks")
+//             .populate("userId", "firstname lastname email phone");
+
+//         if (!employee) {
+//             return res.status(404).json({ message: "Employee not found" });
+//         }
+
+//         return res.status(200).json({
+//             success: true,
+//             employee: {
+//                 firstname: employee.userId?.firstname,
+//                 lastname: employee.userId?.lastname,
+//                 email: employee.userId?.email,
+//                 phone: employee.userId?.phone,
+//                 assignTasks: employee.assignTasks
+//             }
+//         });
+//     } catch (error) {
+//         return res.status(500).json({ message: error.message });
+//     }
+// })
+
+
 router.post("/create", async (req, res) => {
     try {
         const { firstname, lastname, email, password, phone, designation } = req.body;
@@ -39,9 +87,21 @@ router.post("/create", async (req, res) => {
 
                     await employeeModel.create({
                         userId: userCreated._id,
-                        designation
+                        designation,
+                        joiningDate: Date.now(),
+                        phone
                     })
-                    const token = jwt.sign({ id: userCreated._id, email: userCreated.email, firstname: userCreated.firstname, lastname: userCreated.lastname }, "shhhhhh")
+                    const token = jwt.sign(
+                        {
+                            id: userCreated._id,
+                            email: userCreated.email,
+                            firstname: userCreated.firstname,
+                            lastname: userCreated.lastname,
+                            role: "employee"
+                        },
+                        process.env.JWT_SECRET,
+                        { expiresIn: "7d" }
+                    );
                     res.cookie("token", token);
                     res.json(userCreated);
                 } catch (createError) {
@@ -74,10 +134,16 @@ router.post("/login", async (req, res) => {
             }
 
             const token = jwt.sign(
-                { id: user._id, email: user.email, firstname: user.firstname, lastname: user.lastname },
-                process.env.JWT_SECRET
+                {
+                    id: user._id,
+                    email: user.email,
+                    firstname: user.firstname,
+                    lastname: user.lastname,
+                    role: user.role
+                },
+                process.env.JWT_SECRET,
+                { expiresIn: "7d" }
             );
-
             res.cookie("token", token);
             return res.json("employee is login successfully");
         });
