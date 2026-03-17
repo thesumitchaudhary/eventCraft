@@ -34,33 +34,39 @@ router.get("/findEmployee", authMiddelware, async (req, res) => {
     }
 })
 
-// router.get("/myTask", authMiddelware, async (req, res) => {
-//     try {
-//         const userId = req.user.id;
+router.get("/myTask", authMiddelware, async (req, res) => {
+    try {
+        const userId = req.user.id;
 
-//         const employee = await employeeModel
-//             .findOne({ userId })
-//             .populate("assignTasks")
-//             .populate("userId", "firstname lastname email phone");
+        const employee = await employeeModel
+            .findOne({ userId })
+            .populate({
+                path: "tasks",
+                populate: {
+                    path: "eventId",   
+                    model: "EventBooking"   
+                }
+            })
+            .populate("userId", "firstname lastname email phone");
 
-//         if (!employee) {
-//             return res.status(404).json({ message: "Employee not found" });
-//         }
+        if (!employee) {
+            return res.status(404).json({ message: "Employee not found" });
+        }
 
-//         return res.status(200).json({
-//             success: true,
-//             employee: {
-//                 firstname: employee.userId?.firstname,
-//                 lastname: employee.userId?.lastname,
-//                 email: employee.userId?.email,
-//                 phone: employee.userId?.phone,
-//                 assignTasks: employee.assignTasks
-//             }
-//         });
-//     } catch (error) {
-//         return res.status(500).json({ message: error.message });
-//     }
-// })
+        return res.status(200).json({
+            success: true,
+            employee: {
+                firstname: employee.userId?.firstname,
+                lastname: employee.userId?.lastname,
+                email: employee.userId?.email,
+                phone: employee.userId?.phone,
+                tasks: employee.tasks
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+})
 
 
 router.post("/create", async (req, res) => {

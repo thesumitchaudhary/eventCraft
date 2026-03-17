@@ -14,9 +14,6 @@ const employeeSchema = new mongoose.Schema(
     department: String,
     joiningDate: Date,
     designation: String,
-    assignedTask: Number,
-    taskStatus: Number,
-    workUpdates: Number,
   }
 );
 
