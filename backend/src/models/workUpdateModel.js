@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const workUpdateSchema = new mongoose.Schema(
   {
@@ -27,17 +27,20 @@ const workUpdateSchema = new mongoose.Schema(
       default: 0,
     },
 
-    note: {
-      type: String,
-    },
+    note: String,
 
+    // ✅ AWS-based evidence
     evidence: {
-      type: String, // file URL
+      key: String,
+      fileName: String,
+      contentType: String,
+      uploadedAt: {
+        type: Date,
+        default: Date.now,
+      },
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export default mongoose.model("WorkUpdate", workUpdateSchema);
+module.exports = mongoose.model("WorkUpdate", workUpdateSchema);

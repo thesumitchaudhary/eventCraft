@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CircleAlert, Upload } from "lucide-react";
+import { CircleAlert, Upload, Clock4 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import Header from "./components/Header";
@@ -32,7 +32,8 @@ const Dashboard = () => {
     queryFn: () => fetcher(`http://localhost:4041/api/employee/myTask`),
   });
 
-  console.log(data?.employee?.tasks.map((task) => task?.eventId?.eventName));
+  console.log(data?.employee?.tasks.map((task) => task));
+
   return (
     <div className="bg-[#ededed]">
       <Header />
@@ -54,9 +55,9 @@ const Dashboard = () => {
                       {/* high */}
                       {task.priority}
                     </span>
-                    <span className="text-xs bg-black text-white px-3 py-1 rounded-xl">
+                    <span className="flex gap-1 text-xs bg-black text-white px-3 py-1 rounded-xl">
                       {/* in-progress */}
-                      {task.status}
+                      <Clock4 className="h-4 w-4" /> {task.status}
                     </span>
                   </div>
                 </div>
@@ -88,15 +89,23 @@ const Dashboard = () => {
               <div className="grid grid-cols-3 mt-7">
                 <div>
                   <p>Created</p>
-                  <p className="font-bold text-xs">2026-01-15</p>
+                  <p className="font-bold text-xs">
+                    {/* 2026-01-15 */}
+                    {new Date(task?.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
                 <div>
                   <p>Due Date</p>
-                  <p className="font-bold text-xs">2026-01-25</p>
+                  <p className="font-bold text-xs">
+                    {/* 2026-01-25 */}
+                    {new Date(task?.selectDate).toLocaleDateString()}
+                  </p>
                 </div>
                 <div>
                   <p>Priority</p>
-                  <p className="font-bold text-xs">high</p>
+                  <p className="font-bold text-xs">
+                    {/* high */} {task.priority}
+                  </p>
                 </div>
               </div>
               <div className="flex flex-col my-4 bg-gray-100 p-2 rounded-2xl">

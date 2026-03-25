@@ -75,9 +75,9 @@ const Header = () => {
   });
 
   return (
-    <>
+    <div >
       <header className=" border-b h-fit w-full border-gray-200">
-        <div className="bg-gray-50 h-17 my-5">
+        <div className="bg-gray-50 py-5">
           <div className="mx-8 flex gap-2">
             <Calendar className="text-purple-500" />
             <h1>Customer Portal</h1>
@@ -185,7 +185,7 @@ const Header = () => {
           </nav>
         </div>
       </header>
-    </>
+    </div>
   );
 };
 

@@ -142,7 +142,6 @@ const Header = () => {
                 }
               >
                 <CircleCheck
-                  CircleAlert
                   className="max-h-5 max-w-4 font-semibold"
                 />
                 <span className="text-sm font-medium">Completed(1)</span>
