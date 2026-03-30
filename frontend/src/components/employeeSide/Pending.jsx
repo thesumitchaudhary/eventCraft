@@ -39,9 +39,16 @@ const fetcher = async (url) => {
 
 const Pending = () => {
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
 
   const closeUpdateModal = () => {
     setOpenUpdateModal(false);
+    setSelectedTask(null);
+  };
+
+  const openTaskUpdateModal = (task) => {
+    setSelectedTask(task);
+    setOpenUpdateModal(true);
   };
 
   const { data, isLoading, isError, error } = useQuery({
@@ -150,19 +157,23 @@ const Pending = () => {
                       </span>
                     </div>
                     <button
-                      onClick={() => setOpenUpdateModal(true)}
+                      onClick={() => openTaskUpdateModal(task)}
                       className="flex p-2 h-10 rounded-xl bg-black text-white"
                     >
                       <Upload />
                       <span>update Statues</span>
                     </button>
                   </div>
-                  {openUpdateModal && (
-                    <UpdateTaskModal closeUpdateModal={closeUpdateModal} />
-                  )}
                 </div>
               ))}
             </div>
+          )}
+
+          {openUpdateModal && selectedTask && (
+            <UpdateTaskModal
+              closeUpdateModal={closeUpdateModal}
+              task={selectedTask}
+            />
           )}
         </section>
         <section className="flex justify-end mr-15">

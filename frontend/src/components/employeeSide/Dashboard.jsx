@@ -22,9 +22,16 @@ const fetcher = async (url) => {
 
 const Dashboard = () => {
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
 
   const closeUpdateModal = () => {
     setOpenUpdateModal(false);
+    setSelectedTask(null);
+  };
+
+  const openTaskUpdateModal = (task) => {
+    setSelectedTask(task);
+    setOpenUpdateModal(true);
   };
 
   const { data } = useQuery({
@@ -118,18 +125,22 @@ const Dashboard = () => {
               </div>
               <div className="my-5 flex justify-end">
                 <button
-                  onClick={() => setOpenUpdateModal(true)}
+                  onClick={() => openTaskUpdateModal(task)}
                   className="flex p-2 rounded-2xl bg-black text-white"
                 >
                   <Upload />
                   <span>update Statues</span>
                 </button>
               </div>
-              {openUpdateModal && (
-                <UpdateTaskModal closeUpdateModal={closeUpdateModal} />
-              )}
             </div>
           ))}
+
+          {openUpdateModal && selectedTask && (
+            <UpdateTaskModal
+              closeUpdateModal={closeUpdateModal}
+              task={selectedTask}
+            />
+          )}
         </section>
         <section className="flex justify-end mr-15">
           <LiveIcon />

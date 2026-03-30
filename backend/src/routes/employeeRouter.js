@@ -8,6 +8,13 @@ import employeeModel from "../models/employeeModel.js";
 import adminMiddelware from "../Middleware/adminMiddleware.js"
 import authMiddelware from "../Middleware/authMiddleware.js"
 import employeeMiddleware from "../Middleware/employeeMiddleware.js"
+import {
+    generateUploadURL,
+    createWorkUpdate,
+    uploadWorkEvidenceViaBackend,
+    getWorkUpdate,
+    deleteWorkUpdate,
+} from "../controllers/workContoller.js";
 
 const router = express.Router();
 
@@ -164,8 +171,10 @@ router.get("/logout", (req, res) => {
     res.send("Employee is logout successfully")
 })
 
-
-
-
+router.post("/work-updates/upload-url", authMiddelware, generateUploadURL);
+router.post("/work-updates/upload-file", authMiddelware, uploadWorkEvidenceViaBackend);
+router.post("/work-updates", authMiddelware, createWorkUpdate);
+router.get("/work-updates/:id", authMiddelware, getWorkUpdate);
+router.delete("/work-updates/:id", authMiddelware, deleteWorkUpdate);
 
 export default router;
