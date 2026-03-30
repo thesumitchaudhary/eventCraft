@@ -68,7 +68,7 @@ const Customers = () => {
                       {customer?.phone}
                     </td>
                     <td className="border-b border-gray-300 p-1">
-                      123 Main St, New York, NY
+                      {customer?.address}
                     </td>
                     <td>
                       <span className="bg-black mx-5 rounded-md px-2 py-1 text-white">

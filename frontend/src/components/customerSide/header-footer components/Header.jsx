@@ -40,24 +40,25 @@ const Header = () => {
   const [openProfileModal, setOpenProfileModel] = useState(false);
   const [openLiveModal, setOpenLiveModal] = useState(false);
 
-  useEffect(() => {
-    if (openProfileModal || openLiveModal) {
-      document.body.style.overflowY = "hidden";
-    } else {
-      document.body.style.overflowY = "scroll";
-    }
+  // useEffect(() => {
+  //   if (openProfileModal || openLiveModal) {
+  //     document.body.style.overflowY = "hidden";
+  //   } else {
+  //     document.body.style.overflowY = "scroll";
+  //   }
 
-    return () => {
-      document.body.style.overflowY = "scroll";
-    };
-  }, [openProfileModal, openLiveModal]);
+  //   return () => {
+  //     document.body.style.overflowY = "scroll";
+  //   };
+  // }, [openProfileModal, openLiveModal]);
 
   const navigate = useNavigate();
 
   const { data, isLoading } = useQuery({
     queryKey: ["details"],
-    queryFn: () => fetcher("http://localhost:4041/api/customer/me"),
+    queryFn: () => fetcher("http://localhost:4041/api/admin/me"),
   });
+
 
   const closeProfileModal = () => {
     setOpenProfileModel(false);

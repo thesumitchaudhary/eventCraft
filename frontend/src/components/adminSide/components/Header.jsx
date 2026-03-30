@@ -34,10 +34,12 @@ const Header = () => {
     setOpenProfileModal(false);
   };
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["userInformation"],
-    queryFn: () => fetcher("http://localhost:4041/api/customer/me"),
+  const { data } = useQuery({
+    queryKey: ["adminInformation"],
+    queryFn: () => fetcher("http://localhost:4041/api/admin/me"),
   });
+
+  // console.log(data?.admin?.userId.firstname)
 
   return (
     <>
@@ -48,7 +50,9 @@ const Header = () => {
               <Calendar className="text-purple-500" />
               <h1>Admin Portal</h1>
             </div>
-            <p className="mx-8">Welcome, {data?.user.firstName} {data?.user.lastName}</p>
+            <p className="mx-8">Welcome, {data?.admin?.userId.firstname} {data?.admin?.userId.lastname}
+
+            </p>
           </div>
           <div className="flex gap-5 pr-9">
             <button

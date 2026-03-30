@@ -3,7 +3,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
-// import admin model
+//import admin model
+import adminModel from "../models/adminModel.js";
+
+// import user model
 import userModel from "../models/userModel.js";
 
 // import eventbooking model
@@ -28,6 +31,22 @@ const router = express.Router();
 router.get("/", (req, res) => {
     res.send("hey this is admin Router")
 })
+
+router.get("/me", authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.id
+
+        const admin = await adminModel.findOne({ userId }).populate("userId");
+
+        return res.status(200).json({
+            message: "User fetched successfully",
+            admin,
+        });
+    } catch (error) {
+        console.error("/me error", error);
+        return res.status(500).json({ message: "Server error" });
+    }
+});
 
 router.post("/login", async (req, res) => {
     try {
