@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Bell,
   Calendar,
@@ -11,7 +11,7 @@ import {
   Star,
   CircleQuestionMark,
 } from "lucide-react";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 // this is for import pages
@@ -34,9 +34,8 @@ const fetcher = async (url) => {
 };
 
 const Dashboard = () => {
-  const navigate = useNavigate();
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["my-bookings"],
     queryFn: async () =>
       await fetcher("http://localhost:4041/api/index/my-booking"),
@@ -52,23 +51,23 @@ const Dashboard = () => {
       <main>
         <section className="max-w-max mx-auto">
           <div className="flex gap-4">
-            <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-xl">
-              <p>Total Bookings</p>
-              <h3 className="text-2xl font-bold">{data?.events.length}</h3>
+            <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-2xl border-l-6 border-l-[#9810fa]">
+              <p className="text-center">Total Bookings</p>
+              <p className="text-2xl font-semibold text-center text-[#9810fa]">{data?.events.length}</p>
             </div>
-            <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-xl">
-              <p>Upcoming Events</p>
-              <h3 className="text-2xl font-bold">
+            <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-2xl border-l-6 border-l-[#f54a00]">
+              <p className="text-center">Upcoming Events</p>
+              <p className="text-2xl font-semibold text-center text-[#f54a00]">
                 {
                   data?.events.filter(
                     (event) => event.bookingStatus == "accepted",
                   ).length
                 }{" "}
-              </h3>
+              </p>
             </div>
-            <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-xl">
-              <p>Total Spent</p>
-              <h3 className="text-2xl font-bold">$ {data?.events.reduce((total, event) => total + event.totalPaid, 0)}</h3>
+            <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-2xl border-l-6 border-l-[#00a63e]">
+              <p className="text-center">Total Spent</p>
+              <p className="text-2xl font-semibold text-center text-[#00a63e]">$ {data?.events.reduce((total, event) => total + event.totalPaid, 0)}</p>
             </div>
           </div>
         </section>
