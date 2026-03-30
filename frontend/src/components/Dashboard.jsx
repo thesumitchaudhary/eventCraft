@@ -62,9 +62,6 @@ const Dashboard = () => {
               <span className="text-xl mt-1 font-bold">Eventify</span>
             </h1>
             <div className="flex gap-3">
-              <Link to={"/customerDashboard"}>Customer/user</Link>
-              <Link to={"/admin/Dashboard"}>Admin</Link>
-              <Link to={"/employee/Dashboard"}>Employee</Link>
               <button
                 onClick={() => {
                   setOpen(true);
