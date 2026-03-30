@@ -22,13 +22,20 @@ router.get("/", (req, res) => {
     res.json("hey it's working")
 })
 
-// router.get("/me", (req, res) => {
-//     try{
+router.get("/me", authMiddelware, async (req, res) => {
+    try {
+        const userId = req.user.id;
 
-//     }catch(error){
-//         res.json({message: error})
-//     }
-// });
+        const employee = await employeeModel.findOne({ userId }).populate("userId");
+
+        res.status(200).json({
+            message: "user fetched successfully",
+            employee,
+        })
+    } catch (error) {
+        res.json({ message: error })
+    }
+});
 
 router.get("/findEmployee", authMiddelware, async (req, res) => {
     try {
@@ -58,8 +65,8 @@ router.get("/myTask", authMiddelware, async (req, res) => {
             .populate({
                 path: "tasks",
                 populate: {
-                    path: "eventId",   
-                    model: "EventBooking"   
+                    path: "eventId",
+                    model: "EventBooking"
                 }
             })
             .populate("userId", "firstname lastname email phone");

@@ -56,7 +56,7 @@ const Header = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ["details"],
-    queryFn: () => fetcher("http://localhost:4041/api/admin/me"),
+    queryFn: () => fetcher("http://localhost:4041/api/customer/me"),
   });
 
 
@@ -87,7 +87,7 @@ const Header = () => {
             <p className="mx-8"> loading... </p>
           ) : (
             <p className="mx-8">
-              Welcome, {data?.user?.firstName} {data?.user?.lastName}
+              Welcome, {data?.customer?.userId?.firstname} {data?.customer?.userId?.lastname}
             </p>
           )}
         </div>

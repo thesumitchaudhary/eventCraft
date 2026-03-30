@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   Calendar,
   Settings,
@@ -11,54 +11,64 @@ import {
   CircleCheck,
 } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_EMPLOYEE_BACKEND_URL;
+import ProfileModal from "../popupModals/ProfileModal";
+
+const BASE_URL =
+  import.meta.env.VITE_BACKEND_URL ||
+  "http://localhost:4041/api";
 
 const logoutUser = async () => {
-  const navigate = useNavigate();
-
-  const res = await fetch(`${API_URL}/logout`, {
+  const res = await fetch(`${BASE_URL}/employee/logout`, {
     method: "GET",
     credentials: "include",
   });
 
+  const body = await res.json().catch(() => null);
+
   if (!res.ok) {
-    throw new Error("Logout failed");
-  }
-
-  return res.json();
-};
-
-const fetcher = async (url) =>{
-  const res = await fetch(url,{credentials:"include"});
-
-  const body = await res.json();
-
-  if(!res.ok){
-    throw new Error(body.message || "Request Failed")
+    throw new Error(body?.message || "Logout failed");
   }
 
   return body;
-}
+};
+
+const fetcher = async (url) => {
+  const res = await fetch(url, { credentials: "include" });
+
+  const body = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body.message || "Request Failed");
+  }
+
+  return body;
+};
 
 const Header = () => {
+  const [openProfileModal, setOpenProfileModal] = useState(false);
+
+  const navigate = useNavigate();
+
+  const closeProfileModal = () => {
+    setOpenProfileModal(false);
+  };
+
   const logoutMutation = useMutation({
-    mutationFn: () => logoutUser(),
+    mutationFn: logoutUser,
     onSuccess: () => {
-      // console.log("success");
-      navigate("/");
+      navigate("/", { replace: true });
     },
     onError: (error) => {
-      console.log("Error", error);
+      console.error("Logout failed:", error.message);
     },
   });
 
-  const {data} = useQuery({
+  const { data } = useQuery({
     queryKey: ["employeeDetails"],
-    queryFn: () => fetcher("http://localhost:4041/api/customer/me")
-  })
+    queryFn: () => fetcher(`${BASE_URL}/employee/me`),
+  });
 
-
-  // console.log(data?.user?.firstName)
+  // console.log(data?.employee?.userId?.firstname);
 
   return (
     <>
@@ -69,13 +79,22 @@ const Header = () => {
               <Calendar className="text-purple-500" />
               <h1>Employee Portal</h1>
             </div>
-            <p className="mx-8">Welcome,{data?.user?.firstName} {data?.user?.lastName}</p>
+            <p className="mx-8">
+              Welcome, {data?.employee?.userId?.firstname}{" "}
+              {data?.employee?.userId?.lastname}
+            </p>
           </div>
           <div className="flex gap-5 pr-9">
-            <button className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 min-h-sm border border-gray-300">
+            <button
+              onClick={() => setOpenProfileModal(true)}
+              className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 min-h-sm border border-gray-300"
+            >
               <Settings className="" />
               <span>Profile</span>
             </button>
+            {openProfileModal && (
+              <ProfileModal closeProfileModal={closeProfileModal} />
+            )}
             <button
               onClick={() => logoutMutation.mutate()}
               className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 border border-gray-300"
@@ -87,21 +106,38 @@ const Header = () => {
         </div>
 
         <div className="flex gap-5 my-10 mx-5">
-          <div className="bg-gray-50 min-w-72 rounded-2xl p-10">
-            <p className="text-center">Total Tasks</p>
-            <h1 className="text-center text-xl font-bold">2</h1>
+          <div className="bg-gray-50 min-w-72 rounded-2xl p-10 border border-gray-300 border-l-6 border-l-gray-600">
+            <div className="flex gap-1">
+              <ClipboardList className="max-h-5 max-w-4 font-semibold text-gray-600" />
+              <p>Total Tasks</p>
+            </div>
+            <h1 className="text-xl font-bold text-gray-600">2</h1>
           </div>
-          <div className="bg-gray-50 min-w-72 rounded-2xl p-10">
-            <p className="text-center">Pending</p>
-            <h1 className="text-center text-xl font-bold">0</h1>
+          <div className="bg-gray-50 min-w-72 rounded-2xl p-10 border border-gray-300 border-l-6 border-l-[#f54a00]">
+            <div className="flex gap-1">
+              <Clock4 className="max-h-5 max-w-4 font-semibold" />
+              <p>Pending</p>
+            </div>
+            <div className="flex gap-3">
+              <h1 className="text-xl font-bold text-[#f54a00]">0</h1>
+              <span className="bg-[#f54a00] text-white rounded-3xl p-1 w-25 text-xs font-semibold animate-pulse">
+                Action Needed
+              </span>
+            </div>
           </div>
-          <div className="bg-gray-50 min-w-72 rounded-2xl p-10">
-            <p className="text-center">In Progress</p>
-            <h1 className="text-center text-xl font-bold">1</h1>
+          <div className="bg-gray-50 min-w-72 rounded-2xl p-10 border border-gray-300 border-l-6 border-l-[#155dfc]">
+            <div className="flex gap-1">
+              <CircleAlert className="max-h-5 max-w-4 font-semibold" />
+              <p>In Progress</p>
+            </div>
+            <h1 className="text-xl font-bold text-[#155dfc]">1</h1>
           </div>
-          <div className="bg-gray-50 min-w-72 rounded-2xl p-10">
-            <p className="text-center">Completed</p>
-            <h1 className="text-center text-xl font-bold">1</h1>
+          <div className="bg-gray-50 min-w-72 rounded-2xl p-10 border border-gray-300 border-l-6 border-l-[#00a63e]">
+            <div className="flex gap-1">
+              <CircleCheck className="max-h-5 max-w-4 font-semibold" />
+              <p>Completed</p>
+            </div>
+            <h1 className="text-xl font-bold text-[#00a63e]">1</h1>
           </div>
         </div>
 
@@ -119,10 +155,11 @@ const Header = () => {
               </NavLink>
               <NavLink
                 className={({ isActive }) =>
-                  `flex gap-2 px-3 py-2 rounded-xl transition ${isActive ? "bg-white text-black shadow" : "hover:bg-gray-200"}`
+                  `flex gap-2 relative px-3 py-2 rounded-xl transition ${isActive ? "bg-white text-black shadow" : "hover:bg-gray-200"}`
                 }
                 to={"/employee/Pending"}
               >
+                <span className="absolute bg-[#f54a00] animate-pulse rounded-full h-2 w-2 left-23 top-0"></span>
                 <Clock4 className="max-h-5 max-w-4 font-semibold" />
                 <span className="text-sm font-medium">Pending</span>
               </NavLink>
@@ -141,9 +178,7 @@ const Header = () => {
                   `flex gap-2 px-3 py-2 rounded-xl transition ${isActive ? "bg-white text-black shadow" : "hover:bg-gray-200"}`
                 }
               >
-                <CircleCheck
-                  className="max-h-5 max-w-4 font-semibold"
-                />
+                <CircleCheck className="max-h-5 max-w-4 font-semibold" />
                 <span className="text-sm font-medium">Completed(1)</span>
               </NavLink>
             </ul>
