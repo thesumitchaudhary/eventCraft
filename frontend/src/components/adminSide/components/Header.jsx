@@ -14,8 +14,12 @@ import {
   DollarSign,
 } from "lucide-react";
 import ProfileModal from "../popupmodals/ProfileModal";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
+const API_URL = import.meta.env.VITE_BACKEND_URL;
+console.log(API_URL)
+
+// this is for get admin details
 const fetcher = async (url) => {
   const res = await fetch(url, { credentials: "include" });
   const body = await res.json();
@@ -27,19 +31,48 @@ const fetcher = async (url) => {
   return body;
 };
 
+
+// this is for logout admin
+const logoutAdmin = async() =>{
+  const res = await fetch(`${API_URL}/admin/logout`,{
+    method:"GET",
+    credentials:"include"
+  });
+
+  if(!res.ok){
+    throw new Error(res.message || "Request Failed");
+  }
+
+  return await res.json();
+}
+
 const Header = () => {
   const [openProfileModal, setOpenProfileModal] = useState(false);
+
+  const navigate = useNavigate();
 
   const closeProfileModel = () => {
     setOpenProfileModal(false);
   };
 
+  // this is for the get details of the admin
   const { data } = useQuery({
     queryKey: ["adminInformation"],
     queryFn: () => fetcher("http://localhost:4041/api/admin/me"),
   });
 
   // console.log(data?.admin?.userId.firstname)
+
+  //this is for admin logout
+  const logoutAdminMutation = useMutation({
+    mutationFn: () => logoutAdmin(),
+    onSuccess: () =>{
+     navigate("/")
+    },
+    onError: (error) =>{
+      console.log("error", error)
+    }
+  })
 
   return (
     <>
@@ -65,11 +98,9 @@ const Header = () => {
             {openProfileModal && (
               <ProfileModal closeProfileModel={closeProfileModel} />
             )}
-            <button className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 border border-gray-300">
-              <Link className="flex gap-1" to={"/"}>
+            <button onClick={(e) => logoutAdminMutation.mutate()} className="flex gap-1 hover:bg-gray-200 rounded-md py-1 px-3 h-8 w-28 border border-gray-300">     
                 <LogOut />
                 <span>Logout</span>
-              </Link>
             </button>
           </div>
         </div>
