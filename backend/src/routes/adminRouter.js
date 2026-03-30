@@ -32,7 +32,7 @@ router.get("/", (req, res) => {
     res.send("hey this is admin Router")
 })
 
-router.get("/me", authMiddleware, async (req, res) => {
+router.get("/me", authMiddleware,adminMiddleware, async (req, res) => {
     try {
         const userId = req.user.id
 

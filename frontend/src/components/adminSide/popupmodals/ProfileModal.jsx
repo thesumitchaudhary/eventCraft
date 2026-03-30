@@ -1,9 +1,22 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { TextInput, Button } from "@mantine/core";
 import { X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 // this is for use context
 import { Context } from "../../../context/Context";
+
+const fetcher = async (url) => {
+  const res = await fetch(url, { credentials: "include" });
+
+  const body = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body.message || "Request Failed");
+  }
+
+  return body;
+};
 
 const ProfileModal = ({ closeProfileModel }) => {
   const {
@@ -27,12 +40,31 @@ const ProfileModal = ({ closeProfileModel }) => {
   const floatingPhone = focusedPhone || phone?.length > 0;
   const floatingEmail = focusedEmail || email?.length > 0;
 
+  const { data } = useQuery({
+    queryKey: ["adminInformation"],
+    queryFn: () => fetcher("http://localhost:4041/api/admin/me"),
+  });
+
+  console.log(data?.admin);
+
+  useEffect(() => {
+    const user = data?.admin?.userId;
+    const admin = data?.admin;
+
+    if (!user && !admin) return;
+
+    setFirstname(user?.firstname ?? "");
+    setLastname(user?.lastname ?? "");
+    setPhone(admin?.phone ?? "");
+    setEmail(user?.email ?? "");
+  }, [data, setFirstname, setLastname, setPhone, setEmail]);
+
   return (
     <>
       <div className="z-1">
         <div
           className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
-          onClick={close}
+          onClick={closeProfileModel}
         />
 
         <div
@@ -55,7 +87,7 @@ const ProfileModal = ({ closeProfileModel }) => {
               <TextInput
                 label="First Name"
                 placeholder={focusedFirstname ? "e.g. Johnson Wedding" : ""}
-                // value={data?.data?.firstName}
+                value={firstname ?? ""}
                 onChange={(e) => setFirstname(e.currentTarget.value)}
                 onFocus={() => setFocusedFirstname(true)}
                 onBlur={() => setFocusedFirstname(false)}
@@ -75,7 +107,7 @@ const ProfileModal = ({ closeProfileModel }) => {
               <TextInput
                 label="Last Name"
                 placeholder={focusedLastname ? "e.g. Johnson Wedding" : ""}
-                // value={data?.data?.firstName}
+                value={lastname ?? ""}
                 onChange={(e) => setLastname(e.currentTarget.value)}
                 onFocus={() => setFocusedLastname(true)}
                 onBlur={() => setFocusedLastname(false)}
@@ -95,7 +127,7 @@ const ProfileModal = ({ closeProfileModel }) => {
               <TextInput
                 label="Phone"
                 placeholder={focusedPhone ? "e.g. Johnson Wedding" : ""}
-                // value={data?.data?.firstName}
+                value={phone ?? ""}
                 onChange={(e) => setPhone(e.currentTarget.value)}
                 onFocus={() => setFocusedPhone(true)}
                 onBlur={() => setFocusedPhone(false)}
@@ -114,7 +146,7 @@ const ProfileModal = ({ closeProfileModel }) => {
                 disabled
                 label="Email"
                 placeholder={focusedEmail ? "e.g. Johnson Wedding" : ""}
-                // value={data?.data?.firstName}
+                value={email ?? ""}
                 onChange={(e) => setEmail(e.currentTarget.value)}
                 onFocus={() => setFocusedEmail(true)}
                 onBlur={() => setFocusedEmail(false)}
@@ -129,7 +161,9 @@ const ProfileModal = ({ closeProfileModel }) => {
               />
             </div>
             <div>
-              <Button className="w-full" variant="filled" color="#000">Update Profile</Button>
+              <Button className="w-full" variant="filled" color="#000">
+                Update Profile
+              </Button>
             </div>
           </div>
         </div>

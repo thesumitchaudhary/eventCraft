@@ -87,21 +87,21 @@ const Bookings = () => {
         </section>
         <section className="my-10 mx-5">
           <div className="flex gap-5">
-            <div className="min-w-70 p-5 rounded-3xl bg-gray-50 border border-gray-300">
+            <div className="min-w-70 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#6a7282]">
               <p className="text-center">Pending</p>
-              <h3 className="text-center text-2xl font-bold">0</h3>
+              <h3 className="text-center text-2xl font-bold text-[#6a7282]">0</h3>
             </div>
-            <div className="min-w-70 p-5 rounded-3xl bg-gray-50 border border-gray-300">
+            <div className="min-w-70 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#155dfc]">
               <p className="text-center">Confirmed</p>
-              <h3 className="text-center text-2xl font-bold">0</h3>
+              <h3 className="text-center text-2xl font-bold text-[#155dfc]">0</h3>
             </div>
-            <div className="min-w-70 p-5 rounded-3xl bg-gray-50 border border-gray-300">
+            <div className="min-w-70 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#f54a00]">
               <p className="text-center">In Progress</p>
-              <h3 className="text-center text-2xl font-bold">1</h3>
+              <h3 className="text-center text-2xl font-bold text-[#f54a00]">1</h3>
             </div>
-            <div className="min-w-70 p-5 rounded-3xl bg-gray-50 border border-gray-300">
+            <div className="min-w-70 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#00a63e]">
               <p className="text-center">Completed</p>
-              <h3 className="text-center text-2xl font-bold">1</h3>
+              <h3 className="text-center text-2xl font-bold text-[#00a63e]">1</h3>
             </div>
           </div>
         </section>

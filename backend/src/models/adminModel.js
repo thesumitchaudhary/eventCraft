@@ -10,6 +10,9 @@ const adminSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    phone: {
+      type:String
+    }
   },
   {
     timestamps: true

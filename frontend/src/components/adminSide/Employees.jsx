@@ -82,17 +82,17 @@ const Employees = () => {
         </section>
         <section className="my-10 mx-5">
           <div className="flex gap-5">
-            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300">
-              <p>Total Employees</p>
-              <h3>{employees.length}</h3>
+            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#9810fa]">
+              <p className="text-center">Total Employees</p>
+              <h3 className="font-semibold text-2xl text-center text-[#9810fa]">{employees.length}</h3>
             </div>
-            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300">
-              <p>Active Tasks</p>
-              <h3>{employees?.tasks?.length}</h3>
+            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#f54a00]">
+              <p className="text-center">Active Tasks</p>
+              <h3 className="font-semibold text-2xl text-center text-[#f54a00]">{employees?.tasks?.length || 0}</h3>
             </div>
-            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300">
-              <p>Completed Tasks</p>
-              <h3>1</h3>
+            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#00a63e]">
+              <p className="text-center">Completed Tasks</p>
+              <h3 className="font-semibold text-2xl text-center text-[#00a63e]">1</h3>
             </div>
           </div>
         </section>

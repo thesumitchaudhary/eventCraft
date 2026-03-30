@@ -36,14 +36,14 @@ const Dashboard = () => {
       <main>
         <section className="mx-8 my-10">
           <div className="flex gap-4">
-            <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300">
+            <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300 border-l-6 border-l-[#155dfc]">
               <div className="flex gap-3">
                 <Users className="h-5 w-5 text-[#155dfc]" />
                 <p className="text-[#7e7a82]">Total Customers</p>
               </div>
               <h4 className="text-3xl font-bold">{data?.customers.length}</h4>
             </div>
-            <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300">
+            <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300 border-l-6 border-l-[#9810fa]">
               <div className="flex gap-3">
                 <Calendar className="h-5 w-5 text-[#9810fa]" />
                 <p className="text-[#7e7a82]">Active Bookings</p>
@@ -52,14 +52,14 @@ const Dashboard = () => {
                 {data?.customers.flatMap((customer) => customer?.events.length)}
               </h4>
             </div>
-            <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300">
-              <div className="flex gap-3">
-                <CircleUser className="h-5 w-5 text-[#02a740]" />
-                <p className="text-[#7e7a82]">Total Employees</p>
-              </div>
-              <h4 className="text-3xl font-bold">2</h4>
+            <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-l-6 border-l-[#02a740] border-gray-300">
+                <div className="flex gap-3">
+                  <CircleUser className="h-5 w-5 text-[#02a740]" />
+                  <p className="text-[#7e7a82]">Total Employees</p>
+                </div>
+                <h4 className="text-3xl font-bold">2</h4>
             </div>
-            <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300">
+            <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300 border-l-6 border-l-[#009966]">
               <div className="flex gap-3">
                 <DollarSign className="h-5 w-5 text-[#009966]" />
                 <p className="text-[#7e7a82]">Total Revenue</p>
@@ -158,7 +158,9 @@ const Dashboard = () => {
                           {data?.bookingStatus}
                         </span>
                       </td>
-                      <td className="border-b border-gray-300 p-1">${data?.totalAmount}</td>
+                      <td className="border-b border-gray-300 p-1">
+                        ${data?.totalAmount}
+                      </td>
                     </tr>
                   )),
                 )}

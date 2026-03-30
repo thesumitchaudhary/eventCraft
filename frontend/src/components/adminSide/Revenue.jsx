@@ -15,21 +15,21 @@ const Revenue = () => {
       <main>
         <section className="my-10 mx-5">
           <div className="flex gap-5">
-            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl">
+            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#00a63e]">
               <p className="flex">
                 <DollarSign className="text-[#00a63e]" />
                 Total Employees
               </p>
               <h3>2</h3>
             </div>
-            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl">
+            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#f54a00]">
               <p className="flex">
                 <TrendingUp className="text-[#f54a00]" />
                 Active Tasks
               </p>
               <h3>2</h3>
             </div>
-            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl">
+            <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#155dfc]">
               <p className="flex">
                 <FileText className="text-[#155dfc]" />
                 Completed Tasks
