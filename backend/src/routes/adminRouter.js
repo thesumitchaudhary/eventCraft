@@ -146,7 +146,7 @@ router.post("/createTask", async (req, res) => {
 
 // this is for admin to show booked event by the customer
 
-router.get("/showBookedEvent", authMiddleware, async (req, res) => {
+router.get("/showBookedEvent", authMiddleware, adminMiddleware, async (req, res) => {
     try {
         const customers = await customerModel.find().populate("userId", "firstname lastname email role").populate("events");
 

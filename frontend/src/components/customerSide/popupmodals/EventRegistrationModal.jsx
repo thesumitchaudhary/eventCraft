@@ -326,6 +326,7 @@ const EventRegistrationModal = ({ close }) => {
             </div>
           </div>
           <Button
+          color="black"
             disabled={eventBookingMutation.isPending}
             onClick={() => eventBookingMutation.mutate()}
             className="border w-full p-1 rounded-md disabled:opacity-50"

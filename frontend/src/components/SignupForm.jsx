@@ -221,11 +221,12 @@ const SignupForm = () => {
       {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
 
       {!showVerifyFunctionality ? (
-        <Button onClick={handleSubmit} className="border w-40 p-1 rounded-md">
+        <Button onClick={handleSubmit} color="black" className="border w-40 p-1 rounded-md">
           Create Account
         </Button>
       ) : (
-        <Button
+        <Button 
+        color="black"
           onClick={() => codeMutation.mutate()}
           className="border w-40 p-1 rounded-md"
         >

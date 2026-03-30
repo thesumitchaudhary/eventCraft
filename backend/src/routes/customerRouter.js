@@ -9,6 +9,7 @@ import authMiddleware from "../Middleware/authMiddleware.js";
 
 // import userModel 
 import userModel from "../models/userModel.js";
+import customerModel from "../models/customerModel.js";
 
 
 const router = express.Router();
@@ -19,23 +20,13 @@ router.get("/", (req, res) => {
 
 router.get("/me", authMiddleware, async (req, res) => {
     try {
-        const user = await userModel
-            .findById(req.user.id)
-            .select("-password");
+        const userId = req.user.id
 
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
+        const customer = await customerModel.findOne({userId}).populate("userId");
 
         return res.status(200).json({
             message: "User fetched successfully",
-            user: {
-                id: user._id,
-                firstName: user.firstname,
-                lastName: user.lastname,
-                email: user.email,
-                role: user.role
-            }
+            customer,
         });
     } catch (error) {
         console.error("/me error", error);
@@ -50,7 +41,7 @@ router.post("/verifyEmail", verifyEmail);
 router.post("/login", login);
 
 router.put("/updateProfile", async (req,res) =>{
-
+    
 })
 
 router.get("/logout", logout);

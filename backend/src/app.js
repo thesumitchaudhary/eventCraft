@@ -49,6 +49,7 @@ app.use(cors({
     credentials: true
 }));
 app.use(cookieParser())
+app.disable("etag");
 
 
 app.use("/api/admin", adminRouter);

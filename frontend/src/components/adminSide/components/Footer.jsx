@@ -40,22 +40,16 @@ const Footer = () => {
             <h3 className="my-3">Quick Links</h3>
             <ul className="flex flex-col gap-1">
               <li>
-                <a href="#">Home</a>
+                <a href="#">Dashboard</a>
               </li>
               <li>
-                <a href="#">Service</a>
+                <a href="#">Analytics</a>
               </li>
               <li>
-                <a href="#">Gallery</a>
+                <a href="#">Reports</a>
               </li>
               <li>
-                <a href="#">Reviews</a>
-              </li>
-              <li>
-                <a href="#">FAQ</a>
-              </li>
-              <li>
-                <a href="#">Contact</a>
+                <a href="#">Settings</a>
               </li>
             </ul>
           </div>
