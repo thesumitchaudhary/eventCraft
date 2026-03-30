@@ -22,6 +22,14 @@ router.get("/", (req, res) => {
     res.json("hey it's working")
 })
 
+// router.get("/me", (req, res) => {
+//     try{
+
+//     }catch(error){
+//         res.json({message: error})
+//     }
+// });
+
 router.get("/findEmployee", authMiddelware, async (req, res) => {
     try {
         const employeess = await userModel.find({ role: "employee" }).select("-password");

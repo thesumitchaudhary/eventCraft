@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { TextInput, Button } from "@mantine/core";
 
 // this come from context.jsx file
 import { Context } from "../../../context/Context";
 
+const API_URL = import.meta.env.VITE_BACKEND_URL;
+
+// this is for get user data
 const fetcher = async (url) => {
   const res = await fetch(url, {
     credentials: "include",
@@ -18,6 +21,42 @@ const fetcher = async (url) => {
 
   return res.json();
 };
+
+// this is for user detail update
+
+const userUpdate = async ({ id, firstname, lastname, phone, address }) => {
+  if (!id) {
+    throw new Error("Missing user id");
+  }
+
+  const res = await fetch(`${API_URL}/customer/user/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      firstname,
+      lastname,
+      phone,
+      address,
+    }),
+  });
+
+  let body = {};
+  try {
+    body = await res.json();
+  } catch {
+    body = {};
+  }
+
+  if (!res.ok) {
+    throw new Error(body.message || "Request Failed");
+  }
+
+  return body;
+};
+
 const ProfileModal = ({ closeProfileModal }) => {
   const {
     firstname,
@@ -49,8 +88,6 @@ const ProfileModal = ({ closeProfileModal }) => {
     queryFn: () => fetcher("http://localhost:4041/api/customer/me"),
   });
 
-  console.log(data?.customer?.phone)
-
   useEffect(() => {
     const user = data?.customer?.userId ?? null;
     const customer = data?.customer ?? null;
@@ -58,10 +95,24 @@ const ProfileModal = ({ closeProfileModal }) => {
 
     setFirstname(user.firstName ?? user.firstname ?? "");
     setLastname(user.lastName ?? user.lastname ?? "");
-    setPhone(customer.phone ?? "")
-    setAddress(customer.address ?? "")
+    setPhone(customer.phone ?? "");
+    setAddress(customer.address ?? "");
     setEmail(user.email ?? "");
   }, [data, setFirstname, setLastname, setPhone, setAddress, setEmail]);
+
+  console.log(data?.customer?._id)
+
+  // this is for update user details
+  const userUpdateMutation = useMutation({
+    mutationFn: ({ id, firstname, lastname, phone, address }) =>
+      userUpdate({ id, firstname, lastname, phone, address }),
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
 
   // this is for the proile picture upload
   const videoRef = useRef(null);
@@ -101,7 +152,7 @@ const ProfileModal = ({ closeProfileModal }) => {
     } catch (err) {
       if (err?.name === "NotAllowedError") {
         setCameraError(
-          "Camera permission blocked. Allow camera access in browser settings."
+          "Camera permission blocked. Allow camera access in browser settings.",
         );
         return;
       }
@@ -113,7 +164,7 @@ const ProfileModal = ({ closeProfileModal }) => {
 
       if (err?.name === "NotReadableError") {
         setCameraError(
-          "Camera is already in use by another app. Close it and try again."
+          "Camera is already in use by another app. Close it and try again.",
         );
         return;
       }
@@ -228,7 +279,9 @@ const ProfileModal = ({ closeProfileModal }) => {
                         className="w-full h-full"
                       />
                     ) : (
-                      <span className="text-gray-400 text-xs text-center">No Image Selected</span>
+                      <span className="text-gray-400 text-xs text-center">
+                        No Image Selected
+                      </span>
                     )}
                   </div>
 
@@ -404,7 +457,16 @@ const ProfileModal = ({ closeProfileModal }) => {
             </div>
             <div>
               <Button
-                varient="filled"
+                onClick={() =>
+                  userUpdateMutation.mutate({
+                    id: data?.customer?.userId?._id,
+                    firstname,
+                    lastname,
+                    phone,
+                    address,
+                  })
+                }
+                variant="filled"
                 color="#000"
                 className="border p-1 w-full rounded-md bg-black text-white font-medium"
               >
