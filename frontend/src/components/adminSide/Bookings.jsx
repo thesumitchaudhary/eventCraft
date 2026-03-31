@@ -56,7 +56,7 @@ const Bookings = () => {
   });
 
   // console.log(data?.customers?.map((data) => data?.events))
-  console.log(data?.customers?.flatMap((customer) => customer?.events.length))
+  // console.log(data?.customers?.flatMap((customer) => customer?.events.length))
   
   const eventBookActionMutation = useMutation({
     mutationFn: ({ id, bookingStatus }) =>

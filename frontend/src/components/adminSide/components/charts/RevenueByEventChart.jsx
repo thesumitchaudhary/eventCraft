@@ -23,7 +23,7 @@ const RevenueByEventChart = () => {
         Total revenue generated per event category
       </p>
 
-      <div className="h-[300px]">
+      <div className="h-100">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />

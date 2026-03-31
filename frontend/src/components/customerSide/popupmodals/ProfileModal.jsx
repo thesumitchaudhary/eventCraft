@@ -8,7 +8,6 @@ import { Context } from "../../../context/Context";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
-// this is for get user data
 const fetcher = async (url) => {
   const res = await fetch(url, {
     credentials: "include",
@@ -21,8 +20,6 @@ const fetcher = async (url) => {
 
   return res.json();
 };
-
-// this is for user detail update
 
 const userUpdate = async ({ id, firstname, lastname, phone, address, profileImage }) => {
   if (!id) {
@@ -84,10 +81,21 @@ const ProfileModal = ({ closeProfileModal }) => {
   const floatingPhone = focusedPhone || phone?.length > 0;
   const floatingAddress = focusedAddress || address?.length > 0;
 
-  const { data } = useQuery({
+  const { data, refetch, isLoading, error } = useQuery({
     queryKey: ["theuserdetail"],
     queryFn: () => fetcher(`${API_URL}/customer/me`),
   });
+
+  useEffect(() => {
+    if (data) {
+      console.log("Profile data loaded:", data);
+      console.log("User profileImageUrl:", data?.customer?.userId?.profileImageUrl);
+      console.log("User profileImage:", data?.customer?.userId?.profileImage);
+    }
+    if (error) {
+      console.error("Failed to fetch profile:", error);
+    }
+  }, [data, error]);
 
   useEffect(() => {
     const user = data?.customer?.userId ?? null;
@@ -96,26 +104,13 @@ const ProfileModal = ({ closeProfileModal }) => {
 
     setFirstname(user.firstName ?? user.firstname ?? "");
     setLastname(user.lastName ?? user.lastname ?? "");
-    setPhone(customer.phone ?? "");
-    setAddress(customer.address ?? "");
+    setPhone(customer.phone ?? "")
+    setAddress(customer.address ?? "")
     setEmail(user.email ?? "");
-    setImage(user.profileImageUrl ?? user.profileImage ?? null);
+    const profileImg = user.profileImageUrl ?? user.profileImage ?? null;
+    console.log("Setting image from user:", profileImg);
+    setImage(profileImg);
   }, [data, setFirstname, setLastname, setPhone, setAddress, setEmail]);
-
-  console.log(data?.customer?._id)
-
-  // this is for update user details
-  const userUpdateMutation = useMutation({
-    mutationFn: ({ id, firstname, lastname, phone, address, profileImage }) =>
-      userUpdate({ id, firstname, lastname, phone, address, profileImage }),
-    onSuccess: (data) => {
-      console.log(data);
-      setImage(data?.user?.profileImageUrl ?? data?.user?.profileImage ?? image);
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
 
   // this is for the proile picture upload
   const videoRef = useRef(null);
@@ -126,6 +121,23 @@ const ProfileModal = ({ closeProfileModal }) => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [cameraError, setCameraError] = useState("");
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const userUpdateMutation = useMutation({
+    mutationFn: ({ id, firstname, lastname, phone, address, profileImage }) =>
+      userUpdate({ id, firstname, lastname, phone, address, profileImage }),
+    onSuccess: (data) => {
+      console.log("Profile updated:", data);
+      setImage(data?.user?.profileImageUrl ?? data?.user?.profileImage ?? image);
+      refetch();
+      setIsUploading(false);
+      closeProfileModal();
+    },
+    onError: (error) => {
+      console.error("Update error:", error);
+      setIsUploading(false);
+    },
+  });
 
   const startCamera = async () => {
     setCameraError("");
@@ -155,7 +167,7 @@ const ProfileModal = ({ closeProfileModal }) => {
     } catch (err) {
       if (err?.name === "NotAllowedError") {
         setCameraError(
-          "Camera permission blocked. Allow camera access in browser settings.",
+          "Camera permission blocked. Allow camera access in browser settings."
         );
         return;
       }
@@ -167,7 +179,7 @@ const ProfileModal = ({ closeProfileModal }) => {
 
       if (err?.name === "NotReadableError") {
         setCameraError(
-          "Camera is already in use by another app. Close it and try again.",
+          "Camera is already in use by another app. Close it and try again."
         );
         return;
       }
@@ -270,11 +282,17 @@ const ProfileModal = ({ closeProfileModal }) => {
                 <div className="bg-white rounded-2xl p-5">
                   {/* Preview */}
                   <div className="w-40 h-40 mx-auto bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
-                    {image ? (
+                    {isLoading ? (
+                      <span className="text-gray-400 text-xs text-center">Loading...</span>
+                    ) : image ? (
                       <img
                         src={image}
                         alt="Profile preview"
                         className="object-cover w-full h-full"
+                        onError={(e) => {
+                          console.error("Image failed to load:", e);
+                          setImage(null);
+                        }}
                       />
                     ) : isCameraOpen ? (
                       <video
@@ -287,9 +305,7 @@ const ProfileModal = ({ closeProfileModal }) => {
                         className="w-full h-full"
                       />
                     ) : (
-                      <span className="text-gray-400 text-xs text-center">
-                        No Image Selected
-                      </span>
+                      <span className="text-gray-400 text-xs text-center">No Image Selected</span>
                     )}
                   </div>
 
@@ -355,8 +371,22 @@ const ProfileModal = ({ closeProfileModal }) => {
                           Retake
                         </button>
 
-                        <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg">
-                          Upload
+                        <button
+                          onClick={() => {
+                            userUpdateMutation.mutate({
+                              id: data?.customer?.userId?._id,
+                              firstname,
+                              lastname,
+                              phone,
+                              address,
+                              profileImage: image?.startsWith("data:image/") ? image : undefined,
+                            });
+                            setIsUploading(true);
+                          }}
+                          disabled={isUploading || !image?.startsWith("data:image/")}
+                          className="flex-1 bg-blue-600 text-white py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isUploading ? "Uploading..." : "Upload"}
                         </button>
                       </>
                     )}
@@ -472,16 +502,15 @@ const ProfileModal = ({ closeProfileModal }) => {
                     lastname,
                     phone,
                     address,
-                    profileImage: image?.startsWith("data:image/")
-                      ? image
-                      : undefined,
+                    profileImage: image?.startsWith("data:image/") ? image : undefined,
                   })
                 }
+                disabled={userUpdateMutation.isPending}
                 variant="filled"
                 color="#000"
-                className="border p-1 w-full rounded-md bg-black text-white font-medium"
+                className="border p-1 w-full rounded-md bg-black text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Update Profile
+                {userUpdateMutation.isPending ? "Updating..." : "Update Profile"}
               </Button>
             </div>
           </div>

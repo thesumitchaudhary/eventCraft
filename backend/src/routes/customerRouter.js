@@ -8,7 +8,7 @@ import { register, verifyEmail, login, logout } from "../controllers/Auth.js"
 // import authmiddleware for show user
 import authMiddleware from "../Middleware/authMiddleware.js";
 
-// import userModel 
+// import Models
 import userModel from "../models/userModel.js";
 import customerModel from "../models/customerModel.js";
 import { deleteObject, getObjectURL, uploadObject } from "../config/s3.js";

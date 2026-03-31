@@ -25,7 +25,7 @@ const Customers = () => {
     queryFn: () => fetcher("http://localhost:4041/api/admin/showBookedEvent"),
   });
 
-  console.log(data?.customers.flatMap((customer) => customer));
+  // console.log(data?.customers.flatMap((customer) => customer));
 
   return (
     <div className="bg-[#f0f1f3]">

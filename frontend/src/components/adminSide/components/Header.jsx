@@ -17,7 +17,6 @@ import ProfileModal from "../popupmodals/ProfileModal";
 import { useQuery, useMutation } from "@tanstack/react-query";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
-console.log(API_URL)
 
 // this is for get admin details
 const fetcher = async (url) => {

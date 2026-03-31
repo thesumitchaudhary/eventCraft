@@ -2,6 +2,9 @@ import http from "http";
 import express from "express";
 import mongoose from "mongoose"
 import dotenv from "dotenv";
+
+dotenv.config();
+
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
@@ -12,8 +15,6 @@ import adminRouter from "./routes/adminRouter.js"
 import customerRouter from "./routes/customerRouter.js"
 import employeeRouter from "./routes/employeeRouter.js"
 import indexRouter from "./routes/index.js"
-
-dotenv.config();
 
 const PORT = process.env.PORT
 const MONGO_CONNECT_URL = process.env.MONGO_URI

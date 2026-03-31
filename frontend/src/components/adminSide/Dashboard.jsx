@@ -21,10 +21,18 @@ const fetcher = async (url) => {
 };
 
 const Dashboard = () => {
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ["showbookings"],
     queryFn: () => fetcher("http://localhost:4041/api/admin/showBookedEvent"),
   });
+
+    const { data: data1 } = useQuery({
+    queryKey: ["showemployee"],
+    queryFn: () => fetcher("http://localhost:4041/api/employee/findEmployee"),
+  });
+
+  console.log(data1?.users.length)
+
 
   // console.log(data?.customers.flatMap((customer) => customer?.events));
   // console.log(data?.customers.flatMap((customer) => customer?.events.map((data) => data?.eventName)))
@@ -57,7 +65,7 @@ const Dashboard = () => {
                   <CircleUser className="h-5 w-5 text-[#02a740]" />
                   <p className="text-[#7e7a82]">Total Employees</p>
                 </div>
-                <h4 className="text-3xl font-bold">2</h4>
+                <h4 className="text-3xl font-bold">{data1?.users.length}</h4>
             </div>
             <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300 border-l-6 border-l-[#009966]">
               <div className="flex gap-3">
