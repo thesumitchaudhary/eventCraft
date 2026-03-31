@@ -24,7 +24,7 @@ const fetcher = async (url) => {
 
 // this is for user detail update
 
-const userUpdate = async ({ id, firstname, lastname, phone, address }) => {
+const userUpdate = async ({ id, firstname, lastname, phone, address, profileImage }) => {
   if (!id) {
     throw new Error("Missing user id");
   }
@@ -40,6 +40,7 @@ const userUpdate = async ({ id, firstname, lastname, phone, address }) => {
       lastname,
       phone,
       address,
+      profileImage,
     }),
   });
 
@@ -85,7 +86,7 @@ const ProfileModal = ({ closeProfileModal }) => {
 
   const { data } = useQuery({
     queryKey: ["theuserdetail"],
-    queryFn: () => fetcher("http://localhost:4041/api/customer/me"),
+    queryFn: () => fetcher(`${API_URL}/customer/me`),
   });
 
   useEffect(() => {
@@ -98,16 +99,18 @@ const ProfileModal = ({ closeProfileModal }) => {
     setPhone(customer.phone ?? "");
     setAddress(customer.address ?? "");
     setEmail(user.email ?? "");
+    setImage(user.profileImageUrl ?? user.profileImage ?? null);
   }, [data, setFirstname, setLastname, setPhone, setAddress, setEmail]);
 
   console.log(data?.customer?._id)
 
   // this is for update user details
   const userUpdateMutation = useMutation({
-    mutationFn: ({ id, firstname, lastname, phone, address }) =>
-      userUpdate({ id, firstname, lastname, phone, address }),
+    mutationFn: ({ id, firstname, lastname, phone, address, profileImage }) =>
+      userUpdate({ id, firstname, lastname, phone, address, profileImage }),
     onSuccess: (data) => {
       console.log(data);
+      setImage(data?.user?.profileImageUrl ?? data?.user?.profileImage ?? image);
     },
     onError: (error) => {
       console.log(error);
@@ -215,8 +218,13 @@ const ProfileModal = ({ closeProfileModal }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const url = URL.createObjectURL(file);
-    setImage(url);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === "string") {
+        setImage(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   useEffect(() => {
@@ -464,6 +472,9 @@ const ProfileModal = ({ closeProfileModal }) => {
                     lastname,
                     phone,
                     address,
+                    profileImage: image?.startsWith("data:image/")
+                      ? image
+                      : undefined,
                   })
                 }
                 variant="filled"

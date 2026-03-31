@@ -29,14 +29,14 @@ function assertS3Config() {
 }
 
 // GET URL
-async function getObjectURL(key) {
+async function getObjectURL(key, expiresIn = 3600) {
   assertS3Config();
   const command = new GetObjectCommand({
     Bucket: BUCKET,
     Key: normalizeKey(key),
   });
 
-  return await getSignedUrl(s3Client, command, { expiresIn: 60 });
+  return await getSignedUrl(s3Client, command, { expiresIn });
 }
 
 // PUT URL
