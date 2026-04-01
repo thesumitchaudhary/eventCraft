@@ -12,6 +12,7 @@ import { SendEventBookingMail } from "../helpers/sendMail.js"
 import customerModel from "../models/customerModel.js";
 import eventBookingModel from "../models/eventBookingModel.js";
 import paymentModel from "../models/paymentModel.js";
+import Ticket from "../models/ticketModel.js";
 
 const router = express.Router();
 
@@ -261,15 +262,152 @@ router.post("/payment", authMiddleware, async (req, res) => {
     }
 })
 
+router.get("/support-ticket", authMiddleware, async (req, res) => {
+    try {
+        const { id: userId, role } = req.user;
+        const normalizedRole = String(role || "")
+            .trim()
+            .toLowerCase();
+
+        if (normalizedRole === "customer") {
+            let ticket = await Ticket.findOne({
+                customerId: userId,
+                status: { $in: ["pending", "active", "escalated"] },
+            }).sort({ createdAt: -1 });
+
+            if (!ticket) {
+                // Fallback to latest historical ticket so previous chat messages remain visible.
+                ticket = await Ticket.findOne({
+                    customerId: userId,
+                }).sort({ updatedAt: -1 });
+            }
+
+            if (!ticket) {
+                ticket = await Ticket.create({ customerId: userId });
+            }
+
+            return res.status(200).json({
+                success: true,
+                ticketId: ticket._id,
+                status: ticket.status,
+            });
+        }
+
+        if (normalizedRole === "employee" || normalizedRole === "staff") {
+            let ticket = await Ticket.findOne({
+                employeeId: userId,
+                status: { $in: ["active", "escalated"] },
+            }).sort({ updatedAt: -1 });
+
+            if (!ticket) {
+                ticket = await Ticket.findOne({
+                    employeeId: null,
+                    status: { $in: ["pending", "escalated", "active"] },
+                }).sort({ createdAt: 1 });
+
+                if (ticket) {
+                    ticket.employeeId = userId;
+                    if (ticket.status === "pending") {
+                        ticket.status = "active";
+                    }
+                    await ticket.save();
+                }
+            }
+
+            if (!ticket) {
+                // Fallback to latest historical assigned ticket for old conversation visibility.
+                ticket = await Ticket.findOne({
+                    employeeId: userId,
+                }).sort({ updatedAt: -1 });
+            }
+
+            if (!ticket) {
+                // Final fallback: pick latest support ticket if one exists.
+                // This prevents dead-end "no active ticket" states in small-team setups.
+                ticket = await Ticket.findOne({
+                    status: { $in: ["pending", "active", "escalated", "resolved"] },
+                }).sort({ updatedAt: -1 });
+
+                if (ticket && !ticket.employeeId) {
+                    ticket.employeeId = userId;
+                    if (ticket.status === "pending") {
+                        ticket.status = "active";
+                    }
+                    await ticket.save();
+                }
+            }
+
+            if (!ticket) {
+                // Create a fallback ticket for employee-admin support so employee chat can start.
+                ticket = await Ticket.create({
+                    customerId: userId,
+                    employeeId: userId,
+                    status: "active",
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                ticketId: ticket._id,
+                status: ticket.status,
+            });
+        }
+
+        if (normalizedRole === "admin") {
+            // Admin can open a ticket context too, useful for monitoring/responding.
+            let ticket = await Ticket.findOne({
+                status: { $in: ["pending", "active", "escalated", "resolved"] },
+            }).sort({ updatedAt: -1 });
+
+            if (!ticket) {
+                ticket = await Ticket.create({
+                    customerId: userId,
+                    status: "active",
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                ticketId: ticket._id,
+                status: ticket.status,
+            });
+        }
+
+        return res.status(403).json({
+            success: false,
+            message: `Unsupported role for support ticket: ${normalizedRole || "unknown"}`,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+});
+
 router.get("/messages/:ticketId", async (req, res) => {
   try {
+        const { ticketId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(ticketId)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid ticketId",
+                data: [],
+            });
+        }
+
     const messages = await Message.find({
-      ticketId: req.params.ticketId
+            ticketId
     }).sort({ createdAt: 1 });
 
-    res.json(messages);
+        res.json(messages);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch messages" });
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch messages",
+            data: [],
+        });
   }
 });
 

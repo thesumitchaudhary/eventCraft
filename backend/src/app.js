@@ -41,7 +41,17 @@ const admins = new Set();
 // ================= SOCKET AUTH MIDDLEWARE =================
 io.use((socket, next) => {
     try {
-        const token = socket.handshake.auth?.token;
+        const authToken = socket.handshake.auth?.token;
+        const cookieHeader = socket.handshake.headers?.cookie || "";
+        const cookieToken = cookieHeader
+            .split(";")
+            .map((part) => part.trim())
+            .find((part) => part.startsWith("token="))
+            ?.split("=")
+            .slice(1)
+            .join("=");
+
+        const token = authToken || (cookieToken ? decodeURIComponent(cookieToken) : null);
 
         if (!token) {
             return next(new Error("Unauthorized"));

@@ -9,22 +9,60 @@ const LiveChatLayout = ({ closeLiveModal, ticketId }) => {
   const [messages, setMessages] = useState([]);
   const [isOnline, setIsOnline] = useState(socket.connected);
   const [loading, setLoading] = useState(false);
+  const [resolvedTicketId, setResolvedTicketId] = useState(ticketId || "");
+
+  const activeTicketId = ticketId || resolvedTicketId;
 
   const bottomRef = useRef(null);
+  const safeMessages = Array.isArray(messages) ? messages : [];
+
+  const normalizeMessageList = (payload) => {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.data)) return payload.data;
+    return [];
+  };
 
   // ================= SOCKET + FETCH =================
   useEffect(() => {
-    if (!ticketId) return;
+    if (ticketId) return;
+
+    const resolveTicket = async () => {
+      try {
+        const res = await fetch(`${API_URL}/index/support-ticket`, {
+          credentials: "include",
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data?.ticketId) {
+          setResolvedTicketId(data.ticketId);
+        }
+      } catch (err) {
+        console.error("Failed to resolve ticket", err);
+      }
+    };
+
+    resolveTicket();
+  }, [ticketId, API_URL]);
+
+  useEffect(() => {
+    if (!activeTicketId) return;
 
     // join room
-    socket.emit("join_ticket", { ticketId });
+    socket.emit("join_ticket", { ticketId: activeTicketId });
 
     // receive message (avoid duplicates)
     const handleReceiveMessage = (data) => {
       setMessages((prev) => {
-        const exists = prev.find((msg) => msg._id === data._id);
-        if (exists) return prev;
-        return [...prev, data];
+        const prevMessages = Array.isArray(prev) ? prev : [];
+
+        if (!data || typeof data !== "object") {
+          return prevMessages;
+        }
+
+        const exists = prevMessages.find((msg) => msg._id === data._id);
+        if (exists) return prevMessages;
+        return [...prevMessages, data];
       });
     };
 
@@ -34,11 +72,14 @@ const LiveChatLayout = ({ closeLiveModal, ticketId }) => {
     const fetchMessages = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_URL}/index/messages/${ticketId}`);
+        const res = await fetch(`${API_URL}/index/messages/${activeTicketId}`, {
+          credentials: "include",
+        });
         const data = await res.json();
-        setMessages(data);
+        setMessages(normalizeMessageList(data));
       } catch (err) {
         console.error("Failed to fetch messages", err);
+        setMessages([]);
       } finally {
         setLoading(false);
       }
@@ -49,7 +90,7 @@ const LiveChatLayout = ({ closeLiveModal, ticketId }) => {
     return () => {
       socket.off("receive_message", handleReceiveMessage);
     };
-  }, [ticketId]);
+  }, [activeTicketId, API_URL]);
 
   // ================= ONLINE STATUS =================
   useEffect(() => {
@@ -72,10 +113,10 @@ const LiveChatLayout = ({ closeLiveModal, ticketId }) => {
 
   // ================= SEND MESSAGE =================
   const sendMessage = () => {
-    if (!message.trim()) return;
+    if (!message.trim() || !activeTicketId) return;
 
     socket.emit("send_message", {
-      ticketId,
+      ticketId: activeTicketId,
       message,
     });
 
@@ -127,24 +168,26 @@ const LiveChatLayout = ({ closeLiveModal, ticketId }) => {
               <div className="text-gray-500 text-sm">Loading messages...</div>
             )}
 
-            {!loading && messages.length === 0 && (
+            {!loading && safeMessages.length === 0 && (
               <div className="text-gray-400 text-sm">
                 No messages yet. Start conversation 👋
               </div>
             )}
 
-            {messages.map((msg) => (
+            {safeMessages.map((msg) => (
               <div
-                key={msg._id}
+                key={msg._id || `${msg.createdAt || "no-time"}-${msg.senderId || "no-sender"}`}
                 className={`flex flex-col max-w-max p-2 rounded-2xl ${
                   msg.senderRole === "customer"
                     ? "bg-blue-300 ml-auto"
                     : "bg-gray-200"
                 }`}
               >
-                <span>{msg.message}</span>
+                <span>{msg.message || msg.text || ""}</span>
                 <span className="text-gray-500 text-[10px]">
-                  {new Date(msg.createdAt).toLocaleTimeString()}
+                  {msg.createdAt
+                    ? new Date(msg.createdAt).toLocaleTimeString()
+                    : msg.time || ""}
                 </span>
               </div>
             ))}
