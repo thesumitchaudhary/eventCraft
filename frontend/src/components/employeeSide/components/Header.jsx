@@ -68,7 +68,12 @@ const Header = () => {
     queryFn: () => fetcher(`${BASE_URL}/employee/me`),
   });
 
-  // console.log(data?.employee?.userId?.firstname);
+  // console.log(data?.employee);
+
+  //   const { data } = useQuery({
+  //   queryKey: ["employeeDetails"],
+  //   queryFn: () => fetcher(`${BASE_URL}/employee/me`),
+  // });
 
   return (
     <>
@@ -161,7 +166,7 @@ const Header = () => {
               >
                 <span className="absolute bg-[#f54a00] animate-pulse rounded-full h-2 w-2 left-23 top-0"></span>
                 <Clock4 className="max-h-5 max-w-4 font-semibold" />
-                <span className="text-sm font-medium">Pending</span>
+                <span className="text-sm font-medium">Pending(1)</span>
               </NavLink>
               <NavLink
                 className={({ isActive }) =>

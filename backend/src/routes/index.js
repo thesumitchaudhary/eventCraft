@@ -261,4 +261,16 @@ router.post("/payment", authMiddleware, async (req, res) => {
     }
 })
 
+router.get("/messages/:ticketId", async (req, res) => {
+  try {
+    const messages = await Message.find({
+      ticketId: req.params.ticketId
+    }).sort({ createdAt: 1 });
+
+    res.json(messages);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch messages" });
+  }
+});
+
 export default router

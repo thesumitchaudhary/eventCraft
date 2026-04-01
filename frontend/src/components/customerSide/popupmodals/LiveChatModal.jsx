@@ -1,33 +1,82 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Circle, Send, X } from "lucide-react";
 import socket from "../../../socket-connection/socket";
 
-const LiveChatLayout = ({ closeLiveModal }) => {
-  const [message, setMessage] = useState("");
-  const [activeTab, setActiveTab] = useState("All");
-  const [messages, setMessages] = useState([]);
-  const [mode, setmode] = useState(true);
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
+const LiveChatLayout = ({ closeLiveModal, ticketId }) => {
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [isOnline, setIsOnline] = useState(socket.connected);
+  const [loading, setLoading] = useState(false);
+
+  const bottomRef = useRef(null);
+
+  // ================= SOCKET + FETCH =================
   useEffect(() => {
+    if (!ticketId) return;
+
+    // join room
+    socket.emit("join_ticket", { ticketId });
+
+    // receive message (avoid duplicates)
     const handleReceiveMessage = (data) => {
-      // store the DATA coming from server, not input message
-      setMessages((prev) => [...prev, data]);
+      setMessages((prev) => {
+        const exists = prev.find((msg) => msg._id === data._id);
+        if (exists) return prev;
+        return [...prev, data];
+      });
     };
 
     socket.on("receive_message", handleReceiveMessage);
 
-    // cleanup
+    // fetch old messages
+    const fetchMessages = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${API_URL}/index/messages/${ticketId}`);
+        const data = await res.json();
+        setMessages(data);
+      } catch (err) {
+        console.error("Failed to fetch messages", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMessages();
+
     return () => {
       socket.off("receive_message", handleReceiveMessage);
     };
+  }, [ticketId]);
+
+  // ================= ONLINE STATUS =================
+  useEffect(() => {
+    const handleConnect = () => setIsOnline(true);
+    const handleDisconnect = () => setIsOnline(false);
+
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+    };
   }, []);
 
+  // ================= AUTO SCROLL =================
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // ================= SEND MESSAGE =================
   const sendMessage = () => {
     if (!message.trim()) return;
 
     socket.emit("send_message", {
-      text: message,
-      time: new Date().toLocaleTimeString(),
+      ticketId,
+      message,
     });
 
     setMessage("");
@@ -35,36 +84,34 @@ const LiveChatLayout = ({ closeLiveModal }) => {
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center 
-             bg-black/30 backdrop-blur-md"
+      className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-md"
       onClick={closeLiveModal}
     >
       <div
         className="w-[900px] h-[500px] fixed top-1/2 left-1/2 
-               -translate-x-1/2 -translate-y-1/2 
-               bg-white rounded-xl shadow-lg flex"
+        -translate-x-1/2 -translate-y-1/2 
+        bg-white rounded-xl shadow-lg flex"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="w-px bg-gray-300" />
-
         <div className="flex-1 flex flex-col">
-          {/* Header */}
+          {/* ================= HEADER ================= */}
           <div className="p-4 border-b flex justify-between items-start">
             <div>
               <h2 className="font-semibold">Support System</h2>
+
               <div
                 className={`flex items-center gap-2 text-sm ${
-                  mode ? "text-green-600" : "text-red-500"
+                  isOnline ? "text-green-600" : "text-red-500"
                 }`}
               >
                 <Circle
                   className={`h-3 ${
-                    mode
+                    isOnline
                       ? "fill-green-500 text-green-500"
                       : "fill-red-500 text-red-500"
                   }`}
                 />
-                {mode ? "Online" : "Offline"}
+                {isOnline ? "Online" : "Offline"}
               </div>
             </div>
 
@@ -74,19 +121,38 @@ const LiveChatLayout = ({ closeLiveModal }) => {
             />
           </div>
 
-          {/* Messages */}
+          {/* ================= MESSAGES ================= */}
           <div className="flex-1 p-4 space-y-3 overflow-y-auto">
-            <div className="bg-gray-100 p-3 rounded-lg max-w-sm">
-              Hello! How can I help you today?
-            </div>
-            {messages.map((msg, index) => (
-              <div key={index} className="flex flex-col bg-blue-300 max-w-max p-2 rounded-2xl ml-auto">
-                <span> {msg.text} </span> <span className="text-gray-500 text-[10px]">{msg.time}</span>
+            {loading && (
+              <div className="text-gray-500 text-sm">Loading messages...</div>
+            )}
+
+            {!loading && messages.length === 0 && (
+              <div className="text-gray-400 text-sm">
+                No messages yet. Start conversation 👋
+              </div>
+            )}
+
+            {messages.map((msg) => (
+              <div
+                key={msg._id}
+                className={`flex flex-col max-w-max p-2 rounded-2xl ${
+                  msg.senderRole === "customer"
+                    ? "bg-blue-300 ml-auto"
+                    : "bg-gray-200"
+                }`}
+              >
+                <span>{msg.message}</span>
+                <span className="text-gray-500 text-[10px]">
+                  {new Date(msg.createdAt).toLocaleTimeString()}
+                </span>
               </div>
             ))}
+
+            <div ref={bottomRef} />
           </div>
 
-          {/* Input */}
+          {/* ================= INPUT ================= */}
           <div className="p-4 border-t flex gap-3">
             <input
               value={message}

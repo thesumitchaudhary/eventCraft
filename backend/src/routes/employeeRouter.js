@@ -37,6 +37,72 @@ router.get("/me", authMiddelware, async (req, res) => {
     }
 });
 
+router.put("/user/:id", authMiddelware, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const routeUserId = req.params.id;
+
+        if (userId !== routeUserId) {
+            return res.status(403).json({ message: "you can update your own file" })
+        }
+
+        const { firstname, lastname, email, phone } = req.body;
+
+        const existingUser = await userModel.findById(userId);
+        if (!existingUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const userUpdates = {};
+        const employeeUpdates = {};
+
+        if (firstname !== undefined) userUpdates.firstname = firstname;
+        if (lastname !== undefined) userUpdates.lastname = lastname;
+        if (email !== undefined) userUpdates.email = email;
+
+        if (phone !== undefined) employeeUpdates.phone = phone;
+
+
+        if (!Object.keys(userUpdates).length && !Object.keys(employeeUpdates).length) {
+            return res.status(400).json({ message: "No fields provided to update" });
+        }
+
+        if (userUpdates.email) {
+            const existingEmailUser = await userModel.findOne({ email: userUpdates.email, _id: { $ne: userId } });
+            if (existingEmailUser) {
+                return res.status(409).json({ message: "Email is already in use" })
+            }
+        }
+
+        if (Object.keys(userUpdates).length) {
+            await userModel.findByIdAndUpdate(
+                userId,
+                { $set: userUpdates },
+                { new: true, runValidators: true }
+            );
+        }
+
+        if (Object.keys(employeeUpdates).length) {
+            await employeeModel.findByIdAndUpdate(
+                { userId },
+                { $set: employeeUpdates },
+                { new: true, runValidators: true }
+            )
+        }
+
+        const updateEmployee = await employeeModel.findOne({ userId }).populate({ path: "userId", select: "firstname lastname email phone" })
+
+        if (!updateEmployee) {
+            return res.status(404).json({ message: "Customer profile not found" });
+        }
+
+        res.status(200).json({ message: "employee updated successfully", updateEmployee })
+    }
+    catch (error) {
+        res.status(500).json({ message: "internal server error" })
+    }
+})
+
 router.get("/findEmployee", authMiddelware, async (req, res) => {
     try {
         const employeess = await userModel.find({ role: "employee" }).select("-password");
