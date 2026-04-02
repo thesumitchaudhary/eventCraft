@@ -1,4 +1,6 @@
 import WorkUpdate from "../models/workUpdateModel.js";
+import assignTask from "../models/assignTaskModel.js";
+import eventBookingModel from "../models/eventBookingModel.js";
 import { putObjectURL, getObjectURL, uploadObject, deleteObject } from "../config/s3.js";
 import redis from "../config/Redis.js";
 
@@ -24,13 +26,21 @@ export const generateUploadURL = async (req, res) => {
 
 export const createWorkUpdate = async (req, res) => {
     try {
-        const { taskId, employeeId, status, progress, note, key, fileName, contentType } = req.body;
-
-        const work = await WorkUpdate.create({
+        const {
             taskId,
             employeeId,
             status,
+            note,
+            key,
+            fileName,
             progress,
+            contentType
+        } = req.body;
+
+        // 1. Save work update
+        const work = await WorkUpdate.create({
+            taskId,
+            employeeId,
             note,
             evidence: {
                 key,
@@ -39,11 +49,34 @@ export const createWorkUpdate = async (req, res) => {
             },
         });
 
-        res.json(work);
+        // 2. Update task status
+        await assignTask.findByIdAndUpdate(taskId, { status });
+
+        // 3. Get eventId
+        const task = await assignTask.findById(taskId);
+        const eventId = task.eventId;
+
+        // 4. Calculate progress
+        const totalTasks = await assignTask.countDocuments({ eventId });
+
+        const completedTasks = await assignTask.countDocuments({
+            eventId,
+            status: "completed"
+        });
+
+
+        // 5. Update event progress
+        await eventBookingModel.findByIdAndUpdate(eventId, { progress });
+
+        res.json({
+            work,
+            progress
+        });
+
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
-};
+}; 
 
 export const getWorkUpdate = async (req, res) => {
     try {

@@ -238,3 +238,7 @@ export const adminLogin = async (req, res) => {
     }
 
 
+export const adminLogout =  (req, res) => {
+    res.cookie("token", "");
+    res.json("hey the admin is logout successfully");
+}

@@ -26,17 +26,32 @@ const Dashboard = () => {
     queryFn: () => fetcher("http://localhost:4041/api/admin/showBookedEvent"),
   });
 
-    const { data: data1 } = useQuery({
+  
+
+  const paidByCustomer = data?.customers
+    ?.flatMap((c) => c?.events)
+    ?.flatMap((eventDetail) => eventDetail?.totalPaid)
+    ?.reduce((sum, val) => sum + val, 0);
+
+  const { data: data1 } = useQuery({
     queryKey: ["showemployee"],
     queryFn: () => fetcher("http://localhost:4041/api/employee/findEmployee"),
   });
 
-  console.log(data1?.users.length)
+  // console.log(data1?.users.length)
 
+  // Calculate total revenue across all events
+  const totalRevenue = data?.customers
+    .flatMap((customer) => customer?.events || [])
+    .reduce((total, event) => {
+      const eventTotal = Array.isArray(event?.totalAmount)
+        ? event.totalAmount.reduce((sum, amount) => sum + (amount || 0), 0)
+        : event?.totalAmount || 0;
+      return total + eventTotal;
+    }, 0);
 
-  // console.log(data?.customers.flatMap((customer) => customer?.events));
-  // console.log(data?.customers.flatMap((customer) => customer?.events.map((data) => data?.eventName)))
-  // console.log(data?.customers.flatMap((customer) => customer?.events.map((data) => data?.eventType)))
+    // remaining amount
+    const remaining = (totalRevenue || 0) - paidByCustomer;
 
   return (
     <div className="bg-[#f0f1f3]">
@@ -57,22 +72,24 @@ const Dashboard = () => {
                 <p className="text-[#7e7a82]">Active Bookings</p>
               </div>
               <h4 className="text-3xl font-bold">
-                {data?.customers.flatMap((customer) => customer?.events.length)}
+                {data?.customers.flatMap((customer) => customer?.events.length)?.reduce((total,totalcustomer)=> total+totalcustomer,0)}
               </h4>
             </div>
             <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-l-6 border-l-[#02a740] border-gray-300">
-                <div className="flex gap-3">
-                  <CircleUser className="h-5 w-5 text-[#02a740]" />
-                  <p className="text-[#7e7a82]">Total Employees</p>
-                </div>
-                <h4 className="text-3xl font-bold">{data1?.users.length}</h4>
+              <div className="flex gap-3">
+                <CircleUser className="h-5 w-5 text-[#02a740]" />
+                <p className="text-[#7e7a82]">Total Employees</p>
+              </div>
+              <h4 className="text-3xl font-bold">{data1?.users.length}</h4>
             </div>
             <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300 border-l-6 border-l-[#009966]">
               <div className="flex gap-3">
                 <DollarSign className="h-5 w-5 text-[#009966]" />
                 <p className="text-[#7e7a82]">Total Revenue</p>
               </div>
-              <h4 className="text-3xl font-bold">$40,000</h4>
+              <h4 className="text-3xl font-bold">
+                ${totalRevenue?.toLocaleString() || 0}
+              </h4>
             </div>
           </div>
         </section>
@@ -113,19 +130,19 @@ const Dashboard = () => {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Received</span>
                   <span className="text-green-600 text-md font-bold">
-                    $40,000
+                    ${paidByCustomer}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Pending Amount</span>
                   <span className="text-orange-600 text-md font-bold">
-                    $25,000
+                    ${remaining}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Expected</span>
                   <span className="text-blue-600 text-md font-bold">
-                    $65,000
+                    ${totalRevenue?.toLocaleString() || 0}
                   </span>
                 </div>
               </div>

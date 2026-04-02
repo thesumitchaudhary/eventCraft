@@ -14,19 +14,6 @@ const workUpdateSchema = new mongoose.Schema(
       required: true,
     },
 
-    status: {
-      type: String,
-      enum: ["pending", "in-progress", "completed"],
-      default: "pending",
-    },
-
-    progress: {
-      type: Number,
-      min: 0,
-      max: 100,
-      default: 0,
-    },
-
     note: String,
 
     // ✅ AWS-based evidence

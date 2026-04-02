@@ -55,11 +55,11 @@ const Employees = () => {
   });
 
   // console.log(users.map((user) => user.firstname));
-  // console.log(
-  //   details.flatMap((detail) =>
-  //     detail?.tasks?.map((taskDetail) => taskDetail?.taskDescription),
-  //   ),
-  // );
+  console.log(
+    details.flatMap((detail) =>
+      detail?.tasks?.map((taskDetail) => taskDetail).length),
+    );
+
 
   return (
     <div className="bg-[#f0f1f3]">

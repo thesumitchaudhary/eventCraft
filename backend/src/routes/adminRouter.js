@@ -9,6 +9,7 @@ import userModel from "../models/userModel.js";
 import eventBookingModel from "../models/eventBookingModel.js";
 import customerModel from "../models/customerModel.js";
 import eventThemeModel from "../models/eventThemeModel.js";
+import paymentModel from "../models/paymentModel.js";
 import assignTaskModel from "../models/assignTaskModel.js";
 import employeeModel from "../models/employeeModel.js";
 import { deleteObject, getObjectURL, uploadObject } from "../config/s3.js";
@@ -18,15 +19,25 @@ import authMiddleware from "../Middleware/authMiddleware.js";
 import adminMiddleware from "../Middleware/adminMiddleware.js";
 
 // import admin login controller
-import { adminLogin } from "../controllers/Auth.js";
+import { adminLogin, adminLogout } from "../controllers/Auth.js";
 
 // import all action controller and get event Themes
-import { getAllThemes, addEventTheme } from "../controllers/eventThemeController.js"
+import { getAllThemes, addEventTheme, deleteEventTheme, updateEventTheme } from "../controllers/eventThemeController.js"
+
+// import task controller for task create by admin and assign to employee
+import {createTask} from "../controllers/taskController.js";
 
 const router = express.Router();
 
+
+router.get("/", (req, res) => {
+    res.send("hey this is admin Router")
+})
+
 // for admin login
 router.post("/login", adminLogin)
+// for admin logout
+router.get("/logout",adminLogout)
 
 const PROFILE_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const MIME_EXTENSION_MAP = {
@@ -88,9 +99,7 @@ async function attachProfileImageUrl(adminDoc) {
 }
 
 
-router.get("/", (req, res) => {
-    res.send("hey this is admin Router")
-})
+
 
 router.get("/me", authMiddleware, adminMiddleware, async (req, res) => {
     try {
@@ -210,64 +219,7 @@ router.put("/user/:id", authMiddleware, adminMiddleware, async (req, res) => {
 
 // this is for task section
 
-router.post("/createTask", async (req, res) => {
-    try {
-        const {
-            selectedEventId,
-            eventId,
-            taskTitle,
-            taskDescription,
-            assignTo,
-            priority,
-            selectDate,
-        } = req.body;
-
-        const finalEventId = selectedEventId || eventId;
-
-        if (!finalEventId || !taskTitle || !taskDescription || !assignTo || !selectDate) {
-            return res.status(400).json({ message: "All required fields must be provided" });
-        }
-
-        if (!mongoose.isValidObjectId(finalEventId) || !mongoose.isValidObjectId(assignTo)) {
-            return res.status(400).json({ message: "Invalid eventId or assignTo" });
-        }
-
-        const eventExists = await eventBookingModel.exists({ _id: finalEventId });
-        if (!eventExists) {
-            return res.status(404).json({ message: "Event not found" });
-        }
-
-        // accept Employee._id first
-        let employee = await employeeModel.findById(assignTo).select("_id userId");
-
-        // fallback: if frontend sent User._id, map it to Employee._id
-        if (!employee) {
-            employee = await employeeModel.findOne({ userId: assignTo }).select("_id userId");
-        }
-
-        if (!employee) {
-            return res.status(400).json({ message: "assignTo must be a valid Employee/User id linked to Employee" });
-        }
-
-        const assignTask = await assignTaskModel.create({
-            eventId: finalEventId,
-            taskTitle: taskTitle.trim(),
-            taskDescription: taskDescription.trim(),
-            assignTo: employee._id, // always store Employee._id
-            priority,
-            selectDate,
-        });
-
-        await employeeModel.findOneAndUpdate(
-            employee._id,
-            { $push: { tasks: assignTask._id } },
-            { new: true }
-        );
-        return res.status(201).json({ assignTask });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-});
+router.post("/createTask",authMiddleware, adminMiddleware, createTask);
 
 // this is all routes for eventbook action
 
@@ -281,7 +233,40 @@ router.get("/showBookedEvent", authMiddleware, adminMiddleware, async (req, res)
             return res.status(404).json({ message: "no booked events found" });
         }
 
-        return res.status(200).json({ customers });
+        // Extract all booking IDs from all customers
+        const bookingIds = customers.flatMap(customer => customer.events.map(event => event._id));
+            
+        // Get payment information for all bookings
+        const payments = await paymentModel.aggregate([
+            {
+                $match: {
+                    bookingId: { $in: bookingIds }
+                }
+            },
+            {
+                $group: {
+                    _id: "$bookingId",
+                    totalPaid: { $sum: "$paymentAmount" }
+                }
+            }
+        ]);
+
+        // Create a map of bookingId -> totalPaid for easy lookup
+        const paymentMap = {};
+        payments.forEach(payment => {
+            paymentMap[payment._id] = payment.totalPaid;
+        });
+
+        // Enrich customers with payment info
+        const enrichedCustomers = customers.map(customer => ({
+            ...customer.toObject(),
+            events: customer.events.map(event => ({
+                ...event.toObject(),
+                totalPaid: paymentMap[event._id] || 0
+            }))
+        }));
+
+        return res.status(200).json({ customers: enrichedCustomers });
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }
@@ -309,54 +294,10 @@ router.put("/updateStatus/:id", authMiddleware, adminMiddleware, async (req, res
 // this is all routes for the eventtheme
 
 router.get("/getAllEventTheme", authMiddleware, getAllThemes)
-
 router.post("/addEventTheme", authMiddleware, adminMiddleware, addEventTheme)
+router.delete("/deleteEventTheme/:id", authMiddleware, adminMiddleware, deleteEventTheme);
+router.put("/updateEventTheme/:id", authMiddleware, adminMiddleware, updateEventTheme);
 
-router.delete("/deleteEventTheme/:id", authMiddleware, adminMiddleware, async (req, res) => {
-    try {
-        const { id } = req.params;
-        const deleted = await eventThemeModel.findByIdAndDelete(id);
 
-        if (!deleted) {
-            return res.status(404).json({ message: "Theme not found" });
-        }
-        res.json({ message: "Deleted successfully", deleted });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-router.put("/updateEventTheme/:id", authMiddleware, adminMiddleware, async (req, res) => {
-    try {
-        const { themeName, themeType, themePrice } = req.body;
-        const { id } = req.params;
-
-        const updatedTheme = await eventThemeModel.findByIdAndUpdate(
-            id,
-            {
-                themeName,
-                themeType,
-                themePrice
-            },
-            { new: true }
-        );
-
-        if (!updatedTheme) {
-            return res.status(400).json({ message: "Theme does not exist" });
-        }
-
-        res.status(200).json({
-            message: "Theme is updated successfully",
-            data: updatedTheme
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-router.get("/logout", (req, res) => {
-    res.cookie("token", "");
-    res.json("hey the admin is logout successfully");
-})
 
 export default router

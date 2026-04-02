@@ -55,7 +55,7 @@ const Bookings = () => {
       await fetcher("http://localhost:4041/api/admin/showBookedEvent"),
   });
 
-  // console.log(data?.customers?.map((data) => data?.events))
+  console.log(data?.customers?.map((data) => data?.events))
   // console.log(data?.customers?.flatMap((customer) => customer?.events.length))
   
   const eventBookActionMutation = useMutation({
@@ -77,7 +77,7 @@ const Bookings = () => {
           <div className="flex justify-between">
             <div>
               <h1>Booking Management</h1>
-              <p>Total bookings: {data?.customers?.flatMap((customer) => customer?.events.length)}</p>
+              <p>Total bookings: {data?.customers.flatMap((customer) => customer?.events.length)?.reduce((total,totalcustomer)=> total+totalcustomer,0)}</p>
             </div>
             <div className="flex">
               <Search className="border h-10 w-10 p-1" />

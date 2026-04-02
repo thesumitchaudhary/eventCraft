@@ -62,7 +62,7 @@ const Dashboard = () => {
                   data?.events.filter(
                     (event) => event.bookingStatus == "accepted",
                   ).length
-                }{" "}
+                }
               </p>
             </div>
             <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-2xl border-l-6 border-l-[#00a63e]">

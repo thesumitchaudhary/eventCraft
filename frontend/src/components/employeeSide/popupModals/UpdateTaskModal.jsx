@@ -5,6 +5,19 @@ import { useMutation } from "@tanstack/react-query";
 
 const API_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:4041/api";
 
+const fetcher = async (url) => {
+  const res = await fetch(url, { credentials: "include" });
+
+  const body = res.json();
+
+  if (!res.ok) {
+    throw new Error(body.message || "Request Failed");
+  }
+
+  return body;
+};
+
+
 const statusMap = {
   Pending: "pending",
   "In Progress": "in-progress",
@@ -35,6 +48,7 @@ const UpdateTaskModal = ({ closeUpdateModal, task }) => {
 
   const floatingStatus = focusedStatus || status?.length > 0;
   const floatingWorkUpdate = focusedWorkUpdate || workUpdate?.length > 0;
+
 
   // file
   const [file, setFile] = useState(null);

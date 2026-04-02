@@ -43,6 +43,14 @@ const eventBookingSchema = new mongoose.Schema(
     //   required: true,
     },
 
+    
+    progress: { //this is updated by employee
+      type: Number,
+      min: 0,
+      max: 100,
+      default: 0,
+    },
+
     paymentStatus: {
       type: String,
       enum: ["pending", "paid", "failed"],

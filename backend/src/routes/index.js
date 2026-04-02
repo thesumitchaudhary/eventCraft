@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 // this is for the create protected route
 import authMiddleware from "../Middleware/authMiddleware.js"
 import adminMiddelware from "../Middleware/adminMiddleware.js"
+import customerMiddelware from "../Middleware/userMiddleware.js"
 
 // import eventbook mail funtion
 import { SendEventBookingMail } from "../helpers/sendMail.js"
@@ -93,7 +94,7 @@ router.get("/", (req, res) => {
 
 // this is for manual operation using js. this is also for customer side
 
-router.get("/my-booking", authMiddleware, async (req, res) => {
+router.get("/my-booking", authMiddleware, customerMiddelware, async (req, res) => {
     try {
         const userId = req.user.id;
 
@@ -386,7 +387,7 @@ router.get("/support-ticket", authMiddleware, async (req, res) => {
 });
 
 router.get("/messages/:ticketId", async (req, res) => {
-  try {
+    try {
         const { ticketId } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(ticketId)) {
@@ -397,18 +398,18 @@ router.get("/messages/:ticketId", async (req, res) => {
             });
         }
 
-    const messages = await Message.find({
+        const messages = await Message.find({
             ticketId
-    }).sort({ createdAt: 1 });
+        }).sort({ createdAt: 1 });
 
         res.json(messages);
-  } catch (err) {
+    } catch (err) {
         res.status(500).json({
             success: false,
             message: "Failed to fetch messages",
             data: [],
         });
-  }
+    }
 });
 
 export default router
