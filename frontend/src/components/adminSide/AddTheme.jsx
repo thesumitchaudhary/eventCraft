@@ -145,14 +145,6 @@ const AddTheme = () => {
                   <AddThemeModel closeAddThemeModel={closeAddThemeModel} />
                 )}
               </div>
-
-              <div>
-                <input
-                  type="text"
-                  placeholder="Search Theme"
-                  className="border border-gray-400"
-                />
-              </div>
             </div>
           </div>
         </section>
