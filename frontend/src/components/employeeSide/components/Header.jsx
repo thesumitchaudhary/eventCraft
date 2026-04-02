@@ -126,7 +126,7 @@ const Header = () => {
               <ClipboardList className="max-h-5 max-w-4 font-semibold text-gray-600" />
               <p>Total Tasks</p>
             </div>
-            <h1 className="text-xl font-bold text-gray-600">2</h1>
+            <h1 className="text-xl font-bold text-gray-600"> {data1?.employee?.tasks?.filter((task) => task).length}</h1>
           </div>
           <div className="bg-gray-50 min-w-72 rounded-2xl p-10 border border-gray-300 border-l-6 border-l-[#f54a00]">
             <div className="flex gap-1">
@@ -235,7 +235,7 @@ const Header = () => {
                 {data1?.employee?.tasks?.filter(
                   (task) => task.status === "in-progress",
                 ).length === 1 ? (
-                  <span className="absolute bg-[#f54a00] animate-pulse rounded-full h-2 w-2 left-31 top-1"></span>
+                  <span className="absolute bg-[#0000f5] animate-pulse rounded-full h-2 w-2 left-31 top-1"></span>
                 ) : (
                   <span></span>
                 )}

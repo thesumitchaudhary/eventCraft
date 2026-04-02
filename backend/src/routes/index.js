@@ -15,6 +15,10 @@ import eventBookingModel from "../models/eventBookingModel.js";
 import paymentModel from "../models/paymentModel.js";
 import Ticket from "../models/ticketModel.js";
 
+// this is for payment controller
+import { Payment, createEvent } from "../controllers/paymentController.js"
+import { createEvent } from "../controllers/eventBookController.js"
+
 const router = express.Router();
 
 router.get("/", (req, res) => {
@@ -149,119 +153,13 @@ router.get("/my-booking", authMiddleware, customerMiddelware, async (req, res) =
     }
 });
 
-router.post("/createEvent", authMiddleware, async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const userFirstname = req.user.firstname;
-        const userLastname = req.user.lastname;
-
-        const { eventName, eventType, theme, eventDate, venue, guestCount, totalAmount } = req.body;
-        const customer = await customerModel.findOne({ userId });
-
-        if (!customer) {
-            return res.status(404).json({ message: "Customer not found" });
-        }
-
-        const eventBooked = await eventBookingModel.create({
-            customerId: customer._id,
-            eventName,
-            eventType,
-            theme,
-            eventDate,
-            venue,
-            guestCount,
-            totalAmount
-        });
-
-        await customerModel.updateOne(
-            { _id: customer._id },
-            { $push: { events: eventBooked._id } }
-        );
-
-        await SendEventBookingMail(
-            req.user.email,
-            req.user.firstname,
-            req.user.lastname,
-            eventBooked.eventType,
-            eventBooked.theme,
-            eventBooked.eventDate,
-            eventBooked.guestCount,
-            eventBooked.totalAmount,
-            eventBooked.paymentStatus,
-            eventBooked.bookingStatus
-        )
-
-        res.status(201).json({
-            success: true,
-            data: eventBooked
-        });
-    } catch (error) {
-        res.status(500).json({ error: error.message, message: "Error" });
-    }
-});
+router.post("/createEvent", authMiddleware, customerMiddelware, createEvent);
 
 
 
 // this is for payment
 
-router.post("/payment", authMiddleware, async (req, res) => {
-    try {
-        const { bookingId, paymentAmount, cardDetails } = req.body;
-
-        const booking = await eventBookingModel.findById(bookingId);
-        if (!booking) {
-            return res.status(400).json({ success: false, message: "bookingId is required" });
-        }
-
-        const amount = Number(String(paymentAmount).replace(/[^0-9.]/g, ""));
-        if (!amount || amount <= 0) {
-            return res.status(400).json({ success: false, message: "Valid paymentAmount is required" });
-        }
-
-        const previousPayment = await paymentModel.aggregate([
-            {
-                $match: {
-                    bookingId: new mongoose.Schema.Types.ObjectId(bookingId)
-                }
-            },
-            {
-                $group: {
-                    _id: "$bookingId",
-                    totalPaid: { $sum: "$paymentAmount" }
-                }
-            }
-        ]);
-
-        const aleardyPaid = previousPayment[0]?.totalPaid || 0;
-
-        const currentPayment = Number(paymentAmount);
-
-        const totalPaid = aleardyPaid + currentPayment;
-
-        let paymentStatus = "partial";
-
-        if (totalPaid >= booking.totalAmount) {
-            paymentStatus = "paid"
-        }
-
-        const makePayment = await paymentModel.create({
-            bookingId,
-            paymentAmount: amount,
-            cardDetails, // do not store raw card data in production
-            status: "success",
-        });
-
-        await eventBookingModel.findByIdAndUpdate(bookingId, {
-            paymentStatus: paymentStatus,
-        });
-
-        return res
-            .status(201)
-            .json({ success: true, message: "Payment Successful", data: makePayment });
-    } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
-    }
-})
+router.post("/payment", authMiddleware, Payment)
 
 router.get("/support-ticket", authMiddleware, async (req, res) => {
     try {

@@ -13,7 +13,15 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Context } from "../../../context/Context";
 
 // this is for update employee which is attached in user
-const updateEmployee = async ({ id, firstname, lastname, email, phone }) => {
+const updateEmployee = async ({
+  id,
+  firstname,
+  lastname,
+  email,
+  phone,
+  profileImage,
+  removeProfileImage,
+}) => {
   try {
     const res = await fetch(`http://localhost:4041/api/employee/user/${id}`, {
       method: "PUT",
@@ -26,6 +34,8 @@ const updateEmployee = async ({ id, firstname, lastname, email, phone }) => {
         lastname,
         email,
         phone,
+        profileImage,
+        removeProfileImage,
       }),
     });
 
@@ -87,8 +97,24 @@ const ProfileModal = ({ closeProfileModal }) => {
 
   // this for update user
   const updateEmployeeProfilMutation = useMutation({
-    mutationFn: ({ id, firstname, lastname, email, phone }) =>
-      updateEmployee({ id, firstname, lastname, email, phone }),
+    mutationFn: ({
+      id,
+      firstname,
+      lastname,
+      email,
+      phone,
+      profileImage,
+      removeProfileImage,
+    }) =>
+      updateEmployee({
+        id,
+        firstname,
+        lastname,
+        email,
+        phone,
+        profileImage,
+        removeProfileImage,
+      }),
     onSuccess: () => {
       console.log("updated successfully");
     },
@@ -110,12 +136,17 @@ const ProfileModal = ({ closeProfileModal }) => {
   // this is for the proile picture upload
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const streamRef = useRef(null);
 
   const [stream, setStream] = useState(null);
   const [image, setImage] = useState(null);
+  const [showStoredImage, setShowStoredImage] = useState(true);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [cameraError, setCameraError] = useState("");
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const existingProfileImage = data?.employee?.userId?.profileImageUrl || null;
+  const previewImage = image || (showStoredImage ? existingProfileImage : null);
+  const hasPendingUpload = Boolean(image) && String(image).startsWith("data:image/");
 
   const startCamera = async () => {
     setCameraError("");
@@ -138,8 +169,10 @@ const ProfileModal = ({ closeProfileModal }) => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user" },
+        audio: false,
       });
 
+      streamRef.current = mediaStream;
       setStream(mediaStream);
       setIsCameraOpen(true);
     } catch (err) {
@@ -162,18 +195,27 @@ const ProfileModal = ({ closeProfileModal }) => {
         return;
       }
 
+      if (err?.name === "AbortError") {
+        setCameraError("Camera startup was interrupted. Try opening it again.");
+        return;
+      }
+
       setCameraError("Unable to start camera. Please try again.");
     }
   };
 
   const stopCamera = useCallback(() => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
+    const activeStream = streamRef.current;
+
+    if (activeStream) {
+      activeStream.getTracks().forEach((track) => track.stop());
     }
+
+    streamRef.current = null;
+    setStream(null);
     setIsCameraOpen(false);
     setIsVideoReady(false);
-  }, [stream]);
+  }, []);
 
   const takePhoto = () => {
     const video = videoRef.current;
@@ -181,6 +223,11 @@ const ProfileModal = ({ closeProfileModal }) => {
 
     if (!video || !canvas) {
       setCameraError("Camera preview is not ready yet.");
+      return;
+    }
+
+    if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+      setCameraError("Camera frame is still loading. Try capture again.");
       return;
     }
 
@@ -196,9 +243,15 @@ const ProfileModal = ({ closeProfileModal }) => {
     canvas.height = frameHeight;
 
     const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0);
+    if (!ctx) {
+      setCameraError("Unable to process camera image. Please try again.");
+      return;
+    }
+
+    ctx.drawImage(video, 0, 0, frameWidth, frameHeight);
 
     const dataUrl = canvas.toDataURL("image/png");
+    setShowStoredImage(false);
     setImage(dataUrl);
 
     stopCamera();
@@ -208,8 +261,51 @@ const ProfileModal = ({ closeProfileModal }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const url = URL.createObjectURL(file);
-    setImage(url);
+    if (!file.type.startsWith("image/")) {
+      setCameraError("Please select a valid image file.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setCameraError("Image is too large. Max size is 5MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCameraError("");
+      setShowStoredImage(false);
+      setImage(String(reader.result || ""));
+    };
+    reader.onerror = () => {
+      setCameraError("Unable to read selected image. Please try again.");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const uploadProfileImage = () => {
+    const userId = data?.employee?.userId?._id;
+
+    if (!userId) {
+      setCameraError("User data is not ready yet. Please try again.");
+      return;
+    }
+
+    if (!image || !String(image).startsWith("data:image/")) {
+      setCameraError("Please capture or select an image before upload.");
+      return;
+    }
+
+    updateEmployeeProfilMutation.mutate({
+      id: userId,
+      profileImage: image,
+    });
+  };
+
+  const handleRetake = () => {
+    setCameraError("");
+    setImage(null);
+    setShowStoredImage(false);
   };
 
   useEffect(() => {
@@ -221,24 +317,30 @@ const ProfileModal = ({ closeProfileModal }) => {
 
     const videoElement = videoRef.current;
     videoElement.srcObject = stream;
-    videoElement.play().catch(() => null);
+
+    const playPromise = videoElement.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {
+        setCameraError(
+          "Unable to start video preview. Check browser camera permissions.",
+        );
+      });
+    }
+
+    return () => {
+      videoElement.srcObject = null;
+    };
   }, [isCameraOpen, stream]);
 
   return (
     <div className="z-10">
-      {/* overlay */}
       <div
         className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
         onClick={closeProfileModal}
       />
 
-      {/* modal */}
       <div
-        className="fixed top-1/2 left-1/2 
-           -translate-x-1/2 -translate-y-1/2
-           max-w-xl w-full
-           max-h-[90vh] bg-white rounded-2xl p-6 z-50 shadow-lg
-           flex flex-col overflow-hidden"
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-xl w-full max-h-[90vh] bg-white rounded-2xl p-6 z-50 shadow-lg flex flex-col overflow-hidden"
       >
         <div className="flex justify-between">
           <div>
@@ -252,107 +354,111 @@ const ProfileModal = ({ closeProfileModal }) => {
             <X size={20} />
           </button>
         </div>
+
         <div className="mt-4 flex flex-col gap-5 flex-1 min-h-0 overflow-y-auto pr-1">
-          <div>
-            {" "}
-            <div className=" p-4">
-              <div className="bg-white rounded-2xl p-5">
-                {/* Preview */}
-                <div className="w-40 h-40 mx-auto bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
-                  {image ? (
-                    <img
-                      src={image}
-                      alt="Profile preview"
-                      className="object-cover w-full h-full"
-                    />
-                  ) : isCameraOpen ? (
-                    <video
-                      ref={videoRef}
-                      autoPlay
-                      muted
-                      playsInline
-                      onLoadedMetadata={() => setIsVideoReady(true)}
-                      onCanPlay={() => setIsVideoReady(true)}
-                      className="w-full h-full"
-                    />
-                  ) : (
-                    <span className="text-gray-400 text-xs text-center">
-                      No Image Selected
-                    </span>
-                  )}
-                </div>
+          <div className="p-4">
+            <div className="bg-white rounded-2xl p-5">
+              <div className="w-40 h-40 mx-auto bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
+                {previewImage ? (
+                  <img
+                    src={previewImage}
+                    alt="Profile preview"
+                    className="object-cover w-full h-full"
+                  />
+                ) : isCameraOpen ? (
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    muted
+                    playsInline
+                    onLoadedMetadata={() => setIsVideoReady(true)}
+                    onCanPlay={() => setIsVideoReady(true)}
+                    className="w-full h-full"
+                  />
+                ) : (
+                  <span className="text-gray-400 text-xs text-center">
+                    No Image Selected
+                  </span>
+                )}
+              </div>
 
-                <canvas ref={canvasRef} className="hidden" />
+              <canvas ref={canvasRef} className="hidden" />
+              {cameraError && (
+                <p className="mt-2 text-xs text-red-600">{cameraError}</p>
+              )}
 
-                {cameraError && (
-                  <p className="mt-2 text-xs text-red-600">{cameraError}</p>
+              <div className="flex gap-3 mt-4">
+                {!isCameraOpen && !previewImage && (
+                  <>
+                    <label className="flex-1 cursor-pointer bg-gray-200 text-center py-2 rounded-lg hover:bg-gray-300">
+                      Upload
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleUpload}
+                      />
+                    </label>
+
+                    <button
+                      onClick={startCamera}
+                      className="flex-1 bg-black text-white py-2 rounded-lg hover:opacity-90"
+                    >
+                      Camera
+                    </button>
+                  </>
                 )}
 
-                {/* Actions */}
-                <div className="flex gap-3 mt-4">
-                  {!isCameraOpen && !image && (
-                    <>
-                      <label className="flex-1 cursor-pointer bg-gray-200 text-center py-2 rounded-lg hover:bg-gray-300">
-                        Upload
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleUpload}
-                        />
-                      </label>
+                {isCameraOpen && (
+                  <>
+                    <button
+                      onClick={takePhoto}
+                      disabled={!isVideoReady}
+                      title={
+                        isVideoReady ? "Capture photo" : "Camera is loading..."
+                      }
+                      className="flex-1 bg-green-600 text-white py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Capture
+                    </button>
 
+                    <button
+                      onClick={stopCamera}
+                      className="flex-1 bg-red-500 text-white py-2 rounded-lg"
+                    >
+                      Cancel
+                    </button>
+                  </>
+                )}
+
+                {previewImage && (
+                  <>
+                    <button
+                      onClick={handleRetake}
+                      className={`bg-gray-300 py-2 rounded-lg ${
+                        hasPendingUpload ? "flex-1" : "w-full"
+                      }`}
+                    >
+                      Retake
+                    </button>
+
+                    {hasPendingUpload && (
                       <button
-                        onClick={startCamera}
-                        className="flex-1 bg-black text-white py-2 rounded-lg hover:opacity-90"
+                        onClick={uploadProfileImage}
+                        disabled={updateEmployeeProfilMutation.isPending}
+                        className="flex-1 bg-blue-600 text-white py-2 rounded-lg disabled:opacity-60"
                       >
-                        Camera
+                        {updateEmployeeProfilMutation.isPending
+                          ? "Uploading..."
+                          : "Upload"}
                       </button>
-                    </>
-                  )}
-
-                  {isCameraOpen && (
-                    <>
-                      <button
-                        onClick={takePhoto}
-                        disabled={!isVideoReady}
-                        title={
-                          isVideoReady
-                            ? "Capture photo"
-                            : "Camera is loading..."
-                        }
-                        className="flex-1 bg-green-600 text-white py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Capture
-                      </button>
-
-                      <button
-                        onClick={stopCamera}
-                        className="flex-1 bg-red-500 text-white py-2 rounded-lg"
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  )}
-
-                  {image && (
-                    <>
-                      <button
-                        onClick={() => setImage(null)}
-                        className="flex-1 bg-gray-300 py-2 rounded-lg"
-                      >
-                        Retake
-                      </button>
-
-                      <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg">
-                        Upload
-                      </button>
-                    </>
-                  )}
-                </div>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </div>
+
           <div>
             <TextInput
               label="First Name"
@@ -373,6 +479,7 @@ const ProfileModal = ({ closeProfileModal }) => {
               }}
             />
           </div>
+
           <div>
             <TextInput
               label="Last Name"
@@ -393,6 +500,7 @@ const ProfileModal = ({ closeProfileModal }) => {
               }}
             />
           </div>
+
           <div>
             <TextInput
               label="Phone"
@@ -413,6 +521,7 @@ const ProfileModal = ({ closeProfileModal }) => {
               }}
             />
           </div>
+
           <div>
             <TextInput
               disabled
@@ -434,20 +543,26 @@ const ProfileModal = ({ closeProfileModal }) => {
               }}
             />
           </div>
+
           <div>
             <Button
-              onClick={() => updateEmployeeProfilMutation.mutate({
-                id: data?.employee?.userId?._id,
-                firstname,
-                lastname,
-                email,
-                phone
-              })}
+              onClick={() =>
+                updateEmployeeProfilMutation.mutate({
+                  id: data?.employee?.userId?._id,
+                  firstname,
+                  lastname,
+                  email,
+                  phone,
+                })
+              }
+              disabled={updateEmployeeProfilMutation.isPending}
               variant="filled"
               color="#000"
               className="border p-1 w-full rounded-md bg-black text-white font-medium"
             >
-              Update Profile
+              {updateEmployeeProfilMutation.isPending
+                ? "Saving..."
+                : "Update Profile"}
             </Button>
           </div>
         </div>
