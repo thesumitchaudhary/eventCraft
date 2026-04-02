@@ -123,11 +123,11 @@ const MyBookings = () => {
                 <div className="">
                   <div className="relative">
                     <p>Event Progress</p>
-                    <p className="">90%</p>
+                    <p className="">{booking.progress}%</p>
                     <div className="max-w-7xl h-3 border border-black rounded-xl overflow-hidden">
                       <div
                         className="h-full bg-black"
-                        style={{ width: "90%" }}
+                        style={{ width: `${booking.progress}px` }}
                       />
                     </div>
                   </div>

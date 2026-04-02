@@ -34,14 +34,13 @@ const fetcher = async (url) => {
 };
 
 const Dashboard = () => {
-
   const { data, isLoading } = useQuery({
     queryKey: ["my-bookings"],
     queryFn: async () =>
       await fetcher("http://localhost:4041/api/index/my-booking"),
   });
 
-  // console.log("query data:", data);
+  console.log("query data:", data);
   // console.log("query error:", error);
 
   return (
@@ -53,7 +52,9 @@ const Dashboard = () => {
           <div className="flex gap-4">
             <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-2xl border-l-6 border-l-[#9810fa]">
               <p className="text-center">Total Bookings</p>
-              <p className="text-2xl font-semibold text-center text-[#9810fa]">{data?.events.length}</p>
+              <p className="text-2xl font-semibold text-center text-[#9810fa]">
+                {data?.events.length}
+              </p>
             </div>
             <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-2xl border-l-6 border-l-[#f54a00]">
               <p className="text-center">Upcoming Events</p>
@@ -67,7 +68,13 @@ const Dashboard = () => {
             </div>
             <div className="w-99 border p-6 bg-gray-50 border-gray-300 rounded-2xl border-l-6 border-l-[#00a63e]">
               <p className="text-center">Total Spent</p>
-              <p className="text-2xl font-semibold text-center text-[#00a63e]">$ {data?.events.reduce((total, event) => total + event.totalPaid, 0)}</p>
+              <p className="text-2xl font-semibold text-center text-[#00a63e]">
+                ${" "}
+                {data?.events.reduce(
+                  (total, event) => total + event.totalPaid,
+                  0,
+                )}
+              </p>
             </div>
           </div>
         </section>
@@ -83,8 +90,13 @@ const Dashboard = () => {
                   <th className="py-2">Event</th>
                   <th className="py-2">Date</th>
                   <th className="py-2">Theme</th>
-                  <th className="py-2">Status</th>
-                  <th className="py-2">Progress</th>
+                  <th className="py-2">
+                    Status for Conformation <br /> from Admin
+                  </th>
+                  <th className="py-2">
+                    Status for work update <br /> from employee
+                  </th>
+                  <th className="py-2">Work Progress</th>
                 </tr>
               </thead>
 
@@ -102,11 +114,19 @@ const Dashboard = () => {
                     <td className="py-2">{booking.eventName}</td>
                     <td>{new Date(booking.eventDate).toLocaleDateString()}</td>
                     <td>{booking.theme}</td>
-                    <td>{booking.bookingStatus}</td>
                     <td>
-                      {/* {booking.bookingStatus === "completed" ? "100%" : "60%"} */}
-                      0%
+                      {" "}
+                      <span className="text-xs font-semibold text-white bg-gray-600 p-1 rounded-md">
+                        {" "}
+                        {booking.bookingStatus}
+                      </span>
                     </td>
+                    <td>
+                      <span className="text-xs font-semibold text-white bg-black p-1 rounded-md">
+                        {booking.progress !== 0 ? "in-progress" : "pending"}
+                      </span>
+                    </td>
+                    <td>{booking.progress}%</td>
                   </tr>
                 ))}
               </tbody>
