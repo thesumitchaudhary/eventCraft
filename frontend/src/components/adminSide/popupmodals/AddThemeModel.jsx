@@ -85,7 +85,7 @@ export const AddThemeModel = ({ closeAddThemeModel }) => {
             </div>
             <div>
               <TextInput
-                label="Theme Name"
+                label="Theme Type"
                 placeholder={focusedThemeType ? "Enter Event Type" : ""}
                 value={themeType}
                 onChange={(e) => setThemeType(e.currentTarget.value)}
@@ -105,7 +105,7 @@ export const AddThemeModel = ({ closeAddThemeModel }) => {
             </div>
             <div>
               <TextInput
-                label="Theme Name"
+                label="Theme Price"
                 placeholder={focusedThemePrice ? "Enter Event Price" : ""}
                 value={themePrice}
                 onChange={(e) => setThemePrice(e.currentTarget.value)}

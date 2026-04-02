@@ -17,7 +17,16 @@ import { deleteObject, getObjectURL, uploadObject } from "../config/s3.js";
 import authMiddleware from "../Middleware/authMiddleware.js";
 import adminMiddleware from "../Middleware/adminMiddleware.js";
 
+// import admin login controller
+import { adminLogin } from "../controllers/Auth.js";
+
+// import all action controller and get event Themes
+import { getAllThemes, addEventTheme } from "../controllers/eventThemeController.js"
+
 const router = express.Router();
+
+// for admin login
+router.post("/login", adminLogin)
 
 const PROFILE_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const MIME_EXTENSION_MAP = {
@@ -188,7 +197,7 @@ router.put("/user/:id", authMiddleware, adminMiddleware, async (req, res) => {
         }
 
         return res.json({
-            message: "Profile updated", 
+            message: "Profile updated",
             admin: updatedAdmin
         });
     }
@@ -197,57 +206,7 @@ router.put("/user/:id", authMiddleware, adminMiddleware, async (req, res) => {
     }
 });
 
-router.post("/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
 
-        if (!email || !password) {
-            return res.status(400).json({ message: "Email and password are required" });
-        }
-
-        const user = await userModel.findOne({ email: email.trim() });
-
-        if (!user) {
-            return res.status(401).json({ message: "Invalid credentials" });
-        }
-
-        // optional: enforce admin-only login on this route
-        if (user.role !== "admin") {
-            return res.status(403).json({ message: "Access denied" });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password); // fixed typo
-
-        if (!isMatch) {
-            return res.status(401).json({ message: "Invalid credentials" });
-        }
-
-        const token = jwt.sign(
-            {
-                id: user._id,
-                email: user.email,
-                role: user.role,
-                firstname: user.firstname,
-                lastname: user.lastname
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: "1d" }
-        );
-
-        res.cookie("token", token, {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: process.env.NODE_ENV === "production"
-        });
-
-        return res.status(200).json({
-            message: "Admin login successful",
-            role: user.role
-        });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }
-})
 
 // this is for task section
 
@@ -349,34 +308,9 @@ router.put("/updateStatus/:id", authMiddleware, adminMiddleware, async (req, res
 
 // this is all routes for the eventtheme
 
-router.get("/getAllEventTheme", authMiddleware, async (req, res) => {
-    try {
-        const getEventThemes = await eventThemeModel.find();
+router.get("/getAllEventTheme", authMiddleware, getAllThemes)
 
-        if (!getEventThemes) {
-            res.json("there was not theme available")
-        }
-
-        res.json(getEventThemes);
-    } catch (error) {
-        res.json({ message: error })
-    }
-})
-
-router.post("/addEventTheme", authMiddleware, adminMiddleware, async (req, res) => {
-    try {
-        const { themeName, themeType, themePrice } = req.body;
-        const eventThemeCreated = await eventThemeModel.create({
-            themeName,
-            themeType,
-            themePrice
-        })
-        res.json(eventThemeCreated)
-    }
-    catch (error) {
-        res.json({ message: error })
-    }
-})
+router.post("/addEventTheme", authMiddleware, adminMiddleware, addEventTheme)
 
 router.delete("/deleteEventTheme/:id", authMiddleware, adminMiddleware, async (req, res) => {
     try {
