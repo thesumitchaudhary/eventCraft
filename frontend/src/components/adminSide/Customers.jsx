@@ -47,7 +47,7 @@ const Customers = () => {
           <div className="bg-gray-50 p-3 border border-gray-300 rounded-2xl">
             <table className="w-full my-3 border-collapse">
               <thead>
-                <tr className="border-b border-gray-300 text-left">
+                <tr className="border-b-2 border-black text-left">
                   <th className="py-2">Name</th>
                   <th className="py-2">Email</th>
                   <th className="py-2">Phone</th>
@@ -57,17 +57,17 @@ const Customers = () => {
               </thead>
               <tbody>
                 {data?.customers.flatMap((customer) => (
-                  <tr key={customer._id} className="border-b border-gray-300">
-                    <td className="py-2 border-b border-gray-300 p-1">
+                  <tr key={customer._id} className="border-b border-black">
+                    <td className="py-2 border-b p-1">
                       {customer?.userId?.firstname} {customer?.userId?.lastname}
                     </td>
-                    <td className="border-b border-gray-300 p-1">
+                    <td className="border-b p-1">
                       {customer?.userId?.email}
                     </td>
-                    <td className="border-b border-gray-300 p-1">
+                    <td className="border-b p-1">
                       {customer?.phone}
                     </td>
-                    <td className="border-b border-gray-300 p-1">
+                    <td className="border-b p-1">
                       {customer?.address}
                     </td>
                     <td>

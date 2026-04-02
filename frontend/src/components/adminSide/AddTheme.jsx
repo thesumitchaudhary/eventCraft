@@ -161,7 +161,7 @@ const AddTheme = () => {
             <table className="min-w-full">
               {/* TABLE HEADER */}
               <thead className=" sticky top-0">
-                <tr>
+                <tr className="border-b-2 border-black text-left">
                   <th className="text-left px-4 py-3 border-b font-semibold">
                     Theme Name
                   </th>
@@ -204,7 +204,7 @@ const AddTheme = () => {
                 {!isLoading &&
                   data.map((theme, index) => (
                     <tr key={theme._id}>
-                      <td className="px-4 py-3 border-b">
+                      <td className="px-4 py-3 border-b border-black">
                         <input
                           type="text"
                           value={

@@ -47,17 +47,18 @@ const fetcher = async (url) => {
 };
 
 const Bookings = () => {
-  const id = useParams();
-
   const { data, isLoading } = useQuery({
     queryKey: ["showbookings"],
     queryFn: async () =>
       await fetcher("http://localhost:4041/api/admin/showBookedEvent"),
   });
 
-  console.log(data?.customers?.map((data) => data?.events))
-  // console.log(data?.customers?.flatMap((customer) => customer?.events.length))
-  
+  // console.log(data?.customers?.map((data) => data?.events));
+  // console.log(data?.customers?.flatMap((customer) => customer))
+  // console.log(data?.customers?.flatMap((customer) => customer?.events.map((booking)=> booking.bookingStatus === "accepted")).filter((isAccepted) => isAccepted).length)
+  // console.log(data?.customers?.flatMap((customer) => customer?.events.map((booking)=> booking.bookingStatus === "accepted")).filter(Boolean).length)
+  // console.log(data?.customers?.flatMap((customer) => customer?.events.map((booking)=> booking.progress !== 0)).filter(Boolean).length)
+
   const eventBookActionMutation = useMutation({
     mutationFn: ({ id, bookingStatus }) =>
       updateEventBookStatus(id, bookingStatus),
@@ -77,7 +78,12 @@ const Bookings = () => {
           <div className="flex justify-between">
             <div>
               <h1>Booking Management</h1>
-              <p>Total bookings: {data?.customers.flatMap((customer) => customer?.events.length)?.reduce((total,totalcustomer)=> total+totalcustomer,0)}</p>
+              <p>
+                Total bookings:{" "}
+                {data?.customers
+                  .flatMap((customer) => customer?.events.length)
+                  ?.reduce((total, totalcustomer) => total + totalcustomer, 0)}
+              </p>
             </div>
             <div className="flex">
               <Search className="border h-10 w-10 p-1" />
@@ -87,21 +93,73 @@ const Bookings = () => {
         </section>
         <section className="my-10 mx-5">
           <div className="flex gap-5">
-            <div className="min-w-70 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#6a7282]">
+            <div className="min-w-55 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#6a7282]">
               <p className="text-center">Pending</p>
-              <h3 className="text-center text-2xl font-bold text-[#6a7282]">0</h3>
+              <h3 className="text-center text-2xl font-bold text-[#6a7282]">
+                {
+                  data?.customers
+                    ?.flatMap((customer) =>
+                      customer?.events.map(
+                        (booking) => booking.bookingStatus === "pending",
+                      ),
+                    )
+                    .filter(Boolean).length
+                }
+              </h3>
             </div>
-            <div className="min-w-70 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#155dfc]">
+            <div className="min-w-55 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#fd0d0d]">
+              <p className="text-center">rejected</p>
+              <h3 className="text-center text-2xl font-bold text-[#fd0d0d]">
+                {
+                  data?.customers
+                    ?.flatMap((customer) =>
+                      customer?.events.map(
+                        (booking) => booking.bookingStatus === "rejected",
+                      ),
+                    )
+                    .filter(Boolean).length
+                }
+              </h3>
+            </div>
+            <div className="min-w-55 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#155dfc]">
               <p className="text-center">Confirmed</p>
-              <h3 className="text-center text-2xl font-bold text-[#155dfc]">0</h3>
+              <h3 className="text-center text-2xl font-bold text-[#155dfc]">
+                {
+                  data?.customers
+                    ?.flatMap((customer) =>
+                      customer?.events.map(
+                        (booking) => booking.bookingStatus === "accepted",
+                      ),
+                    )
+                    .filter(Boolean).length
+                }
+              </h3>
             </div>
-            <div className="min-w-70 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#f54a00]">
+            <div className="min-w-55 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#f54a00]">
               <p className="text-center">In Progress</p>
-              <h3 className="text-center text-2xl font-bold text-[#f54a00]">1</h3>
+              <h3 className="text-center text-2xl font-bold text-[#f54a00]">
+                {
+                  data?.customers
+                    ?.flatMap((customer) =>
+                      customer?.events.map((booking) => booking.progress !== 0),
+                    )
+                    .filter(Boolean).length
+                }
+              </h3>
             </div>
-            <div className="min-w-70 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#00a63e]">
+            <div className="min-w-55 p-5 rounded-2xl bg-gray-50 border border-gray-300 border-l-6 border-l-[#00a63e]">
               <p className="text-center">Completed</p>
-              <h3 className="text-center text-2xl font-bold text-[#00a63e]">1</h3>
+              <h3 className="text-center text-2xl font-bold text-[#00a63e]">
+                {
+                  data?.customers
+                    ?.flatMap((customer) =>
+                      customer?.events.map(
+                        (booking) => booking.bookingStatus === "completed",
+                      ),
+                    )
+                    .filter(Boolean).length
+                }
+              </h3>
             </div>
           </div>
         </section>
@@ -109,7 +167,7 @@ const Bookings = () => {
           <div className="bg-gray-50 p-5 rounded-2xl border border-gray-300">
             <table className="w-full my-4 border-collapse text-sm">
               <thead>
-                <tr className="border-b border-black text-left">
+                <tr className="border-b-2 border-black text-left">
                   <th className="py-2 px-2">Event Name</th>
                   <th className="py-2 px-2">Type</th>
                   <th className="py-2 px-2">Theme</th>
@@ -132,80 +190,84 @@ const Bookings = () => {
                     </td>
                   </tr>
                 )}
-                {data?.customers?.flatMap((customer) => customer?.events.map((booking) => (
-                  <tr key={booking._id} className="border-b border-gray-300">
-                    <td className="py-2 px-2">{booking.eventName}</td>
-                    <td className="py-2 px-2">{booking.eventType}</td>
-                    <td className="py-2 px-2">{booking.theme}</td>
-                    <td className="py-2 px-2">
-                      {new Date(booking.eventDate).toLocaleDateString()}
-                    </td>
-                    <td className="py-2 px-2">{booking.venue}</td>
-                    <td className="py-2 px-2">{booking.guestCount}</td>
-                    <td className="py-2 px-2">{booking.totalAmount}</td>
-                    <td className="py-2 px-2">
-                      <span className="bg-gray-800 text-white text-xs px-2 py-1 rounded">
-                        {booking.paymentStatus}
-                      </span>
-                    </td>
-                    <td className="py-2 px-2">
-                      <span className="bg-gray-500 text-white text-xs px-2 py-1 rounded">
-                        {booking.bookingStatus}
-                      </span>
-                    </td>
-                    <td className="py-2 px-2 font-medium">60%</td>
-                    <td className="py-2 px-2 font-medium flex flex-col">
-                      <Menu>
-                        <Menu.Target>
-                          <ActionIcon
-                            variant="transparent"
-                            aria-label="More options"
-                          >
-                            <EllipsisVertical
-                              className="text-black"
-                              size={18}
-                            />
-                          </ActionIcon>
-                        </Menu.Target>
+                {data?.customers?.flatMap((customer) =>
+                  customer?.events.map((booking) => (
+                    <tr key={booking._id} className="border-b border-black">
+                      <td className="py-2 px-2">{booking.eventName}</td>
+                      <td className="py-2 px-2">{booking.eventType}</td>
+                      <td className="py-2 px-2">{booking.theme}</td>
+                      <td className="py-2 px-2">
+                        {new Date(booking.eventDate).toLocaleDateString()}
+                      </td>
+                      <td className="py-2 px-2">{booking.venue}</td>
+                      <td className="py-2 px-2">{booking.guestCount}</td>
+                      <td className="py-2 px-2">{booking.totalAmount}</td>
+                      <td className="py-2 px-2">
+                        <span className="bg-gray-800 text-white text-xs px-2 py-1 rounded">
+                          {booking.paymentStatus}
+                        </span>
+                      </td>
+                      <td className="py-2 px-2">
+                        <span className="bg-gray-500 text-white text-xs px-2 py-1 rounded">
+                          {booking.bookingStatus}
+                        </span>
+                      </td>
+                      <td className="py-2 px-2 font-medium">
+                        {booking.progress}%
+                      </td>
+                      <td className="py-2 px-2 font-medium flex flex-col">
+                        <Menu>
+                          <Menu.Target>
+                            <ActionIcon
+                              variant="transparent"
+                              aria-label="More options"
+                            >
+                              <EllipsisVertical
+                                className="text-black"
+                                size={18}
+                              />
+                            </ActionIcon>
+                          </Menu.Target>
 
-                        <Menu.Dropdown>
-                          <Menu.Item
-                            onClick={(e) =>
-                              eventBookActionMutation.mutate({
-                                id: booking._id,
-                                bookingStatus: "rejected",
-                              })
-                            }
-                          >
-                            Reject
-                          </Menu.Item>
-                          <Menu.Item
-                            onClick={(e) =>
-                              eventBookActionMutation.mutate({
-                                id: booking._id,
-                                bookingStatus: "accepted",
-                              })
-                            }
-                          >
-                            Accept
-                          </Menu.Item>
-                          <Menu.Item
-                            onClick={(e) =>
-                              eventBookActionMutation.mutate({
-                                id: booking._id,
-                                bookingStatus: "completed",
-                              })
-                            }
-                          >
-                            Completed
-                          </Menu.Item>
+                          <Menu.Dropdown>
+                            <Menu.Item
+                              onClick={(e) =>
+                                eventBookActionMutation.mutate({
+                                  id: booking._id,
+                                  bookingStatus: "rejected",
+                                })
+                              }
+                            >
+                              Reject
+                            </Menu.Item>
+                            <Menu.Item
+                              onClick={(e) =>
+                                eventBookActionMutation.mutate({
+                                  id: booking._id,
+                                  bookingStatus: "accepted",
+                                })
+                              }
+                            >
+                              Accept
+                            </Menu.Item>
+                            <Menu.Item
+                              onClick={(e) =>
+                                eventBookActionMutation.mutate({
+                                  id: booking._id,
+                                  bookingStatus: "completed",
+                                })
+                              }
+                            >
+                              Completed
+                            </Menu.Item>
 
-                          {/* Other items ... */}
-                        </Menu.Dropdown>
-                      </Menu>
-                    </td>
-                  </tr>
-                )))}
+                            {/* Other items ... */}
+                          </Menu.Dropdown>
+                        </Menu>
+                      </td>
+                    </tr>
+                  )),
+                )}
               </tbody>
             </table>
           </div>

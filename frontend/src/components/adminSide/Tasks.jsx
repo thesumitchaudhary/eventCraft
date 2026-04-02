@@ -89,10 +89,10 @@ const Tasks = () => {
           </div>
         </section>
         <section className="my-10 mx-5">
-          <div className="bg-gray-50 p-5 border border-gray-300 rounded-2xl">
+          <div className="bg-gray-50 p-5 border  rounded-2xl">
             <table className="w-full table-fixed border-collapse">
-              <thead className="bg-gray-100 text-gray-700 text-sm uppercase tracking-wide">
-                <tr>
+              <thead className="  text-sm uppercase tracking-wide">
+                <tr className="border-b-2 border-black  text-left">
                   <th className="w-[22%] px-4 py-3 text-left">Task</th>
                   <th className="w-[28%] px-4 py-3 text-left">Description</th>
                   <th className="w-[14%] px-4 py-3 text-left">Assigned To</th>
@@ -107,7 +107,7 @@ const Tasks = () => {
                 {taskRows.map((row) => (
                   <tr
                     key={row.rowKey}
-                    className="border-b border-gray-200 hover:bg-gray-50 transition"
+                    className="border-b border-black hover:bg-gray-50 transition"
                   >
                     {/* Task */}
                     <td className="px-4 py-3 font-medium text-gray-800 truncate">
@@ -141,7 +141,7 @@ const Tasks = () => {
                     </td>
 
                     {/* Status */}
-                    <td className="px-4 py-3">
+                    <td className="px-2 py-3">
                       <span className="text-xs font-medium px-3 py-1 rounded-full bg-gray-900 text-white">
                         {row.status}
                       </span>
@@ -157,50 +157,6 @@ const Tasks = () => {
                     </td>
                   </tr>
                 ))}
-                {/* <tr className="border-b border-black">
-                  <td className="py-2 border-b border-gray-300 p-1">
-                    Corporate Event Catering Coordination
-                  </td>
-                  <td className="border-b border-gray-300 p-1">
-                    Coordinate with catering team for Tech Corp annual
-                  </td>
-                  <td className="border-b border-gray-300 p-1">Mike Davis</td>
-                  <td className="border-b  border-gray-300 p-1">
-                    <span className="bg-[#fef9c2] p-1 px-2 text-xs rounded-xl text-[#984b00]">
-                      Meduim
-                    </span>
-                  </td>
-                  <td className="border-b  border-gray-300">
-                    <span className="bg-gray-300 text-black text-xs p-1 rounded-xl">
-                      pending
-                    </span>
-                  </td>
-                  <td className="border-b border-gray-300 p-1">2026-02-01</td>
-                  <td className="border-b border-gray-300 p-1">2026-01-18</td>
-                </tr>
-                <tr className="border-b border-black">
-                  <td className="py-2 border-b border-gray-300 p-1">
-                    Birthday Party Entertainment Setupn
-                  </td>
-                  <td className="border-b border-gray-300 p-1">
-                    Setup sound system and lighting for kids birthday party
-                  </td>
-                  <td className="border-b border-gray-300 p-1">
-                    Sarah Johnson
-                  </td>
-                  <td className="border-b  border-gray-300 p-1">
-                    <span className="bg-[#dbfce7] p-1 px-2 text-xs rounded-xl text-[#246630]">
-                      low
-                    </span>
-                  </td>
-                  <td className="border-b  border-gray-300">
-                    <span className="bg-black text-white text-xs p-1 rounded-xl">
-                      completed
-                    </span>
-                  </td>
-                  <td className="border-b border-gray-300 p-1">2026-02-01</td>
-                  <td className="border-b border-gray-300 p-1">2026-01-18</td>
-                </tr> */}
               </tbody>
             </table>
           </div>

@@ -71,7 +71,7 @@ export default function CellPie({ isAnimationActive = true }) {
       if (["pending"].includes(status)) acc.pending += 1;
       else if (["in progress", "processing", "ongoing"].includes(status))
         acc.inProgress += 1;
-      else acc.completed += 1;
+      else acc.inProgress += 1;
       return acc;
     },
     { pending: 0, inProgress: 0, completed: 0 }

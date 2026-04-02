@@ -55,11 +55,10 @@ const Employees = () => {
   });
 
   // console.log(users.map((user) => user.firstname));
-  console.log(
-    details.flatMap((detail) =>
-      detail?.tasks?.map((taskDetail) => taskDetail).length),
-    );
-
+  const completed = details
+    .flatMap((detail) => detail?.tasks || [])
+    .filter((task) => task?.status === "in-progress").length;
+  console.log(completed);
 
   return (
     <div className="bg-[#f0f1f3]">
@@ -69,7 +68,7 @@ const Employees = () => {
           <div className="flex justify-between">
             <h1>Employee Management</h1>
             <button
-              onClick={(e) => setOpenEmployeeModal(true)}
+              onClick={() => setOpenEmployeeModal(true)}
               className="flex gap-1 bg-black text-white p-2 rounded-2xl"
             >
               <UserPlus className="h-4" />
@@ -83,16 +82,30 @@ const Employees = () => {
         <section className="my-10 mx-5">
           <div className="flex gap-5">
             <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#9810fa]">
-              <p className="text-center">Total Employees</p>
-              <h3 className="font-semibold text-2xl text-center text-[#9810fa]">{employees.length}</h3>
+              <p>Total Employees</p>
+              <h3 className="font-semibold text-2xl text-[#9810fa]">
+                {employees.length}
+              </h3>
             </div>
             <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#f54a00]">
-              <p className="text-center">Active Tasks</p>
-              <h3 className="font-semibold text-2xl text-center text-[#f54a00]">{employees?.tasks?.length || 0}</h3>
+              <p>Active Tasks</p>
+              <h3 className="font-semibold text-2xl text-[#f54a00]">
+                {
+                  details
+                    .flatMap((detail) => detail?.tasks || [])
+                    .filter((task) => task?.status === "in-progress").length
+                }
+              </h3>
             </div>
             <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#00a63e]">
-              <p className="text-center">Completed Tasks</p>
-              <h3 className="font-semibold text-2xl text-center text-[#00a63e]">1</h3>
+              <p>Completed Tasks</p>
+              <h3 className="font-semibold text-2xl text-[#00a63e]">
+                  {
+                  details
+                    .flatMap((detail) => detail?.tasks || [])
+                    .filter((task) => task?.status === "completed").length
+                }
+              </h3>
             </div>
           </div>
         </section>
@@ -100,7 +113,7 @@ const Employees = () => {
           <div className="bg-gray-50 border border-gray-300 rounded-2xl p-2">
             <table className="w-full my-3 border-collapse">
               <thead>
-                <tr className="border-b border-black text-left">
+                <tr className="border-b-2 border-black text-left">
                   <th className="py-2">Name</th>
                   <th className="py-2">Email</th>
                   <th className="py-2">Phone</th>
@@ -116,24 +129,24 @@ const Employees = () => {
                       key={employee?._id || employee?.userId || `emp-${index}`}
                       className="border-b border-black"
                     >
-                      <td className="py-2 border-b border-gray-300 p-1">
+                      <td className="py-2 border-b p-1">
                         {[employee?.firstname, employee?.lastname]
                           .filter(Boolean)
                           .join(" ") || "N/A"}
                       </td>
-                      <td className="border-b border-gray-300 p-1">
-                        {employee?.email || "N/A"}
+                      <td className="border-b p-1">
+                        {employee?.email}
                       </td>
-                      <td className="border-b border-gray-300 p-1">
-                        {employee?.phone || "N/A"}
+                      <td className="border-b p-1">
+                        {employee?.phone}
                       </td>
-                      <td className="border-b border-gray-300 p-1">
-                        {employee?.designation || "Event Coordinator"}
+                      <td className="border-b p-1">
+                        {employee?.designation}
                       </td>
-                      <td className="border-b border-gray-300 p-1">
-                        {employee?.joiningDate || "2024-01-15"}
+                      <td className="border-b p-1">
+                        {new Date(employee?.joiningDate).toLocaleDateString()}
                       </td>
-                      <td className="border-b border-gray-300 p-1">
+                      <td className="border-b p-1">
                         <span>{employee?.tasks.length}</span>
                       </td>
                     </tr>

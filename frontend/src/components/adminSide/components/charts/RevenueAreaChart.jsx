@@ -9,19 +9,67 @@ import {
   Legend,
 } from "recharts";
 import { RechartsDevtools } from "@recharts/devtools";
+import { useQuery } from "@tanstack/react-query";
 
-const data = [
-  { month: "Dec 2025", revenue: 26000 },
-  { month: "Nov 2025", revenue: 24000 },
-  { month: "Oct 2025", revenue: 15000 },
-];
+const fetcher = async (url) => {
+  const res = await fetch(url, { credentials: "include" });
+  const body = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body?.message || "Request Failed");
+  }
+
+  return body;
+};
 
 export default function RevenueAreaChart() {
+  const { data: apiData, isLoading, error } = useQuery({
+    queryKey: ["showbookings"],
+    queryFn: () =>
+      fetcher("http://localhost:4041/api/admin/showBookedEvent"),
+  });
+
+  // Transform API data to group revenue by month
+  const chartData = React.useMemo(() => {
+    if (!apiData?.customers) return [];
+
+    const revenueByMonth = {};
+
+    apiData.customers.forEach((customer) => {
+      if (Array.isArray(customer?.events)) {
+        customer.events.forEach((event) => {
+          // Calculate event total
+          const eventTotal = Array.isArray(event?.totalAmount)
+            ? event.totalAmount.reduce((sum, amount) => sum + (amount || 0), 0)
+            : event?.totalAmount || 0;
+
+          // Get month from event date
+          const eventDate = new Date(event?.createdAt || event?.date || new Date());
+          const monthKey = eventDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+          });
+
+          // Accumulate revenue by month
+          revenueByMonth[monthKey] = (revenueByMonth[monthKey] || 0) + eventTotal;
+        });
+      }
+    });
+
+    // Convert to array and sort by date
+    return Object.entries(revenueByMonth)
+      .map(([month, revenue]) => ({ month, revenue }))
+      .sort((a, b) => new Date(a.month) - new Date(b.month));
+  }, [apiData]);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
   return (
     <AreaChart
       width={900}
       height={320}
-      data={data}
+      data={chartData}
       margin={{ top: 20, right: 30, left: 10, bottom: 0 }}
     >
       {/* Gradient definition */}
@@ -35,10 +83,7 @@ export default function RevenueAreaChart() {
       <CartesianGrid strokeDasharray="4 4" vertical={false} />
 
       <XAxis dataKey="month" />
-      <YAxis
-        ticks={[0, 6500, 13000, 19500, 26000]}
-        domain={[0, 26000]}
-      />
+      <YAxis />
 
       <Tooltip />
       <Legend />
