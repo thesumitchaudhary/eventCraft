@@ -179,7 +179,7 @@ const LiveChatLayout = ({ closeLiveModal, ticketId }) => {
                 key={msg._id || `${msg.createdAt || "no-time"}-${msg.senderId || "no-sender"}`}
                 className={`flex flex-col max-w-max p-2 rounded-2xl ${
                   msg.senderRole === "customer"
-                    ? "bg-blue-300 ml-auto"
+                    ? "bg-blue-400 ml-auto"
                     : "bg-gray-200"
                 }`}
               >

@@ -29,7 +29,7 @@ const LiveIcon = () => {
     <>
       <button
         onClick={(e) => setOpenLiveModal(true)}
-        className="fixed top-140 rounded-full max-w-max bg-black text-white p-4"
+        className="fixed top-130 rounded-full max-w-max bg-black text-white p-4"
       >
         <MessageCircle />
       </button>

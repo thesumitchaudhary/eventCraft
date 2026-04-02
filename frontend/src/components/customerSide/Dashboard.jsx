@@ -86,7 +86,7 @@ const Dashboard = () => {
             </div>
             <table className="w-full my-3 border-collapse">
               <thead>
-                <tr className="border-b border-black text-left">
+                <tr className="border-b-2 border-black text-left">
                   <th className="py-2">Event</th>
                   <th className="py-2">Date</th>
                   <th className="py-2">Theme</th>

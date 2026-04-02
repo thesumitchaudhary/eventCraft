@@ -22,7 +22,7 @@ const LiveIcon = () => {
             toOpenLiveModal();
             // controlLive();
           }}
-          className="fixed top-140 z-10 rounded-full bg-black text-white p-4"
+          className="fixed top-130 z-10 rounded-full bg-black text-white p-4"
         >
           <MessageCircle />
         </button>
