@@ -39,7 +39,8 @@ const Dashboard = () => {
     queryFn: () => fetcher(`http://localhost:4041/api/employee/myTask`),
   });
 
-  console.log(data?.employee?.tasks.map((task) => task));
+  // console.log(data?.employee?.tasks.map((task) => task));
+  console.log(data);
 
   return (
     <div className="bg-[#ededed]">
@@ -54,16 +55,21 @@ const Dashboard = () => {
               <div className="flex flex-col gap-1">
                 <div className="flex justify-between">
                   <h4 className="text-lg ">
-                    {/* Setup Wedding Venue Decorations */}
                     {task.taskTitle}
                   </h4>
                   <div className="flex gap-5">
-                    <span className="text-sm text-red-500 bg-red-200 px-3 p-1 rounded-full">
-                      {/* high */}
-                      {task.priority}
+                    <span className="text-sm px-3 p-1 rounded-full">
+                      {task.priority === "Medium" ? (
+                        <span className="bg-[#fef9c2] text-[#90550b] p-1 px-5 rounded-md">
+                          Medium
+                        </span>
+                      ) : task.priority === "High" ? (
+                        <span className="text-red-500 bg-red-200  p-1 px-5 rounded-md">High</span>
+                      ) : (
+                        <span className="bg-[#dbfce7] text-[#157441]  p-1 px-5 rounded-md">Low</span>
+                      )}
                     </span>
                     <span className="flex gap-1 text-xs bg-black text-white px-3 py-1 rounded-xl">
-                      {/* in-progress */}
                       <Clock4 className="h-4 w-4" /> {task.status}
                     </span>
                   </div>
@@ -88,7 +94,7 @@ const Dashboard = () => {
                       </span>
                     </span>
                     <span className="text-gray-600">
-                      Progress: <span className="text-blackl">0%</span>
+                      Progress: <span className="text-blackl">{task?.eventId?.progress}%</span>
                     </span>
                   </p>
                 </div>
@@ -111,7 +117,13 @@ const Dashboard = () => {
                 <div>
                   <p>Priority</p>
                   <p className="font-bold text-xs">
-                    {/* high */} {task.priority}
+                    {task.priority === "Medium" ? (
+                      <span>Medium</span>
+                    ) : task.priority === "High" ? (
+                      <span>High</span>
+                    ) : (
+                      <span>Low</span>
+                    )}
                   </p>
                 </div>
               </div>

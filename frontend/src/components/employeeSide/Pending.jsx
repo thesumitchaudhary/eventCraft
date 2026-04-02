@@ -62,7 +62,7 @@ const Pending = () => {
   });
 
   const pendingTasks =
-    data?.employee?.tasks?.filter((task) => task.status !== "completed") || [];
+    data?.employee?.tasks?.filter((task) => task.status !== "in-progress") || [];
 
   console.log(pendingTasks.length);
 
@@ -93,6 +93,7 @@ const Pending = () => {
       <Header />
       <main>
         <section className="my-10 mx-5">
+          {pendingTasks.length === 0 ?(<div> </div>): (
           <div className="flex justify-between animate-pulse bg-linear-to-r from-[#ff6b00] to-[#fe9800] p-10 rounded-xl">
             <div className="flex gap-3">
               <div className="h-10 w-10 rounded-full bg-[#ff8a33] text-white p-2 mt-1">
@@ -107,6 +108,7 @@ const Pending = () => {
               <span className="text-2xl font-bold text-[#fe9800]">1</span>
             </div>
           </div>
+          )}
         </section>
         <section className="my-10 mx-5">
           {pendingTasks.length === 0 ? (
@@ -142,8 +144,16 @@ const Pending = () => {
                     <p className="text-gray-400">{task.taskDescription}</p>
                   </div>
                   <div>
-                    <span className="text-sm text-red-500 bg-red-200 px-3 p-1 rounded-full">
-                      {task.priority}
+                    <span className="text-sm px-3 p-1 rounded-full">
+                          {task.priority === "Medium" ? (
+                        <span className="bg-[#fef9c2] text-[#90550b] p-1 rounded-md">
+                          Medium
+                        </span>
+                      ) : task.priority === "High" ? (
+                        <span className="text-red-500 bg-red-200 ">High</span>
+                      ) : (
+                        <span className="bg-[#dbfce7] text-[#157441]">Low</span>
+                      )}
                     </span>
                   </div>
 
@@ -169,14 +179,14 @@ const Pending = () => {
                         <div className="mb-4 flex items-center justify-between">
                           <p className="text-xl text-[#415a77]">Overall Progress</p>
                           <span className="text-xl font-semibold text-[#8a2be2]">
-                            {0}%
+                            {task?.eventId?.progress}%
                           </span>
                         </div>
 
                         <div className="h-5 w-full rounded-full bg-[#ececf4]">
                           <div
                             className="h-full rounded-full bg-linear-to-r from-[#9d4edd] to-[#4361ee]"
-                            style={{ width: `${0}%` }}
+                            style={{ width: `${task?.eventId?.progress}%` }}
                           ></div>
                         </div>
                       </div>

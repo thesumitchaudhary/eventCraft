@@ -14,8 +14,7 @@ import {
 import ProfileModal from "../popupModals/ProfileModal";
 
 const BASE_URL =
-  import.meta.env.VITE_BACKEND_URL ||
-  "http://localhost:4041/api";
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:4041/api";
 
 const logoutUser = async () => {
   const res = await fetch(`${BASE_URL}/employee/logout`, {
@@ -75,6 +74,17 @@ const Header = () => {
   //   queryFn: () => fetcher(`${BASE_URL}/employee/me`),
   // });
 
+  const { data: data1 } = useQuery({
+    queryKey: ["showSigninEmployee"],
+    queryFn: () => fetcher(`http://localhost:4041/api/employee/myTask`),
+  });
+
+  const progessTasks =
+    data1?.employee?.tasks?.filter((task) => task.status === "in-progress") ||
+    [];
+
+  console.log(progessTasks.length);
+
   return (
     <>
       <header className="h-fit w-full ">
@@ -125,24 +135,56 @@ const Header = () => {
             </div>
             <div className="flex gap-3">
               <h1 className="text-xl font-bold text-[#f54a00]">0</h1>
-              <span className="bg-[#f54a00] text-white rounded-3xl p-1 w-25 text-xs font-semibold animate-pulse">
-                Action Needed
-              </span>
+              {data1?.employee?.tasks?.filter(
+                (task) => task.status === "pending",
+              ).length === 1 ? (
+                <span className="bg-[#f54a00] text-white rounded-3xl p-1 w-25 text-xs font-semibold animate-pulse">
+                  Action Needed
+                </span>
+              ) : (
+                <span></span>
+              )}
             </div>
           </div>
-          <div className="bg-gray-50 min-w-72 rounded-2xl p-10 border border-gray-300 border-l-6 border-l-[#155dfc]">
+          <div
+            className={`bg-gray-50 min-w-72 rounded-2xl p-10 border border-gray-300 border-l-6 border-l-[#155dfc]`}
+          >
             <div className="flex gap-1">
               <CircleAlert className="max-h-5 max-w-4 font-semibold" />
               <p>In Progress</p>
             </div>
-            <h1 className="text-xl font-bold text-[#155dfc]">1</h1>
+            <div className="flex gap-2">
+              <h1 className="text-xl font-bold text-[#155dfc]">
+                {" "}
+                {
+                  data1?.employee?.tasks?.filter(
+                    (task) => task.status === "in-progress",
+                  ).length
+                }
+              </h1>
+              {data1?.employee?.tasks?.filter(
+                (task) => task.status === "in-progress",
+              ).length === 1 ? (
+                <span className="bg-[#0000f5] text-white rounded-3xl p-1 w-25 text-xs font-semibold animate-pulse">
+                  Action Needed
+                </span>
+              ) : (
+                <span></span>
+              )}
+            </div>
           </div>
           <div className="bg-gray-50 min-w-72 rounded-2xl p-10 border border-gray-300 border-l-6 border-l-[#00a63e]">
             <div className="flex gap-1">
               <CircleCheck className="max-h-5 max-w-4 font-semibold" />
               <p>Completed</p>
             </div>
-            <h1 className="text-xl font-bold text-[#00a63e]">1</h1>
+            <h1 className="text-xl font-bold text-[#00a63e]">
+              {
+                data1?.employee?.tasks?.filter(
+                  (task) => task.status === "completed",
+                ).length
+              }
+            </h1>
           </div>
         </div>
 
@@ -164,18 +206,50 @@ const Header = () => {
                 }
                 to={"/employee/Pending"}
               >
-                <span className="absolute bg-[#f54a00] animate-pulse rounded-full h-2 w-2 left-23 top-0"></span>
+                {data1?.employee?.tasks?.filter(
+                  (task) => task.status === "pending",
+                ).length === 1 ? (
+                  <span className="absolute bg-[#f54a00] animate-pulse rounded-full h-2 w-2 left-25 top-1"></span>
+                ) : (
+                  <span></span>
+                )}
+
                 <Clock4 className="max-h-5 max-w-4 font-semibold" />
-                <span className="text-sm font-medium">Pending(1)</span>
+                <span className="text-sm font-medium">
+                  Pending
+                  {data1?.employee?.tasks?.filter(
+                    (task) => task.status === "pending",
+                  ).length === 1 ? (
+                    <span>(1)</span>
+                  ) : (
+                    <span>(0)</span>
+                  )}
+                </span>
               </NavLink>
               <NavLink
                 className={({ isActive }) =>
-                  `flex gap-2 px-3 py-2 rounded-xl transition ${isActive ? "bg-white text-black shadow" : "hover:bg-gray-200"}`
+                  `flex gap-2 relative px-3 py-2 rounded-xl transition ${isActive ? "bg-white text-black shadow" : "hover:bg-gray-200"}`
                 }
                 to={"/employee/InProgress"}
               >
+                {data1?.employee?.tasks?.filter(
+                  (task) => task.status === "in-progress",
+                ).length === 1 ? (
+                  <span className="absolute bg-[#f54a00] animate-pulse rounded-full h-2 w-2 left-31 top-1"></span>
+                ) : (
+                  <span></span>
+                )}
                 <CircleAlert className="max-h-5 max-w-4 font-semibold" />
-                <span className="text-sm font-medium">In Progress(1)</span>
+                <span className="text-sm font-medium">
+                  In Progress
+                  {data1?.employee?.tasks?.filter(
+                    (task) => task.status === "in-progress",
+                  ).length === 1 ? (
+                    <span>(1)</span>
+                  ) : (
+                    <span>(0)</span>
+                  )}
+                </span>
               </NavLink>
               <NavLink
                 to={"/employee/Completed"}
@@ -184,7 +258,16 @@ const Header = () => {
                 }
               >
                 <CircleCheck className="max-h-5 max-w-4 font-semibold" />
-                <span className="text-sm font-medium">Completed(1)</span>
+                <span className="text-sm font-medium">
+                  Completed
+                  {data1?.employee?.tasks?.filter(
+                    (task) => task.status === "completed",
+                  ).length === 1 ? (
+                    <span>(1)</span>
+                  ) : (
+                    <span>(0)</span>
+                  )}
+                </span>
               </NavLink>
             </ul>
           </nav>
