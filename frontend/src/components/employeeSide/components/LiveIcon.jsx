@@ -18,7 +18,7 @@ const LiveIcon = () => {
     <>
       <div>
         <button
-          onClick={(e) => {
+          onClick={() => {
             toOpenLiveModal();
             // controlLive();
           }}

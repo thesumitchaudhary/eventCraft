@@ -184,7 +184,7 @@ const LiveChatLayout = ({ closeLiveModal, ticketId }) => {
                 }`}
               >
                 <span>{msg.message || msg.text || ""}</span>
-                <span className="text-gray-500 text-[10px]">
+                <span className="text-gray-500 text-end text-[10px]">
                   {msg.createdAt
                     ? new Date(msg.createdAt).toLocaleTimeString()
                     : msg.time || ""}
