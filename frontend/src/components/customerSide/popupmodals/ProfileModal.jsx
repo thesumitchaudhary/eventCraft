@@ -7,6 +7,8 @@ import { TextInput, Button } from "@mantine/core";
 import { Context } from "../../../context/Context";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
+const VITE_CUSTOMER_BACKEND_API_URL = import.meta.env.VITE_CUSTOMER_BACKEND_URL;
+
 
 const fetcher = async (url) => {
   const res = await fetch(url, {
@@ -25,8 +27,9 @@ const userUpdate = async ({ id, firstname, lastname, phone, address, profileImag
   if (!id) {
     throw new Error("Missing user id");
   }
+ 
 
-  const res = await fetch(`${API_URL}/customer/user/${id}`, {
+  const res = await fetch(`${VITE_CUSTOMER_BACKEND_API_URL}/user/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -88,9 +91,9 @@ const ProfileModal = ({ closeProfileModal }) => {
 
   useEffect(() => {
     if (data) {
-      console.log("Profile data loaded:", data);
-      console.log("User profileImageUrl:", data?.customer?.userId?.profileImageUrl);
-      console.log("User profileImage:", data?.customer?.userId?.profileImage);
+      // console.log("Profile data loaded:", data);
+      // console.log("User profileImageUrl:", data?.customer?.userId?.profileImageUrl);
+      // console.log("User profileImage:", data?.customer?.userId?.profileImage);
     }
     if (error) {
       console.error("Failed to fetch profile:", error);
@@ -108,7 +111,7 @@ const ProfileModal = ({ closeProfileModal }) => {
     setAddress(customer.address ?? "")
     setEmail(user.email ?? "");
     const profileImg = user.profileImageUrl ?? user.profileImage ?? null;
-    console.log("Setting image from user:", profileImg);
+    // console.log("Setting image from user:", profileImg);
     setImage(profileImg);
   }, [data, setFirstname, setLastname, setPhone, setAddress, setEmail]);
 
@@ -127,7 +130,7 @@ const ProfileModal = ({ closeProfileModal }) => {
     mutationFn: ({ id, firstname, lastname, phone, address, profileImage }) =>
       userUpdate({ id, firstname, lastname, phone, address, profileImage }),
     onSuccess: (data) => {
-      console.log("Profile updated:", data);
+      // console.log("Profile updated:", data);
       setImage(data?.user?.profileImageUrl ?? data?.user?.profileImage ?? image);
       refetch();
       setIsUploading(false);

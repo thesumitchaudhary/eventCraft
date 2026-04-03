@@ -21,7 +21,6 @@ import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 
 const API_INDEX_BASE_URL = import.meta.env.VITE_INDEX_BACKEND_URL;
 
-
 const fetcher = async (url) => {
   const res = await fetch(url, {
     credentials: "include",
@@ -40,11 +39,8 @@ const Dashboard = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["my-bookings"],
     queryFn: async () =>
-      await fetcher("http://localhost:4041/api/index/my-booking"),
+      await fetcher(`${API_INDEX_BASE_URL}/my-booking`),
   });
-
-  // console.log("query data:", data);
-  // console.log("query error:", error);
 
   return (
     <div className="bg-[#eeeeef] min-h-screen relative">

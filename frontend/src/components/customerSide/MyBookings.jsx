@@ -10,6 +10,8 @@ import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 import EventRegistrationModal from "./popupmodals/EventRegistrationModal";
 import MakePaymentModal from "./popupmodals/MakePaymentModal";
 
+const INDEX_BACKEND_API_URL = import.meta.env.VITE_INDEX_BACKEND_URL;
+
 // this is for the show booked events
 const fetcher = async (url) => {
   const res = await fetch(url, { credentials: "include" });
@@ -40,7 +42,7 @@ const MyBookings = () => {
 
   const { data, isLoading, error, isError } = useQuery({
     queryKey: ["my-bookings"],
-    queryFn: () => fetcher("http://localhost:4041/api/index/my-booking"),
+    queryFn: () => fetcher(`${INDEX_BACKEND_API_URL}/my-booking`),
   });
 
   // console.log(data?.events)
@@ -127,7 +129,7 @@ const MyBookings = () => {
                     <div className="max-w-7xl h-3 border border-black rounded-xl overflow-hidden">
                       <div
                         className="h-full bg-black"
-                        style={{ width: `${booking.progress}px` }}
+                        style={{ width: `${booking.progress}%` }}
                       />
                     </div>
                   </div>

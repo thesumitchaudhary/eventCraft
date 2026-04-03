@@ -9,6 +9,9 @@ import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 
 import MakePaymentModal from "./popupmodals/MakePaymentModal";
 
+const INDEX_BACKEND_API_URL = import.meta.env.VITE_INDEX_BACKEND_URL;
+// console.log( )
+
 const fetcher = async (url) => {
   const res = await fetch(url, { credentials: "include" });
 
@@ -28,10 +31,10 @@ const Payments = () => {
 
   const { data } = useQuery({
     queryKey: ["my-bookings"],
-    queryFn: () => fetcher("http://localhost:4041/api/index/my-booking"),
+    queryFn: () => fetcher(`${INDEX_BACKEND_API_URL}/my-booking`),
   });
 
-  console.log(data);
+  // console.log(data);
 
   return (
     <div className="bg-[#eeeeef] min-h-screen">

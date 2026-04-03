@@ -14,10 +14,11 @@ import {
 import Header from "./header-footer components/Header";
 import Footer from "./header-footer components/Footer";
 import LiveIcon from "./header-footer components/live icon components/LiveIcon";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL;
+const API_URL_ADMIN = import.meta.env.VITE_ADMIN_BACKEND_URL;
+
 
 const fetcher = (url) =>
   fetch(url, {
@@ -27,7 +28,7 @@ const fetcher = (url) =>
 const EventThemes = () => {
   const { data = [], isLoading } = useQuery({
     queryKey: ["eventThemesDetails"],
-    queryFn: async () => await fetcher(`${API_URL}/admin/getAllEventTheme`),
+    queryFn: async () => await fetcher(`${API_URL_ADMIN}/getAllEventTheme`),
   });
 
 

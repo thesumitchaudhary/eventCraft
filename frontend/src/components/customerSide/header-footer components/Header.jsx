@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Bell,
   Calendar,
@@ -38,7 +38,6 @@ const logoutUser = async () => {
 
 const Header = () => {
   const [openProfileModal, setOpenProfileModel] = useState(false);
-  const [openLiveModal, setOpenLiveModal] = useState(false);
 
   // useEffect(() => {
   //   if (openProfileModal || openLiveModal) {
