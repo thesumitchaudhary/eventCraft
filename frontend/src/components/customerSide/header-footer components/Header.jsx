@@ -56,7 +56,7 @@ const Header = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ["details"],
-    queryFn: () => fetcher("http://localhost:4041/api/customer/me"),
+    queryFn: () => fetcher(`${API_URL}/me`),
   });
 
 

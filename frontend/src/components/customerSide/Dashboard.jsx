@@ -19,6 +19,9 @@ import Header from "./header-footer components/Header";
 import Footer from "./header-footer components/Footer";
 import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 
+const API_INDEX_BASE_URL = import.meta.env.VITE_INDEX_BACKEND_URL;
+
+
 const fetcher = async (url) => {
   const res = await fetch(url, {
     credentials: "include",
@@ -40,7 +43,7 @@ const Dashboard = () => {
       await fetcher("http://localhost:4041/api/index/my-booking"),
   });
 
-  console.log("query data:", data);
+  // console.log("query data:", data);
   // console.log("query error:", error);
 
   return (

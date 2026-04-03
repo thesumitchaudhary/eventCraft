@@ -35,6 +35,13 @@ const SigninForm = () => {
   const floatingEmail = focusedEmail || email.length > 0;
   const floatingPassword = focusedPassword || password.length > 0;
 
+  // this is for reset form
+
+  const resetForm = () => {
+    setEmail("");
+    setPassword("");
+  };
+
   const pathname = location.pathname.toLowerCase();
   const role = pathname.includes("/admin")
     ? "admin"
@@ -45,8 +52,7 @@ const SigninForm = () => {
   const userMutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (data) => {
-      setEmail("");
-      setPassword("");
+     resetForm();
 
       const loggedInRole = data?.role || role;
       if (loggedInRole === "admin") navigate("/admin/Dashboard");

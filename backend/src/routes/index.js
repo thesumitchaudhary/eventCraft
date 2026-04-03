@@ -16,7 +16,7 @@ import paymentModel from "../models/paymentModel.js";
 import Ticket from "../models/ticketModel.js";
 
 // this is for payment controller
-import { Payment, createEvent } from "../controllers/paymentController.js"
+import { Payment } from "../controllers/paymentController.js"
 import { createEvent } from "../controllers/eventBookController.js"
 
 const router = express.Router();
