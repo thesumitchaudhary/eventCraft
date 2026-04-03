@@ -17,6 +17,9 @@ import {
     deleteWorkUpdate,
 } from "../controllers/workContoller.js";
 
+// this controller from auth controller
+import { employeesCreate, employeeLogin, employeeLogout } from "../controllers/Auth.js"
+
 const router = express.Router();
 
 const PROFILE_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
@@ -237,101 +240,11 @@ router.get("/myTask", authMiddelware, async (req, res) => {
     }
 })
 
+// this is for create of employee from admin
 
-router.post("/create", async (req, res) => {
-    try {
-        const { firstname, lastname, email, password, phone, designation } = req.body;
-
-
-        const existingUser = await userModel.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ error: "Email already exists" });
-        }
-
-        bcrypt.genSalt(10, function (err, salt) {
-            bcrypt.hash(password, salt, async function (err, hash) {
-                try {
-                    const userCreated = await userModel.create({
-                        firstname,
-                        lastname,
-                        email,
-                        password: hash,
-                        phone,
-                        role: "employee"
-                    });
-
-                    await employeeModel.create({
-                        userId: userCreated._id,
-                        designation,
-                        joiningDate: Date.now(),
-                        phone
-                    })
-                    const token = jwt.sign(
-                        {
-                            id: userCreated._id,
-                            email: userCreated.email,
-                            firstname: userCreated.firstname,
-                            lastname: userCreated.lastname,
-                            role: "employee"
-                        },
-                        process.env.JWT_SECRET,
-                        { expiresIn: "7d" }
-                    );
-                    res.cookie("token", token);
-                    res.json(userCreated);
-                } catch (createError) {
-                    res.status(400).json({ error: createError.message });
-                }
-            });
-        });
-    }
-    catch (error) {
-        res.status(500).json({ error: error.message })
-    }
-});
-
-router.post("/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await userModel.findOne({ email });
-
-        if (!user) {
-            return res.status(401).json({ error: "Invalid credentials" });
-        }
-
-        bcrypt.compare(password, user.password, function (err, result) {
-            if (err) {
-                return res.status(500).json({ error: "Internal server error" });
-            }
-
-            if (!result) {
-                return res.status(401).json({ error: "Invalid credentials" });
-            }
-
-            const token = jwt.sign(
-                {
-                    id: user._id,
-                    email: user.email,
-                    firstname: user.firstname,
-                    lastname: user.lastname,
-                    role: user.role
-                },
-                process.env.JWT_SECRET,
-                { expiresIn: "7d" }
-            );
-            res.cookie("token", token);
-            return res.json("employee is login successfully");
-        });
-    } catch (error) {
-        return res.status(500).json({ error: "Internal server error" });
-    }
-})
-
-
-router.get("/logout", (req, res) => {
-    res.cookie("token", "");
-    res.send("Employee is logout successfully")
-})
+router.post("/create", authMiddelware, adminMiddelware, employeesCreate);
+router.post("/login",employeeLogin)
+router.get("/logout", employeeLogout);
 
 router.post("/work-updates/upload-url", authMiddelware, generateUploadURL);
 router.post("/work-updates/upload-file", authMiddelware, uploadWorkEvidenceViaBackend);

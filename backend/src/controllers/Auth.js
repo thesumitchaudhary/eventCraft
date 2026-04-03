@@ -11,6 +11,7 @@ import customerModel from "../models/customerModel.js";
 // import nodemailer for send email
 import sendMail from "../helpers/sendVerificationMail.js"
 
+// this is link with customer routes
 
 export const register = async (req, res) => {
     try {
@@ -81,7 +82,7 @@ export const register = async (req, res) => {
         });
     }
 }
-
+// this is link with customer routes
 export const verifyEmail = async (req, res) => {
     try {
         const { email, code } = req.body;
@@ -115,6 +116,7 @@ export const verifyEmail = async (req, res) => {
     }
 }
 
+// this is link with customer routes
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -178,6 +180,7 @@ export const login = async (req, res) => {
     }
 };
 
+// this is link with customer routes
 export const logout = (req, res) => {
     res.cookie("token", "")
     res.send("hey the customer is logout")
@@ -185,60 +188,164 @@ export const logout = (req, res) => {
 
 // for admin
 
+// this is link with admin routes
+
 export const adminLogin = async (req, res) => {
-        try {
-            const { email, password } = req.body;
-    
-            if (!email || !password) {
-                return res.status(400).json({ message: "Email and password are required" });
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and password are required" });
+        }
+
+        const user = await userModel.findOne({ email: email.trim() });
+
+        if (!user) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        // optional: enforce admin-only login on this route
+        if (user.role !== "admin") {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password); // fixed typo
+
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        const token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email,
+                role: user.role,
+                firstname: user.firstname,
+                lastname: user.lastname
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production"
+        });
+
+        return res.status(200).json({
+            message: "Admin login successful",
+            role: user.role
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+// this is link with admin routes
+
+export const adminLogout = (req, res) => {
+    res.cookie("token", "");
+    res.json("hey the admin is logout successfully");
+}
+
+// this is for employee
+
+// this is link with employee routes
+
+export const employeesCreate = async (req, res) => {
+    try {
+        const { firstname, lastname, email, password, phone, designation } = req.body;
+
+
+        const existingUser = await userModel.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: "Email already exists" });
+        }
+
+        bcrypt.genSalt(10, function (err, salt) {
+            bcrypt.hash(password, salt, async function (err, hash) {
+                try {
+                    const userCreated = await userModel.create({
+                        firstname,
+                        lastname,
+                        email,
+                        password: hash,
+                        phone,
+                        role: "employee"
+                    });
+
+                    await employeeModel.create({
+                        userId: userCreated._id,
+                        designation,
+                        joiningDate: Date.now(),
+                        phone
+                    })
+                    const token = jwt.sign(
+                        {
+                            id: userCreated._id,
+                            email: userCreated.email,
+                            firstname: userCreated.firstname,
+                            lastname: userCreated.lastname,
+                            role: "employee"
+                        },
+                        process.env.JWT_SECRET,
+                        { expiresIn: "7d" }
+                    );
+                    res.cookie("token", token);
+                    res.json(userCreated);
+                } catch (createError) {
+                    res.status(400).json({ error: createError.message });
+                }
+            });
+        });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+}
+
+// this is link with employee routes
+
+export const employeeLogin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await userModel.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        bcrypt.compare(password, user.password, function (err, result) {
+            if (err) {
+                return res.status(500).json({ error: "Internal server error" });
             }
-    
-            const user = await userModel.findOne({ email: email.trim() });
-    
-            if (!user) {
-                return res.status(401).json({ message: "Invalid credentials" });
+
+            if (!result) {
+                return res.status(401).json({ error: "Invalid credentials" });
             }
-    
-            // optional: enforce admin-only login on this route
-            if (user.role !== "admin") {
-                return res.status(403).json({ message: "Access denied" });
-            }
-    
-            const isMatch = await bcrypt.compare(password, user.password); // fixed typo
-    
-            if (!isMatch) {
-                return res.status(401).json({ message: "Invalid credentials" });
-            }
-    
+
             const token = jwt.sign(
                 {
                     id: user._id,
                     email: user.email,
-                    role: user.role,
                     firstname: user.firstname,
-                    lastname: user.lastname
+                    lastname: user.lastname,
+                    role: user.role
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: "1d" }
+                { expiresIn: "7d" }
             );
-    
-            res.cookie("token", token, {
-                httpOnly: true,
-                sameSite: "lax",
-                secure: process.env.NODE_ENV === "production"
-            });
-    
-            return res.status(200).json({
-                message: "Admin login successful",
-                role: user.role
-            });
-        } catch (error) {
-            return res.status(500).json({ message: error.message });
-        }
+            res.cookie("token", token);
+            return res.json("employee is login successfully");
+        });
+    } catch (error) {
+        return res.status(500).json({ error: "Internal server error" });
     }
+}
 
 
-export const adminLogout =  (req, res) => {
+export const employeeLogout = (req, res) => {
     res.cookie("token", "");
-    res.json("hey the admin is logout successfully");
+    res.send("Employee is logout successfully")
 }

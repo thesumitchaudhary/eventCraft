@@ -71,6 +71,10 @@ io.use((socket, next) => {
 io.on("connection", (socket) => {
     console.log("User connected:", socket.id);
 
+    if (socket.user?.role === "admin") {
+        admins.add(socket.id);
+    }
+
     // ================= JOIN TICKET =================
     socket.on("join_ticket", async ({ ticketId }) => {
         try {
@@ -93,11 +97,6 @@ io.on("connection", (socket) => {
             socket.join(ticketId);
 
             users[socket.id] = { ticketId, role, userId };
-
-            // track admin
-            if (role === "admin") {
-                admins.add(socket.id);
-            }
 
             // assign employee
             if (role === "employee") {
@@ -159,7 +158,7 @@ io.on("connection", (socket) => {
 
     // ================= DISCONNECT =================
     socket.on("disconnect", () => {
-        if (users[socket.id]?.role === "admin") {
+        if (socket.user?.role === "admin") {
             admins.delete(socket.id);
         }
 

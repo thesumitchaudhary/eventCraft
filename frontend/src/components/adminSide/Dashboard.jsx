@@ -1,207 +1,252 @@
-  import React from "react";
-  import { Link, NavLink } from "react-router-dom";
-  import { Users, Calendar, CircleUser, DollarSign } from "lucide-react";
-  import { useQuery } from "@tanstack/react-query";
+import React from "react";
+import { Link, NavLink } from "react-router-dom";
+import { Users, Calendar, CircleUser, DollarSign } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
-  import Header from "./components/Header";
-  import Footer from "./components/Footer";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
-  import LiveIcon from "./components/LiveIcon";
+import LiveIcon from "./components/LiveIcon";
 
-  const fetcher = async (url) => {
-    const res = await fetch(url, { credentials: "include" });
+const fetcher = async (url) => {
+  const res = await fetch(url, { credentials: "include" });
 
-    const body = res.json();
+  const body = await res.json();
 
-    if (!res.ok) {
-      throw new Error(body.message || "Request Failed");
-    }
+  if (!res.ok) {
+    throw new Error(body.message || "Request Failed");
+  }
 
-    return body;
-  };
+  return body;
+};
 
-  const Dashboard = () => {
-    const { data } = useQuery({
-      queryKey: ["showbookings"],
-      queryFn: () => fetcher("http://localhost:4041/api/admin/showBookedEvent"),
-    });
+const Dashboard = () => {
+  const { data } = useQuery({
+    queryKey: ["showbookings"],
+    queryFn: () => fetcher("http://localhost:4041/api/admin/showBookedEvent"),
+  });
 
-    const paidByCustomer = data?.customers
-      ?.flatMap((c) => c?.events)
-      ?.flatMap((eventDetail) => eventDetail?.totalPaid)
-      ?.reduce((sum, val) => sum + val, 0);
+  // console.log(data)
 
-    const { data: data1 } = useQuery({
-      queryKey: ["showemployee"],
-      queryFn: () => fetcher("http://localhost:4041/api/employee/findEmployee"),
-    });
+  const paidByCustomer = data?.customers
+    ?.flatMap((c) => c?.events)
+    ?.flatMap((eventDetail) => eventDetail?.totalPaid)
+    ?.reduce((sum, val) => sum + val, 0);
 
-    // console.log(data1?.users.length)
+  // Calculate total revenue across all events
+  const totalRevenue = data?.customers
+    .flatMap((customer) => customer?.events || [])
+    .reduce((total, event) => {
+      const eventTotal = Array.isArray(event?.totalAmount)
+        ? event.totalAmount.reduce((sum, amount) => sum + (amount || 0), 0)
+        : event?.totalAmount || 0;
+      return total + eventTotal;
+    }, 0);
 
-    // Calculate total revenue across all events
-    const totalRevenue = data?.customers
-      .flatMap((customer) => customer?.events || [])
-      .reduce((total, event) => {
-        const eventTotal = Array.isArray(event?.totalAmount)
-          ? event.totalAmount.reduce((sum, amount) => sum + (amount || 0), 0)
-          : event?.totalAmount || 0;
-        return total + eventTotal;
-      }, 0);
+  // remaining amount
+  const remaining = (totalRevenue || 0) - paidByCustomer;
 
-      // remaining amount
-      const remaining = (totalRevenue || 0) - paidByCustomer;
+  const { data: data1 } = useQuery({
+    queryKey: ["showemployee"],
+    queryFn: () => fetcher("http://localhost:4041/api/employee/findEmployee"),
+  });
 
-    return (
-      <div className="bg-[#f0f1f3]">
-        <Header />
-        <main>
-          <section className="mx-8 my-10">
-            <div className="flex gap-4">
-              <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300 border-l-6 border-l-[#155dfc]">
-                <div className="flex gap-3">
-                  <Users className="h-5 w-5 text-[#155dfc]" />
-                  <p className="text-[#7e7a82]">Total Customers</p>
-                </div>
-                <h4 className="text-3xl font-bold text-[#155dfc]">{data?.customers.length}</h4>
+  // normalize response safely
+  const users = Array.isArray(data1?.users) ? data1.users : [];
+  const details = Array.isArray(data1?.details) ? data1.details : [];
+
+  // merge users + details (match by userId if available, else by index)
+  const employees = users.map((user, index) => {
+    const detail =
+      details.find((d) => d.userId === user._id || d.user?._id === user._id) ||
+      details[index] ||
+      {};
+
+    return {
+      ...user,
+      ...detail,
+    };
+  });
+
+  // console.log(users.map((user) => user.firstname));
+  const completed = details
+    .flatMap((detail) => detail?.tasks || [])
+    .filter((task) => task?.status === "in-progress").length;
+  console.log(completed);
+
+  return (
+    <div className="bg-[#f0f1f3]">
+      <Header />
+      <main>
+        <section className="mx-8 my-10">
+          <div className="flex gap-4">
+            <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300 border-l-6 border-l-[#155dfc]">
+              <div className="flex gap-3">
+                <Users className="h-5 w-5 text-[#155dfc]" />
+                <p className="text-[#7e7a82]">Total Customers</p>
               </div>
-              <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300 border-l-6 border-l-[#9810fa]">
-                <div className="flex gap-3">
-                  <Calendar className="h-5 w-5 text-[#9810fa]" />
-                  <p className="text-[#7e7a82]">Active Bookings</p>
-                </div>
-                <h4 className="text-3xl font-bold text-[#9810fa]">
-                  {data?.customers.flatMap((customer) => customer?.events.length)?.reduce((total,totalcustomer)=> total+totalcustomer,0)}
-                </h4>
-              </div>
-              <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-l-6 border-l-[#02a740] border-gray-300">
-                <div className="flex gap-3">
-                  <CircleUser className="h-5 w-5 text-[#02a740]" />
-                  <p className="text-[#7e7a82]">Total Employees</p>
-                </div>
-                <h4 className="text-3xl font-bold text-[#02a740]">{data1?.users.length}</h4>
-              </div>
-              <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300 border-l-6 border-l-[#009966]">
-                <div className="flex gap-3">
-                  <DollarSign className="h-5 w-5 text-[#009966]" />
-                  <p className="text-[#7e7a82]">Total Revenue</p>
-                </div>
-                <h4 className="text-3xl font-bold text-[#009966]">
-                      ${paidByCustomer}
-                </h4>
-              </div>
+              <h4 className="text-3xl font-bold text-[#155dfc]">
+                {data?.customers.length}
+              </h4>
             </div>
-          </section>
-          <section className="mx-8 my-10">
-            <div className="flex gap-15">
-              <div className="bg-gray-50 min-w-140 rounded-2xl bg-card text-card-foreground flex flex-col gap-6 border-gray-300 border">
-                <div>
-                  <div className="my-3 mx-4 grid grid-rows-2 ">
-                    <h4 className="text-sm font-bold">Task Distribution</h4>
-                    <p className="text-[#717182]">Overview of task status</p>
-                  </div>
-                  <div className="grid grid-cols-3 mx-7">
-                    <div className="grid grid-rows-2 place-items-center">
-                      <p className="text-[#99a1af] text-xl font-bold">1</p>
-                      <p className="text-[#4a5573]">pending</p>
-                    </div>
-                    <div className="grid grid-rows-2 place-items-center">
-                      <p className="text-[#155dfc] text-xl font-bold">1</p>
-                      <p className="text-[#4a5573]">in progress</p>
-                    </div>
-                    <div className="grid grid-rows-2 place-items-center">
-                      <p className="text-[#00a63e] text-xl font-bold">1</p>
-                      <p className="text-[#4a5573]">completed</p>
-                    </div>
-                  </div>
-                </div>
+            <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300 border-l-6 border-l-[#9810fa]">
+              <div className="flex gap-3">
+                <Calendar className="h-5 w-5 text-[#9810fa]" />
+                <p className="text-[#7e7a82]">Active Bookings</p>
               </div>
-              <div className="bg-gray-50 flex flex-col gap-3 p-5 min-w-140 rounded-2xl border-gray-300 border">
-                <div className="flex flex-col gap-1">
-                  <div>
-                    <h2 className="text-sm font-bold">Revenue Summary</h2>
-                  </div>
-                  <div>
-                    <p className="text-[#717182]">Payment status overview</p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Received</span>
-                    <span className="text-green-600 text-md font-bold">
-                      ${paidByCustomer}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Pending Amount</span>
-                    <span className="text-orange-600 text-md font-bold">
-                      ${remaining}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Expected</span>
-                    <span className="text-blue-600 text-md font-bold">
-                      ${totalRevenue?.toLocaleString() || 0}
-                    </span>
-                  </div>
-                </div>
-              </div>
+              <h4 className="text-3xl font-bold text-[#9810fa]">
+                {data?.customers
+                  .flatMap((customer) => customer?.events.length)
+                  ?.reduce((total, totalcustomer) => total + totalcustomer, 0)}
+              </h4>
             </div>
-          </section>
-          <section className="mx-8 my-7">
-            <div className="bg-gray-50 rounded-2xl p-10 border-gray-300 border">
+            <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-l-6 border-l-[#02a740] border-gray-300">
+              <div className="flex gap-3">
+                <CircleUser className="h-5 w-5 text-[#02a740]" />
+                <p className="text-[#7e7a82]">Total Employees</p>
+              </div>
+              <h4 className="text-3xl font-bold text-[#02a740]">
+                {employees.length}
+              </h4>
+            </div>
+            <div className="min-w-2xs bg-gray-50 border p-5 rounded-2xl border-gray-300 border-l-6 border-l-[#009966]">
+              <div className="flex gap-3">
+                <DollarSign className="h-5 w-5 text-[#009966]" />
+                <p className="text-[#7e7a82]">Total Revenue</p>
+              </div>
+              <h4 className="text-3xl font-bold text-[#009966]">
+                ${paidByCustomer}
+              </h4>
+            </div>
+          </div>
+        </section>
+        <section className="mx-8 my-10">
+          <div className="flex gap-15">
+            <div className="bg-gray-50 min-w-140 rounded-2xl bg-card text-card-foreground flex flex-col gap-6 border-gray-300 border">
               <div>
-                <h2>Recent Bookings</h2>
-                <p>Latest event bookings</p>
+                <div className="my-3 mx-4 grid grid-rows-2 ">
+                  <h4 className="text-sm font-bold">Task Distribution</h4>
+                  <p className="text-[#717182]">Overview of task status</p>
+                </div>
+                <div className="grid grid-cols-3 mx-7">
+                  <div className="grid grid-rows-2 place-items-center">
+                    <p className="text-[#99a1af] text-xl font-bold">
+                      {
+                        details
+                          .flatMap((detail) => detail?.tasks || [])
+                          .filter((task) => task?.status === "pending").length
+                      }
+                    </p>
+                    <p className="text-[#4a5573]">pending</p>
+                  </div>
+                  <div className="grid grid-rows-2 place-items-center">
+                    <p className="text-[#155dfc] text-xl font-bold">
+                      {
+                        details
+                          .flatMap((detail) => detail?.tasks || [])
+                          .filter((task) => task?.status === "in-progress")
+                          .length
+                      }
+                    </p>
+                    <p className="text-[#4a5573]">in progress</p>
+                  </div>
+                  <div className="grid grid-rows-2 place-items-center">
+                    <p className="text-[#00a63e] text-xl font-bold">
+                      {" "}
+                      {
+                        details
+                          .flatMap((detail) => detail?.tasks || [])
+                          .filter((task) => task?.status === "completed").length
+                      }
+                    </p>
+                    <p className="text-[#4a5573]">completed</p>
+                  </div>
+                </div>
               </div>
-              <table className="w-full my-3 border-collapse">
-                <thead>
-                  <tr className="border-b-2 border-black text-left">
-                    <th className="py-2">Event Name</th>
-                    <th className="py-2">Type</th>
-                    <th className="py-2">Date</th>
-                    <th className="py-2">Status From Admin</th>
-                    <th className="py-2">Status From Work</th>
-                    <th className="py-2">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data?.customers.flatMap((customer) =>
-                    customer?.events.map((data) => (
-                      <tr key={data._id} className="border-b border-black">
-                        <td className="py-2 border-b  p-1">
-                          {data?.eventName}
-                        </td>
-                        <td className="border-b p-1">
-                          {data?.eventType}
-                        </td>
-                        <td className="border-b p-1">
-                          {new Date(data?.eventDate).toLocaleDateString()}
-                        </td>
-                        <td className="border-b  p-1">
-                          <span className="bg-black text-white text-xs p-1 rounded-md">
-                            {data?.bookingStatus}
-                          </span>
-                        </td>
-                          <td className="border-b p-1">
-                          <span className="text-xs bg-black p-1 text-white rounded-md">{data?.progress !== 0 ? "in-progress" : "pending"}</span>
-                        </td>
-                        <td className="border-b p-1">
-                          ${data?.totalAmount}
-                        </td>
-                      </tr>
-                    )),
-                  )}
-                </tbody>
-              </table>
             </div>
-          </section>
-          <section className="flex justify-end mr-15">
-            <LiveIcon />
-          </section>
-        </main>
-        <Footer />
-      </div>
-    );
-  };
+            <div className="bg-gray-50 flex flex-col gap-3 p-5 min-w-140 rounded-2xl border-gray-300 border">
+              <div className="flex flex-col gap-1">
+                <div>
+                  <h2 className="text-sm font-bold">Revenue Summary</h2>
+                </div>
+                <div>
+                  <p className="text-[#717182]">Payment status overview</p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total Received</span>
+                  <span className="text-green-600 text-md font-bold">
+                    ${paidByCustomer}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Pending Amount</span>
+                  <span className="text-orange-600 text-md font-bold">
+                    ${remaining}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total Expected</span>
+                  <span className="text-blue-600 text-md font-bold">
+                    ${totalRevenue?.toLocaleString() || 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section className="mx-8 my-7">
+          <div className="bg-gray-50 rounded-2xl p-10 border-gray-300 border">
+            <div>
+              <h2>Recent Bookings</h2>
+              <p>Latest event bookings</p>
+            </div>
+            <table className="w-full my-3 border-collapse">
+              <thead>
+                <tr className="border-b-2 border-black text-left">
+                  <th className="py-2">Event Name</th>
+                  <th className="py-2">Type</th>
+                  <th className="py-2">Date</th>
+                  <th className="py-2">Status From Admin</th>
+                  <th className="py-2">Status From Work</th>
+                  <th className="py-2">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data?.customers.flatMap((customer) =>
+                  customer?.events.map((data) => (
+                    <tr key={data._id} className="border-b border-black">
+                      <td className="py-2 border-b  p-1">{data?.eventName}</td>
+                      <td className="border-b p-1">{data?.eventType}</td>
+                      <td className="border-b p-1">
+                        {new Date(data?.eventDate).toLocaleDateString()}
+                      </td>
+                      <td className="border-b  p-1">
+                        <span className="bg-black text-white text-xs p-1 rounded-md">
+                          {data?.bookingStatus}
+                        </span>
+                      </td>
+                      <td className="border-b p-1">
+                        <span className="text-xs bg-black p-1 text-white rounded-md">
+                          {data?.progress !== 0 ? "in-progress" : "pending"}
+                        </span>
+                      </td>
+                      <td className="border-b p-1">${data?.totalAmount}</td>
+                    </tr>
+                  )),
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section className="flex justify-end mr-15">
+          <LiveIcon />
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+};
 
-  export default Dashboard;
+export default Dashboard;
