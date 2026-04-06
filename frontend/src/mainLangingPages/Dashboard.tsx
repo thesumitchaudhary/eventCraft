@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-// import AuthModal from "./AuthModal";
+import AuthModal from "./AuthModel";
 import {
   Calendar,
   Calendar as Calenders,
@@ -19,8 +19,8 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-//   const [open, setOpen] = useState(false);
-//   const [authMode, setAuthMode] = useState("signup");
+  const [open, setOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("signup");
   const [animatedText, setAnimatedText] = useState("Wedding Events");
 
   const navigate = useNavigate();
@@ -71,7 +71,7 @@ const Dashboard = () => {
               </nav>
             </div>
             <div className="flex gap-3">
-              {/* <button
+              <button
                 onClick={() => {
                   setOpen(true);
                   setAuthMode("signin");
@@ -88,14 +88,14 @@ const Dashboard = () => {
                 className="bg-black text-white h-8 py-1 px-2 rounded-md flex gap-1"
               >
                 GetStart
-              </button> */}
+              </button>
             </div>
           </div>
         </header>
       </div>
-      {/* {open && (
+      {open && (
         <AuthModal open={open} setOpen={setOpen} defaultMode={authMode} />
-      )} */}
+      )}
       <main>
         <section className="flex flex-col gap-5 max-h-fit">
           <h2 className="relative mr-2 text-7xl text-nowrap font-bold flex justify-center">
@@ -119,7 +119,7 @@ const Dashboard = () => {
             expert planning, seamless execution, and unforgettable experiences.
           </p>
           <div className="flex justify-center gap-10">
-            {/* <button
+            <button
               onClick={(e) => {
                 setOpen(true);
                 setAuthMode("signup");
@@ -136,7 +136,7 @@ const Dashboard = () => {
               className="border hover:bg-gray-200 font-medium h-10 border-gray-300 py-2 px-9 rounded-md flex gap-1"
             >
               Sign In
-            </button> */}
+            </button>
           </div>
         </section>
         <section className="my-37 flex flex-col gap-10">
@@ -235,7 +235,7 @@ const Dashboard = () => {
               special events
             </p>
             <div className="flex gap-4 justify-center">
-              {/* <button
+              <button
                 onClick={(e) => {
                   setOpen(true);
                   setAuthMode("signup");
@@ -252,7 +252,7 @@ const Dashboard = () => {
                 className="border p-2 px-9 hover:bg-white hover:text-black border-white rounded-md"
               >
                 Signin
-              </button> */}
+              </button>
             </div>
           </div>
         </section>
