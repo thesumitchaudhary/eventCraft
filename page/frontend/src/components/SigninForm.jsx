@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { Context } from "../context/Context";
 import { Button, TextInput } from "@mantine/core";
+import { syncSocketAuth } from "../socket-connection/socket";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -53,6 +54,11 @@ const SigninForm = () => {
     mutationFn: loginUser,
     onSuccess: (data) => {
      resetForm();
+
+      if (data?.token) {
+        localStorage.setItem("token", data.token);
+        syncSocketAuth(data.token);
+      }
 
       const loggedInRole = data?.role || role;
       if (loggedInRole === "admin") navigate("/admin/Dashboard");

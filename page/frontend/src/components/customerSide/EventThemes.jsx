@@ -12,7 +12,6 @@ import {
   TrendingUp,
 } from "lucide-react";
 import Header from "./header-footer components/Header";
-import Footer from "./header-footer components/Footer";
 import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 import { NavLink, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -68,7 +67,6 @@ const EventThemes = () => {
           <LiveIcon />
         </section>
       </main>
-      <Footer />
     </div>
   );
 };

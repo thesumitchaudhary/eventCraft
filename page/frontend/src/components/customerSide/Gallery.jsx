@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import Header from "./header-footer components/Header";
-import Footer from "./header-footer components/Footer";
 import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 
 // this is for import image
@@ -188,7 +187,6 @@ const Gallery = () => {
           <LiveIcon />
         </section>
       </main>
-      <Footer />
     </div>
   );
 };

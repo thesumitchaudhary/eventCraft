@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { CircleQuestionMark, ChevronUp, ChevronDown } from "lucide-react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import Header from "./header-footer components/Header";
-import Footer from "./header-footer components/Footer";
 import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 
 const FAQ = () => {
@@ -261,7 +260,6 @@ const FAQ = () => {
           <LiveIcon />
         </section>
       </main>
-      <Footer />
     </div>
   );
 };

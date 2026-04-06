@@ -235,7 +235,8 @@ export const adminLogin = async (req, res) => {
 
         return res.status(200).json({
             message: "Admin login successful",
-            role: user.role
+            role: user.role,
+            token
         });
     } catch (error) {
         return res.status(500).json({ message: error.message });
@@ -337,7 +338,11 @@ export const employeeLogin = async (req, res) => {
                 { expiresIn: "7d" }
             );
             res.cookie("token", token);
-            return res.json("employee is login successfully");
+            return res.json({
+                message: "employee is login successfully",
+                token,
+                role: user.role,
+            });
         });
     } catch (error) {
         return res.status(500).json({ error: "Internal server error" });

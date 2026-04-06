@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 
 // import file from header-footer componenets
 import Header from "./header-footer components/Header";
-import Footer from "./header-footer components/Footer";
 import LiveIcon from "./header-footer components/live icon components/LiveIcon";
 
 import MakePaymentModal from "./popupmodals/MakePaymentModal";
@@ -130,7 +129,6 @@ const Payments = () => {
           <LiveIcon />
         </section>
       </main>
-      <Footer />
     </div>
   );
 };
