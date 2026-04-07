@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import AuthModal from "./AuthModel";
 import {
   Calendar,
@@ -16,18 +16,16 @@ import {
   Phone,
   Mail,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import type { CSSProperties } from "react";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
-  const [authMode, setAuthMode] = useState("signup");
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signup");
   const [animatedText, setAnimatedText] = useState("Wedding Events");
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const words = ["Wedding Events", "Birthday Events", "Corporates Events"];
-    let timeoutIds = [];
+    let timeoutIds: ReturnType<typeof setTimeout>[] = [];
 
     const textLoad = () => {
       timeoutIds = [
@@ -46,7 +44,7 @@ const Dashboard = () => {
     };
   }, []);
 
-  const wordWidths = {
+  const wordWidths: Record<string, number> = {
     "Wedding Events": 565,
     "Birthday Events": 548,
     "Corporates Events": 648,
@@ -93,9 +91,7 @@ const Dashboard = () => {
           </div>
         </header>
       </div>
-      {open && (
-        <AuthModal open={open} setOpen={setOpen} defaultMode={authMode} />
-      )}
+      {open && <AuthModal setOpen={setOpen} defaultMode={authMode} />}
       <main>
         <section className="flex flex-col gap-5 max-h-fit">
           <h2 className="relative mr-2 text-7xl text-nowrap font-bold flex justify-center">
@@ -107,7 +103,7 @@ const Dashboard = () => {
                   className="bg-gray-100 h-20 typing-mask font-semibold bg-linear-to-r/srgb from-indigo-500 to-teal-400 bg-clip-text text-transparent"
                   style={{
                     "--word-px": `${wordWidths[animatedText] || 500}px`,
-                  }} // adjust multiplier as needed
+                  } as CSSProperties & { "--word-px": string }}
                 >
                   {animatedText}
                 </span>
@@ -120,7 +116,7 @@ const Dashboard = () => {
           </p>
           <div className="flex justify-center gap-10">
             <button
-              onClick={(e) => {
+              onClick={() => {
                 setOpen(true);
                 setAuthMode("signup");
               }}
@@ -129,7 +125,7 @@ const Dashboard = () => {
               Start Planning <MoveRight className="mt-0" />
             </button>
             <button
-              onClick={(e) => {
+              onClick={() => {
                 setOpen(true);
                 setAuthMode("signin");
               }}
@@ -236,7 +232,7 @@ const Dashboard = () => {
             </p>
             <div className="flex gap-4 justify-center">
               <button
-                onClick={(e) => {
+                onClick={() => {
                   setOpen(true);
                   setAuthMode("signup");
                 }}
@@ -245,7 +241,7 @@ const Dashboard = () => {
                 Create Account
               </button>
               <button
-                onClick={(e) => {
+                onClick={() => {
                   setOpen(true);
                   setAuthMode("signin");
                 }}

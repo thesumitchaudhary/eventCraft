@@ -13,30 +13,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-const bookings = [
-  {
-    id: "BK-1021",
-    event: "Annual Meetup",
-    date: "2026-04-10",
-    status: "Confirmed",
-    amount: "$120",
-  },
-  {
-    id: "BK-1022",
-    event: "Product Workshop",
-    date: "2026-04-18",
-    status: "Pending",
-    amount: "$80",
-  },
-  {
-    id: "BK-1023",
-    event: "Team Conference",
-    date: "2026-05-02",
-    status: "Cancelled",
-    amount: "$0",
-  },
-]
-
 export default function MyBookingPage() {
   return (
     <SidebarProvider>

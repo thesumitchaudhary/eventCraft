@@ -7,7 +7,19 @@
 
   const API_URL = import.meta.env.VITE_CUSTOMER_BACKEND_URL;
 
-  const userCreate = async ({ firstname, lastname, email, password, phone }) => {
+  type CreateUserPayload = {
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+    phone: string;
+  };
+
+  type VerifyCodePayload = {
+    code: string;
+  };
+
+  const userCreate = async ({ firstname, lastname, email, password, phone }: CreateUserPayload) => {
     try {
       const response = await fetch(`${API_URL}/create`, {
         method: "POST",
@@ -26,7 +38,7 @@
     }
   };
 
-  const verifyCode = async ({ code }) => {
+  const verifyCode = async ({ code }: VerifyCodePayload) => {
     try {
       const res = await fetch(`${API_URL}/verifyEmail`, {
         method: "POST",
@@ -47,12 +59,6 @@
   const SignupForm = () => {
     const navigate = useNavigate();
 
-    const context = useContext(Context);
-
-    if (!context) {
-      throw new Error("SignupForm must be used within ContextProvider");
-    }
-
     const {
       firstname,
       setFirstname,
@@ -66,7 +72,7 @@
       setPhone,
       otp,
       setOtp,
-    } = context;
+    } = useContext(Context);
 
     const [errorMessage, setErrorMessage] = useState("");
     const [showVerifyFunctionality, setShowVerifyFunctionality] = useState(false);

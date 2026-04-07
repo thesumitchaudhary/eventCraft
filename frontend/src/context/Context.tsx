@@ -20,7 +20,26 @@ type ContextValue = {
   setAddress: (value: string) => void;
 };
 
-export const Context = createContext<ContextValue | null>(null);
+const defaultContextValue: ContextValue = {
+  firstname: "",
+  setFirstname: () => {},
+  lastname: "",
+  setLastname: () => {},
+  email: "",
+  setEmail: () => {},
+  password: "",
+  setPassword: () => {},
+  otp: "",
+  setOtp: () => {},
+  phone: "",
+  setPhone: () => {},
+  designation: "",
+  setDesignation: () => {},
+  address: "",
+  setAddress: () => {},
+};
+
+export const Context = createContext<ContextValue>(defaultContextValue);
 
 export const ContextProvider = (props: { children: ReactNode }) => {
   const [firstname, setFirstname] = useState("");

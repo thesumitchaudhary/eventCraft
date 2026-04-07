@@ -11,9 +11,14 @@ type LoginPayload = {
   role: string;
 };
 
+type LoginResponse = {
+  token?: string;
+  role?: string;
+};
+
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
-const loginUser = async ({ email, password, role }: LoginPayload) => {
+const loginUser = async ({ email, password, role }: LoginPayload): Promise<LoginResponse> => {
   const res = await fetch(`${BASE_URL}/${role}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -35,15 +40,9 @@ const SigninForm = () => {
   const [focusedPassword, setFocusedPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const navigate = useNavigate();
   const location = useLocation();
-  const context = useContext(Context);
-
-  if (!context) {
-    throw new Error("SigninForm must be used within ContextProvider");
-  }
-
-  const { email, setEmail, password, setPassword } = context;
+  const navigate = useNavigate();
+  const { email, setEmail, password, setPassword } = useContext(Context);
 
   const floatingEmail = focusedEmail || email.length > 0;
   const floatingPassword = focusedPassword || password.length > 0;

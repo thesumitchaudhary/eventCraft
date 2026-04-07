@@ -13,30 +13,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-const adminBookings = [
-  {
-    id: "BK-5011",
-    customer: "Priya Sharma",
-    event: "Destination Wedding",
-    date: "2026-05-12",
-    status: "Confirmed",
-  },
-  {
-    id: "BK-5012",
-    customer: "Apex Technologies",
-    event: "Annual Product Expo",
-    date: "2026-05-20",
-    status: "Pending",
-  },
-  {
-    id: "BK-5013",
-    customer: "Neha and Rohan",
-    event: "Engagement Party",
-    date: "2026-06-01",
-    status: "Cancelled",
-  },
-];
-
 export default function AdminBookingsPage() {
   return (
     <SidebarProvider>

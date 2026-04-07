@@ -1,8 +1,43 @@
-import React, { useState, createContext } from "react";
+import { createContext, useState } from "react";
+import type { ReactNode } from "react";
 
-export const EventContext = createContext(null);
+type EventContextValue = {
+  eventName: string;
+  setEventName: (value: string) => void;
+  eventType: string;
+  setEventType: (value: string) => void;
+  selectTheme: string;
+  setSelectTheme: (value: string) => void;
+  date: string;
+  setDate: (value: string) => void;
+  venue: string;
+  setVenue: (value: string) => void;
+  guestCount: string;
+  setGuestCount: (value: string) => void;
+  budget: string;
+  setBudget: (value: string) => void;
+};
 
-export const EventProvider = (props) => {
+const defaultEventContextValue: EventContextValue = {
+  eventName: "",
+  setEventName: () => {},
+  eventType: "",
+  setEventType: () => {},
+  selectTheme: "",
+  setSelectTheme: () => {},
+  date: "",
+  setDate: () => {},
+  venue: "",
+  setVenue: () => {},
+  guestCount: "",
+  setGuestCount: () => {},
+  budget: "",
+  setBudget: () => {},
+};
+
+export const EventContext = createContext<EventContextValue>(defaultEventContextValue);
+
+export const EventProvider = (props: { children: ReactNode }) => {
   const [eventName, setEventName] = useState("");
   const [eventType, setEventType] = useState("");
   const [selectTheme, setSelectTheme] = useState("");
