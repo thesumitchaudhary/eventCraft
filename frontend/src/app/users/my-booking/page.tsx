@@ -58,7 +58,7 @@ export default function MyBookingPage() {
           </div>
         </header>
 
-          <div className="min-h-[60vh] rounded-xl bg-muted/20 p-4">
+          <div className="min-h-[60vh] rounded-xl p-4">
             <div className="left-4 p-2 my-4 rounded-xl max-w-250 flex flex-col gap-10">
               {data?.events?.map((booking) => (
                 <div

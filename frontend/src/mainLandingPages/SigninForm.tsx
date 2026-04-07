@@ -2,8 +2,9 @@ import { useContext, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { Context } from "../context/Context";
-import { Button, TextInput } from "@mantine/core";
+import { TextInput } from "@mantine/core";
 import { syncSocketAuth } from "../socket-connection/socket";
+import { Button } from "../components/ui/button";
 
 type LoginPayload = {
   email: string;
@@ -119,9 +120,9 @@ const SigninForm = () => {
           classNames={{
             root: "relative mt-1",
             input:
-              "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
-            label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
-              floatingEmail ? "-translate-y-5 text-xs text-gray-900" : ""
+              "bg-transparent border-0 border-b-2 border-border rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-primary",
+            label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-muted-foreground transition-all duration-100 ease-in-out ${
+              floatingEmail ? "-translate-y-5 text-xs text-foreground" : ""
             }`,
           }}
         />
@@ -136,21 +137,20 @@ const SigninForm = () => {
           classNames={{
             root: "relative mt-1",
             input:
-              "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
-            label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
-              floatingPassword ? "-translate-y-5 text-xs text-gray-900" : ""
+              "bg-transparent border-0 border-b-2 border-border rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-primary",
+            label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-muted-foreground transition-all duration-100 ease-in-out ${
+              floatingPassword ? "-translate-y-5 text-xs text-foreground" : ""
             }`,
           }}
         />
 
-        {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
+        {errorMessage && <p className="text-sm text-destructive">{errorMessage}</p>}
 
         <Button
           onClick={handleSubmit}
-          color="black"
-          loading={userMutation.isPending}
+          disabled={userMutation.isPending}
         >
-          Sign In
+          {userMutation.isPending ? "Signing In..." : "Sign In"}
         </Button>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import { X } from "lucide-react";
 
@@ -54,28 +54,28 @@ const AuthModal = ({ setOpen, defaultMode = "signin" }: AuthModalProps) => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/40 z-40" onClick={closeModal} />
+      <div className="fixed inset-0 z-40 bg-foreground/40 backdrop-blur-sm" onClick={closeModal} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
           ref={modalRef}
-          className="bg-white w-full max-w-[450px] p-4 rounded-xl shadow-lg"
+          className="w-full max-w-[450px] rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-2xl"
         >
           <div>
             <div className="flex justify-between">
               <div>
                 <h1 className="font-semibold">Welcome to Eventify</h1>
-                <p className="text-sm">
+                <p className="text-sm text-muted-foreground">
                   Sign in to your account or create a new one
                 </p>
               </div>
-              <button onClick={() => safeSetOpen(false)}>
+              <button onClick={() => safeSetOpen(false)} className="text-muted-foreground transition-colors hover:text-foreground">
                 <X />
               </button>
             </div>
-            <div className="flex gap-4 bg-gray-200 rounded-xl justify-between p-2 mb-4">
+            <div className="mb-4 flex justify-between gap-4 rounded-xl bg-muted p-2">
               <button
-                className={`flex-1 py-1 rounded-lg ${
-                  mode === "signup" ? "bg-white shadow" : ""
+                className={`flex-1 rounded-lg py-1 transition-colors ${
+                  mode === "signup" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
                 onClick={() => setMode("signup")}
               >
@@ -83,8 +83,8 @@ const AuthModal = ({ setOpen, defaultMode = "signin" }: AuthModalProps) => {
               </button>
 
               <button
-                className={`flex-1 py-1 rounded-lg ${
-                  mode === "signin" ? "bg-white shadow" : ""
+                className={`flex-1 rounded-lg py-1 transition-colors ${
+                  mode === "signin" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
                 }`}
                 onClick={() => setMode("signin")}
               >
