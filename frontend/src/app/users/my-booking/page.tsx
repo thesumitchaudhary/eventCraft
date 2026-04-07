@@ -1,43 +1,38 @@
-import { AppSidebar } from "../../../components/app-siderbar"
+import { AppSidebar } from "../../../components/app-siderbar";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import { useQuery } from "@tanstack/react-query";
 
-const bookings = [
-  {
-    id: "BK-1021",
-    event: "Annual Meetup",
-    date: "2026-04-10",
-    status: "Confirmed",
-    amount: "$120",
-  },
-  {
-    id: "BK-1022",
-    event: "Product Workshop",
-    date: "2026-04-18",
-    status: "Pending",
-    amount: "$80",
-  },
-  {
-    id: "BK-1023",
-    event: "Team Conference",
-    date: "2026-05-02",
-    status: "Cancelled",
-    amount: "$0",
-  },
-]
+const INDEX_BACKEND_API_URL = import.meta.env.VITE_INDEX_BACKEND_URL;
+
+// this is for the show booked events
+const fetcher = async (url) => {
+  const res = await fetch(url, { credentials: "include" });
+
+  if (!res.ok) {
+    throw new Error("There was a problem");
+  }
+
+  return res.json();
+};
 
 export default function MyBookingPage() {
+  const { data } = useQuery({
+    queryKey: ["my-bookings"],
+    queryFn: () => fetcher(`${INDEX_BACKEND_API_URL}/my-booking`),
+  });
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -63,40 +58,81 @@ export default function MyBookingPage() {
           </div>
         </header>
 
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="rounded-xl bg-muted/50 p-4">
-            <h2 className="text-lg font-semibold">My Bookings</h2>
-            <p className="text-sm text-muted-foreground">
-              View and manage all your event bookings.
-            </p>
-          </div>
+          <div className="min-h-[60vh] rounded-xl bg-muted/20 p-4">
+            <div className="left-4 p-2 my-4 rounded-xl max-w-250 flex flex-col gap-10">
+              {data?.events?.map((booking) => (
+                <div
+                  key={booking._id}
+                  className="mb-4 bg-muted/50 p-3 rounded-xl"
+                >
+                  <div className="flex justify-between">
+                    <div>
+                      <h2 className="font-bold text-xl">{booking.eventName}</h2>
+                      <p>Wedding - Classic Elegant</p>
+                    </div>
+                    <div className="flex gap-3 mt-4">
+                      <span className=" bg-black max-h-max max-w-max px-3 text-xs rounded-md text-white">
+                        in-progress
+                      </span>
+                      <span className="bg-[#dbeafe] max-h-max max-w-max px-4 text-xs rounded-md text-[#193cba]">
+                        partial
+                      </span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 my-3">
+                    <div>
+                      <span>Date</span>
+                      <p>{new Date(booking.eventDate).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                      <span>Venue</span>
+                      <h3>{booking.venue}</h3>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-4 my-3">
+                    <div>
+                      <span>Guest Count</span>
+                      <h3>{booking.guestCount} guests</h3>
+                    </div>
+                    <div>
+                      <span>Budgets</span>
+                      <p>{booking.totalAmount}</p>
+                    </div>
+                  </div>
+                  <div className="">
+                    <div className="relative">
+                      <p>Event Progress</p>
+                      <p className="">{booking.progress}%</p>
+                      <div className="max-w-7xl h-3 border border-black rounded-xl overflow-hidden">
+                        <div
+                          className="h-full bg-black"
+                          style={{ width: `${booking.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <hr className="mt-4" />
+                  <div className="flex justify-between mt-2">
+                    <div className="flex flex-col">
+                      <span className="text-sm text-gray-500">Payment</span>
+                      <span className="font-semibold text-sm">
+                        ${booking.totalPaid} / {booking.totalAmount}
+                      </span>
+                    </div>
 
-          <div className="min-h-[60vh] rounded-xl bg-muted/50 p-4">
-            <table className="w-full border border-gray-300 bg-white">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border px-4 py-2 text-left">Booking ID</th>
-                  <th className="border px-4 py-2 text-left">Event</th>
-                  <th className="border px-4 py-2 text-left">Date</th>
-                  <th className="border px-4 py-2 text-left">Status</th>
-                  <th className="border px-4 py-2 text-left">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.map((booking) => (
-                  <tr key={booking.id}>
-                    <td className="border px-4 py-2">{booking.id}</td>
-                    <td className="border px-4 py-2">{booking.event}</td>
-                    <td className="border px-4 py-2">{booking.date}</td>
-                    <td className="border px-4 py-2">{booking.status}</td>
-                    <td className="border px-4 py-2">{booking.amount}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenPaymentModal(booking?._id)}
+                      className="bg-black rounded-xl p-2"
+                    >
+                      <span className="text-white">Make Payment</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

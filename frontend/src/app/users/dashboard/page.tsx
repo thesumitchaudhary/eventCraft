@@ -1,5 +1,5 @@
 // import { AppSidebar } from "../../../components/admin-sidebar";
-import { AppSidebar } from "../../../components/app-siderbar"
+import { AppSidebar } from "../../../components/app-siderbar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,8 +15,30 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useQuery } from "@tanstack/react-query";
+
+const API_INDEX_BASE_URL = import.meta.env.VITE_INDEX_BACKEND_URL;
+
+const fetcher = async (url: string) => {
+  const res = await fetch(url, {
+    credentials: "include",
+  });
+
+  const body = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body?.message || "Request failed");
+  }
+
+  return body;
+};
 
 export default function Page() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["my-bookings"],
+    queryFn: async () => await fetcher(`${API_INDEX_BASE_URL}/my-booking`),
+  });
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -31,9 +53,7 @@ export default function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Customer dashboard
-                  </BreadcrumbLink>
+                  <BreadcrumbLink href="#">Customer dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
@@ -47,46 +67,79 @@ export default function Page() {
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
             <div className="rounded-xl bg-muted/50 p-10">
               <h3>Total Bookings</h3>
-              <span>2</span>
+              <span>{data?.events.length}</span>
             </div>
             <div className="rounded-xl bg-muted/50 p-10">
               <h3>Upcoming Events</h3>
-              <span>0</span>
+              <span>
+                {" "}
+                {
+                  data?.events.filter(
+                    (event) => event.bookingStatus == "accepted",
+                  ).length
+                }
+              </span>
             </div>
             <div className="rounded-xl bg-muted/50 p-10">
               <h3>Total Spent</h3>
-              <span>$40,000</span>
+              <span>
+                {data?.events.reduce(
+                  (total, event) => total + event.totalPaid,
+                  0,
+                )}
+              </span>
             </div>
           </div>
           <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min p-5">
-            <table className="w-full bg-white">
-              <thead>
-                <tr className="border-b">
-                  <th className="px-4 py-2 text-left">Event</th>
-                  <th className="px-4 py-2 text-left">Date</th>
-                  <th className="px-4 py-2 text-left">Theme</th>
-                  <th className="px-4 py-2 text-left">status</th>
-                  <th className="px-4 py-2 text-left">Progress</th>
-                </tr>
-              </thead>
+            <table className="w-full my-3 border-collapse">
+                <thead>
+                  <tr className="border-b-2 border-black text-left">
+                    <th className="py-2">Event</th>
+                    <th className="py-2">Date</th>
+                    <th className="py-2">Theme</th>
+                    <th className="py-2">
+                      Status for Conformation <br /> from Admin
+                    </th>
+                    <th className="py-2">
+                      Status for work update <br /> from employee
+                    </th>
+                    <th className="py-2">Work Progress</th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                <tr className="border-b">
-                  <td className="px-4 py-2">Johnson Wedding</td>
-                  <td className="px-4 py-2">2026-02-14</td>
-                  <td className="px-4 py-2">Classic Elegant</td>
-                  <td className="px-4 py-2">in-progress</td>
-                  <td className="px-4 py-2">60%</td>
-                </tr>
-                 <tr className="border-b">
-                  <td className="px-4 py-2">Anniversary Celebration</td>
-                  <td className="px-4 py-2">2025-11-15</td>
-                  <td className="px-4 py-2">Romantic Garden</td>
-                  <td className="px-4 py-2">completed</td>
-                  <td className="px-4 py-2">100%</td>
-                </tr>
-              </tbody>
-            </table>
+                <tbody>
+                  {isLoading && (
+                    <tr>
+                      <td colSpan="5" className="text-center py-4">
+                        Loading...
+                      </td>
+                    </tr>
+                  )}
+
+                  {data?.events?.map((booking) => (
+                    <tr key={booking._id} className="border-b border-black">
+                      <td className="py-2">{booking.eventName}</td>
+                      <td>
+                        {new Date(booking.eventDate).toLocaleDateString()}
+                      </td>
+                      <td>{booking.theme}</td>
+                      <td>
+                        {" "}
+                        <span className="text-xs font-semibold text-white bg-gray-600 p-1 rounded-md">
+                          {" "}
+                          {booking.bookingStatus}
+                        </span>
+                      </td>
+                      <td>
+                        <span className="text-xs font-semibold text-white bg-black p-1 rounded-md">
+                          {booking.progress !== 0 ? "in-progress" : "pending"}
+                        </span>
+                      </td>
+                      <td>{booking.progress}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
           </div>
         </div>
       </SidebarInset>

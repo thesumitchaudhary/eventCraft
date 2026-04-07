@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { Context } from "../context/Context";
@@ -16,11 +16,13 @@ type LoginResponse = {
   role?: string;
 };
 
-const API_BASE_URL:string =  "http://localhost:4041/api";
+const API_BASE_URL: string = "http://localhost:4041/api";
 
-console.log(API_BASE_URL);
-
-const loginUser = async ({ email, password, role }: LoginPayload): Promise<LoginResponse> => {
+const loginUser = async ({
+  email,
+  password,
+  role,
+}: LoginPayload): Promise<LoginResponse> => {
   const res = await fetch(`${API_BASE_URL}/${role}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -38,6 +40,7 @@ const loginUser = async ({ email, password, role }: LoginPayload): Promise<Login
 };
 
 const SigninForm = () => {
+
   const [focusedEmail, setFocusedEmail] = useState(false);
   const [focusedPassword, setFocusedPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -75,12 +78,14 @@ const SigninForm = () => {
       }
 
       const loggedInRole = data?.role || role;
-      if (loggedInRole === "admin") navigate("/admin/dashboard");
-      else if (loggedInRole === "employee") navigate("/employee/dashboard");
+      if (loggedInRole === "admin") navigate("/admin");
+      else if (loggedInRole === "employee") navigate("/employee");
       else navigate("/customer/dashboard");
     },
     onError: (err: unknown) => {
-      setErrorMessage(err instanceof Error ? err.message : "Invalid email or password");
+      setErrorMessage(
+        err instanceof Error ? err.message : "Invalid email or password",
+      );
     },
   });
 
