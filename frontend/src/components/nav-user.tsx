@@ -34,12 +34,14 @@ import { Link } from "react-router-dom";
 
 export function NavUser({
   user,
+  onLogout,
 }: {
   user: {
     name: string
     email: string
     avatar: string
   }
+  onLogout?: () => void
 }) {
   const { isMobile } = useSidebar()
   const [isAccountOpen, setIsAccountOpen] = useState(false)
@@ -113,12 +115,9 @@ export function NavUser({
               </DropdownMenuItem> */}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link to={"/"} className="flex gap-3">
-              <LogOutIcon
-              />
-              Log out
-              </Link>
+            <DropdownMenuItem onClick={onLogout}>
+              <LogOutIcon />
+              <span className="ml-2">Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,7 +1,11 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
-// import for main landing page
-import LandingPage from "./mainLangingPages/Dashboard";
+
+// this is main dashboard of the website
+import LandingPage from "./mainLandingPages/Dashboard";
+
+// this is for the sign in and also sign up form for user,admin, and employee
+import AuthModal from "./mainLandingPages/AuthModel";
 
 // import for customer
 import Page from "./app/users/dashboard/page";
@@ -28,7 +32,14 @@ import EmployeeCompletedPage from "./app/employee/completed/page";
 function App() {
   return (
     <Routes>
+      {/* this is the main dashboard */}
       <Route path="/" element={<LandingPage />} />
+
+      {/* auth (same UI, role decided by route) */}
+      <Route path="/login" element={<AuthModal />} />
+      <Route path="/admin/login" element={<AuthModal />} />
+      <Route path="/employee/login" element={<AuthModal />} />
+
       <Route path="/customer/dashboard" element={<Page />} />
       <Route path="/customer/myBooking" element={<MyBookingPage />} />
       <Route path="/customer/EventTheme" element={<EventThemePage />} />
