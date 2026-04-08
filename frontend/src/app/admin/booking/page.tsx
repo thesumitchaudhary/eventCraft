@@ -159,7 +159,7 @@ export default function AdminBookingsPage() {
             <div>
               <input
                 type="text"
-                className="w-full px-2 py-1 outline-none"
+                className="rounded-md border px-3 py-2 w-70"
                 placeholder="Search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -167,35 +167,23 @@ export default function AdminBookingsPage() {
             </div>
           </div>
           <div className="grid auto-rows-4 gap-4 md:grid-cols-4">
-            <div className="rounded-xl bg-muted/50 p-5">
+            <div className="rounded-md bg-muted/50 p-5 border-gary-200 border-l-6 border-l-[#6a7282]">
               <div className="flex gap-1">
                 <h3>Pending</h3>
               </div>
-              <span>
+              <span className="text-[#6a7282] font-bold text-xl">
                 {" "}
                 {
-                  allBookings.filter((b) => b.bookingStatus === "pending")
+                  allBookings.filter((b) => b.bookingStatus === "requested")
                     .length
                 }
               </span>
             </div>
-            <div className="rounded-xl bg-muted/50 p-5">
+            <div className="rounded-md bg-muted/50 p-5 border-gary-200 border-l-6 border-l-[#155dfc]">
               <div className="flex gap-1">
                 <h3>Confirmed</h3>
               </div>
-              <span>
-                {" "}
-                {
-                  allBookings.filter((b) => b.bookingStatus === "rejected")
-                    .length
-                }
-              </span>
-            </div>
-            <div className="rounded-xl bg-muted/50 p-5">
-              <div className="flex gap-1">
-                <h3>In Progress</h3>
-              </div>
-              <span>
+              <span className="text-[#155dfc] font-bold text-xl">
                 {" "}
                 {
                   allBookings.filter((b) => b.bookingStatus === "accepted")
@@ -203,11 +191,29 @@ export default function AdminBookingsPage() {
                 }
               </span>
             </div>
-            <div className="rounded-xl bg-muted/50 p-5">
+            <div className="rounded-md bg-muted/50 p-5 border-gary-200 border-l-6 border-l-[#fd0d0d]">
+              <div className="flex gap-1">
+                <h3>rejected</h3>
+              </div>
+              <span className="text-[#fd0d0d] font-bold text-xl">
+                {" "}
+                {
+                  allBookings.filter((b) => b.bookingStatus === "rejected")
+                    .length
+                }
+              </span>
+            </div>
+            <div className="rounded-md bg-muted/50 p-5 border-gary-200 border-l-6 border-l-[#00a63e]">
               <div className="flex gap-1">
                 <h3>Completed</h3>
               </div>
-              <span>0</span>
+              <span className="text-[#00a63e] font-bold text-xl">
+                {" "}
+                {
+                  allBookings.filter((b) => b.bookingStatus === "completed")
+                    .length
+                }
+              </span>
             </div>
           </div>
 
@@ -257,7 +263,7 @@ export default function AdminBookingsPage() {
                           </span>
                         </td>
                         <td className="py-2 px-2">
-                          <span className="bg-gray-500 text-white text-xs px-2 py-1 rounded">
+                          <span className="bg-gray-600 text-white text-xs px-2 py-1 rounded">
                             {booking.bookingStatus}
                           </span>
                         </td>

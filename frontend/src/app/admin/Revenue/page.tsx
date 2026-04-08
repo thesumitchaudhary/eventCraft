@@ -29,6 +29,8 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
+import { FileText, TrendingUp, DollarSign } from "lucide-react";
+
 type EventDetail = {
   _id?: string;
   eventName?: string;
@@ -145,16 +147,13 @@ export default function AdminThemePage() {
               </h3>
             </div>
             <div className="rounded-xl bg-muted/50 p-5">
-              <p className="text-sm text-muted-foreground">Top event type</p>
+              <p className="text-sm text-muted-foreground">   Pending Amount</p>
               <h3 className="mt-2 text-2xl font-semibold">
-                {topCategory?.name ?? "No data"}
-              </h3>
-              <p className="text-sm text-muted-foreground">
                 ${topCategory?.revenue?.toLocaleString() ?? 0}
-              </p>
+              </h3>
             </div>
             <div className="rounded-xl bg-muted/50 p-5">
-              <p className="text-sm text-muted-foreground">Remaining balance</p>
+              <p className="text-sm text-muted-foreground">Total Expected</p>
               <h3 className="mt-2 text-2xl font-semibold">
                 ${remaining.toLocaleString()}
               </h3>
@@ -200,6 +199,35 @@ export default function AdminThemePage() {
             </div>
           )}
           <div className="gap-4 md:grid-cols-4 bg-muted/70">
+            <div>
+              <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#00a63e]">
+                <p className="flex">
+                  <DollarSign className="text-[#00a63e]" />
+                  Total Revenue
+                </p>
+                <h3 className="font-semibold text-2xl text-[#00a63e]">
+                  $ {paidByCustomer}
+                </h3>
+              </div>
+              <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#f54a00]">
+                <p className="flex gap-1">
+                  <TrendingUp className="text-[#f54a00]" />
+                  Pending Amount
+                </p>
+                <h3 className="font-semibold text-2xl text-[#f54a00]">
+                  $ {remaining}
+                </h3>
+              </div>
+              <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#155dfc]">
+                <p className="flex gap-1">
+                  <FileText className="text-[#155dfc]" />
+                  Total Expected
+                </p>
+                <h3 className="font-semibold text-2xl text-[#155dfc]">
+                  $ {totalRevenue}
+                </h3>
+              </div>
+            </div>
             <div className="bg-gray-50 p-5 rounded-2xl">
               <h3 className="text-2xl font-bold">Payment Details</h3>
               <p>All bookings with payment information</p>
