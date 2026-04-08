@@ -24,7 +24,7 @@ type Theme = {
   _id: string;
   themeName: string;
   themeType: string;
-  themePrice: number;
+  themePrice: number | string;
 };
 
 type ThemePayload = {
@@ -175,6 +175,8 @@ export default function AdminThemePage() {
     });
   };
 
+  const getPriceAsNumber = (price: number | string) => Number(String(price).trim());
+
   return (
     <SidebarProvider>
       <AdminSidebar />
@@ -298,7 +300,8 @@ export default function AdminThemePage() {
 
                       <td className="border-b px-4 py-3 font-medium">
                         <input
-                          type="number"
+                          type="text"
+                          inputMode="decimal"
                           value={
                             editRow?._id === theme._id
                               ? editRow.themePrice
@@ -308,7 +311,7 @@ export default function AdminThemePage() {
                           onChange={(e) =>
                             setEditRow((prev) => ({
                               ...(prev?._id === theme._id ? prev : theme),
-                              themePrice: Number(e.target.value),
+                              themePrice: e.target.value,
                             }))
                           }
                         />
@@ -323,11 +326,17 @@ export default function AdminThemePage() {
                               return;
                             }
 
+                            const parsedPrice = getPriceAsNumber(editRow.themePrice);
+
+                            if (Number.isNaN(parsedPrice)) {
+                              return;
+                            }
+
                             themeUpdateMutation.mutate({
                               id: editRow._id,
                               themeName: editRow.themeName,
                               themeType: editRow.themeType,
-                              themePrice: Number(editRow.themePrice),
+                              themePrice: parsedPrice,
                             });
                           }}
                         >

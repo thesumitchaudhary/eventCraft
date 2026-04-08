@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import type { LucideIcon } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 
 function renderIcon(icon?: LucideIcon | React.ReactNode) {
   if (!icon) {
@@ -39,20 +39,37 @@ export function NavMain({
     }[]
   }[]
 }) {
+  const location = useLocation()
+
+  const normalizePath = (path: string) => {
+    if (path === "/") return "/"
+    return path.replace(/\/+$/, "")
+  }
+
+  const isItemActive = (itemUrl: string) => {
+    const currentPath = normalizePath(location.pathname)
+    const targetPath = normalizePath(itemUrl)
+
+    return currentPath === targetPath
+  }
+
   return (
     <SidebarGroup>
       {/* <SidebarGroupLabel>Platform</SidebarGroupLabel> */}
       <SidebarMenu>
-        {items.map((item) => (
+        {items.map((item) => {
+          const active = isItemActive(item.url)
+
+          return (
           <Collapsible
             key={item.title}
             asChild
-            defaultOpen={item.isActive} 
+            defaultOpen={item.isActive ?? active}
             className="group/collapsible"
           > 
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <SidebarMenuButton asChild tooltip={item.title}>
+                <SidebarMenuButton asChild tooltip={item.title} isActive={active}>
                   <Link to={item.url}>
                     {renderIcon(item.icon)}
                     <span>{item.title}</span>
@@ -75,7 +92,8 @@ export function NavMain({
               </CollapsibleContent>
             </SidebarMenuItem>
           </Collapsible>
-        ))}
+          )
+        })}
       </SidebarMenu>
     </SidebarGroup>
   )

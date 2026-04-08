@@ -15,9 +15,9 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { X, ClipboardList } from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import AssignTaskModal from "@/components/assign-task";
 
 const fetcher = async (url) => {
   const res = await fetch(url, { credentials: "include" });
@@ -94,7 +94,7 @@ export default function AdminThemePage() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Theme Catalog</BreadcrumbPage>
+                  <BreadcrumbPage>Assign Task</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
@@ -170,7 +170,7 @@ export default function AdminThemePage() {
 
                       {/* Status */}
                       <td className="px-2 py-3">
-                        <span className="text-xs font-medium px-3 py-1 rounded-full bg-gray-900 text-white">
+                        <span className="text-xs font-medium px-1 py-1 rounded-full bg-gray-900 text-white">
                           {row.status}
                         </span>
                       </td>
@@ -191,87 +191,10 @@ export default function AdminThemePage() {
           </div>
         </div>
 
-        {isAssignTaskOpen && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-            onClick={() => setIsAssignTaskOpen(false)}
-          >
-            <div
-              className="w-full max-w-2xl rounded-xl bg-white p-6 shadow-2xl"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <div className="mb-5 flex items-start justify-between">
-                <div>
-                  <h2 className="text-xl font-semibold">Assign Task</h2>
-                  <p className="text-sm text-muted-foreground">
-                    Create a task and assign it to an employee.
-                  </p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsAssignTaskOpen(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <form
-                className="space-y-4"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  setIsAssignTaskOpen(false);
-                }}
-              >
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium">Task Title</label>
-                    <Input placeholder="Setup venue decorations" />
-                  </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium">Description</label>
-                    <textarea
-                      className="min-h-28 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                      placeholder="Describe the task details"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Related Event</label>
-                    <Input placeholder="Johnson Wedding" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Assign To</label>
-                    <Input placeholder="Sarah Johnson" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Priority</label>
-                    <Input placeholder="High" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Due Date</label>
-                    <Input type="date" />
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-2 pt-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsAssignTaskOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="bg-black text-white hover:bg-black hover:text-white"
-                  >
-                    Save Task
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        <AssignTaskModal
+          open={isAssignTaskOpen}
+          closeTaskModal={() => setIsAssignTaskOpen(false)}
+        />
       </SidebarInset>
     </SidebarProvider>
   );

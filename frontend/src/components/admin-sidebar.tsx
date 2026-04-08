@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import {
   Calendar,
   DollarSign,
@@ -16,7 +18,9 @@ import {
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
+import { ProfileEditorAdmin } from "@/components/profile-editor-admin";
 import { TeamSwitcher } from "@/components/team-switcher";
+import LiveChatLayoutAdmin from "@/components/live-chat-layout-admin";
 import {
   Sidebar,
   SidebarContent,
@@ -31,18 +35,54 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+type AdminUserShape = {
+  firstName?: string;
+  firstname?: string;
+  lastName?: string;
+  lastname?: string;
+  email?: string;
+  profileImageUrl?: string;
+  profileImage?: string;
+};
+
+type AdminMeResponse = {
+  admin?: {
+    userId?: AdminUserShape;
+  };
+};
+
+const ADMIN_API_URL = `${import.meta.env.VITE_BACKEND_URL}/admin`;
+
+const fetchAdminMe = async (): Promise<AdminMeResponse> => {
+  const res = await fetch(`${ADMIN_API_URL}/me`, {
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch admin profile: ${res.status}`);
+  }
+
+  return res.json();
+};
+
+const logoutAdmin = async () => {
+  const res = await fetch(`${ADMIN_API_URL}/logout`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Logout failed");
+  }
+
+  return res.json();
+};
+
 const data = {
-  user: {
-    name: "Admin User",
-    email: "admin@eventcraft.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   teams: [
     {
       name: "Event Craft Admin",
@@ -138,6 +178,34 @@ const data = {
 
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isMobile } = useSidebar();
+  const navigate = useNavigate();
+  const { data: adminData } = useQuery({
+    queryKey: ["admin-me-sidebar"],
+    queryFn: fetchAdminMe,
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: logoutAdmin,
+    onSuccess: () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("role");
+      sessionStorage.clear();
+      navigate("/");
+    },
+    onError: (error) => {
+      console.log("error", error);
+    },
+  });
+
+  const queryUser = adminData?.admin?.userId;
+  const user = {
+    name:
+      `${queryUser?.firstName || queryUser?.firstname || ""} ${queryUser?.lastName || queryUser?.lastname || ""}`.trim() ||
+      "Admin User",
+    email: queryUser?.email || "",
+    avatar: queryUser?.profileImageUrl || queryUser?.profileImage || "/avatars/shadcn.jpg",
+  };
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -159,19 +227,20 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
               </SheetTrigger>
             </SidebarMenuItem>
           </SidebarMenu>
-          <SheetContent side={isMobile ? "bottom" : "right"} className="sm:max-w-md">
-            <SheetHeader>
-              <SheetTitle>Admin Help Desk</SheetTitle>
-              <SheetDescription>
-                Share your issue and the support team will respond shortly.
-              </SheetDescription>
-            </SheetHeader>
-            <div className="px-4 pb-4 text-sm text-muted-foreground">
-              support@eventcraft.com
+          <SheetContent
+            side={isMobile ? "bottom" : "right"}
+            className="flex w-full items-center justify-center p-6 pt-14 sm:max-w-3xl"
+          >
+            <div className="w-full">
+              <LiveChatLayoutAdmin />
             </div>
           </SheetContent>
         </Sheet>
-        <NavUser user={data.user} />
+        <NavUser
+          user={user}
+          onLogout={() => logoutMutation.mutate()}
+          AccountEditor={ProfileEditorAdmin}
+        />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

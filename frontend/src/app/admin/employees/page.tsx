@@ -15,10 +15,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { UserPlus, X } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
+import AddEmployeeModal from "@/components/add-employee";
 
 const fetcher = async (url) => {
   const res = await fetch(url, { credentials: "include" });
@@ -170,7 +170,7 @@ export default function AdminThemePage() {
                         {new Date(employee?.joiningDate).toLocaleDateString()}
                       </td>
                       <td className="border-b p-1">
-                        <span>{employee?.tasks.length}</span>
+                        <span>{Array.isArray(employee?.tasks) ? employee.tasks.length : 0}</span>
                       </td>
                     </tr>
                   ))
@@ -187,74 +187,9 @@ export default function AdminThemePage() {
         </div>
 
         {isAddEmployeeOpen && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-            onClick={() => setIsAddEmployeeOpen(false)}
-          >
-            <div
-              className="w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <div className="mb-5 flex items-start justify-between">
-                <div>
-                  <h2 className="text-xl font-semibold">Add Employee</h2>
-                  <p className="text-sm text-muted-foreground">
-                    Enter employee details to create a new profile.
-                  </p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsAddEmployeeOpen(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <form
-                className="space-y-4"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  setIsAddEmployeeOpen(false);
-                }}
-              >
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Full Name</label>
-                    <Input placeholder="John Doe" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Email</label>
-                    <Input type="email" placeholder="john@email.com" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Phone</label>
-                    <Input placeholder="+1 234 567 890" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Designation</label>
-                    <Input placeholder="Event Manager" />
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-2 pt-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsAddEmployeeOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="bg-black text-white hover:bg-black"
-                  >
-                    Add Employee
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </div>
+          <AddEmployeeModal
+            closeAddEmployeeModal={() => setIsAddEmployeeOpen(false)}
+          />
         )}
       </SidebarInset>
     </SidebarProvider>

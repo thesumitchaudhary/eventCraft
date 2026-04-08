@@ -14,6 +14,9 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import BookingStatusPie from "./components/BookingStatusPie";
+import EventsByTypeChart from "./components/EventsByTypeChart";
+import RevenueAreaChart from "./components/RevenueAreaChart";
 
 export default function AdminThemePage() {
   return (
@@ -40,33 +43,15 @@ export default function AdminThemePage() {
             </Breadcrumb>
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-xl bg-muted/50 p-4">
-              <h4 className="font-semibold">Royal Classic</h4>
-              <span className="text-sm text-muted-foreground">Wedding</span>
-              <h3 className="mt-2 text-lg font-semibold">$7,500</h3>
-              <span className="text-sm text-muted-foreground">Premium package</span>
-            </div>
-            <div className="aspect-video rounded-xl bg-muted/50 p-4">
-              <h4 className="font-semibold">Minimal Corporate</h4>
-              <span className="text-sm text-muted-foreground">Corporate</span>
-              <h3 className="mt-2 text-lg font-semibold">$5,200</h3>
-              <span className="text-sm text-muted-foreground">Business events</span>
-            </div>
-            <div className="aspect-video rounded-xl bg-muted/50 p-4">
-              <h4 className="font-semibold">Bloom Garden</h4>
-              <span className="text-sm text-muted-foreground">Engagement</span>
-              <h3 className="mt-2 text-lg font-semibold">$4,300</h3>
-              <span className="text-sm text-muted-foreground">Outdoor setup</span>
-            </div>
-            <div className="aspect-video rounded-xl bg-muted/50 p-4">
-              <h4 className="font-semibold">Twinkle Kids</h4>
-              <span className="text-sm text-muted-foreground">Birthday</span>
-              <h3 className="mt-2 text-lg font-semibold">$2,100</h3>
-              <span className="text-sm text-muted-foreground">Starter package</span>
-            </div>
-          </div>
+        <div className="flex flex-1 flex-col gap-5 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.06),transparent_35%)] p-4 pt-0 lg:p-6">
+          <section className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+            <BookingStatusPie />
+            <EventsByTypeChart />
+          </section>
+
+          <section className="w-full">
+            <RevenueAreaChart />
+          </section>
         </div>
       </SidebarInset>
     </SidebarProvider>
