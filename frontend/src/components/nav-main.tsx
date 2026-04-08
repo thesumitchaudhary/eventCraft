@@ -27,6 +27,7 @@ function renderIcon(icon?: LucideIcon | React.ReactNode) {
 
 export function NavMain({
   items,
+  onNavigate,
 }: {
   items: {
     title: string
@@ -38,6 +39,7 @@ export function NavMain({
       url: string
     }[]
   }[]
+  onNavigate?: () => void
 }) {
   const location = useLocation()
 
@@ -70,7 +72,7 @@ export function NavMain({
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
                 <SidebarMenuButton asChild tooltip={item.title} isActive={active}>
-                  <Link to={item.url}>
+                  <Link to={item.url} onClick={onNavigate}>
                     {renderIcon(item.icon)}
                     <span>{item.title}</span>
                     {/* <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" /> */}

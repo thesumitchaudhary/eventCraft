@@ -262,7 +262,7 @@ const Dashboard = () => {
             </div>
           </div>
         </section>
-        <section className="my-16 max-w-6xl mx-auto px-4">
+        {/* <section className="my-16 max-w-6xl mx-auto px-4">
           <div className="flex justify-center">
             <MagicCard
               mode="orb"
@@ -313,7 +313,7 @@ const Dashboard = () => {
               </div>
             </MagicCard>
           </div>
-        </section>
+        </section> */}
         <section className="max-w-6xl mx-auto my-20">
           <div className="rounded-2xl bg-linear-to-r from-primary via-secondary to-accent p-10 text-primary-foreground shadow-lg">
             <h2 className="my-5 text-3xl font-bold flex justify-center">

@@ -121,7 +121,7 @@ const SigninForm = () => {
           classNames={{
             root: "relative mt-1",
             input:
-              "bg-transparent border-0 border-b-2 border-border rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-primary",
+              "bg-transparent !border-0 !border-b-2  px-0 pt-5 pb-1 focus:outline-none focus:border-primary",
             label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-muted-foreground transition-all duration-100 ease-in-out ${
               floatingEmail ? "-translate-y-5 text-xs text-foreground" : ""
             }`,
@@ -138,7 +138,7 @@ const SigninForm = () => {
           classNames={{
             root: "relative mt-1",
             input:
-              "bg-transparent border-0 border-b-2 border-border rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-primary",
+              "bg-transparent !border-0 !border-b-2 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-primary",
             label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-muted-foreground transition-all duration-100 ease-in-out ${
               floatingPassword ? "-translate-y-5 text-xs text-foreground" : ""
             }`,

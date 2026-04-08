@@ -153,7 +153,7 @@ const SignupForm = () => {
         classNames={{
           root: "relative mt-1",
           input:
-            "block w-full rounded-none border-0 border-b-2 border-solid border-border bg-transparent px-0 pt-5 pb-1 focus:border-primary focus:outline-none",
+            "block w-full rounded-none !border-0 !border-b-2 border-solid bg-transparent px-0 pt-5 pb-1 focus:border-primary focus:outline-none",
           label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-muted-foreground transition-all duration-100 ease-in-out ${
             floatingFirstname ? "-translate-y-5 text-xs text-foreground" : ""
           }`,
@@ -169,7 +169,7 @@ const SignupForm = () => {
         classNames={{
           root: "relative mt-1",
           input:
-            "block w-full rounded-none border-0 border-b-2 border-solid border-border bg-transparent px-0 pt-5 pb-1 focus:border-primary focus:outline-none",
+            "block w-full rounded-none !border-0 !border-b-2 border-solid bg-transparent px-0 pt-5 pb-1 focus:border-primary focus:outline-none",
           label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-muted-foreground transition-all duration-100 ease-in-out ${
             floatingLastname ? "-translate-y-5 text-xs text-foreground" : ""
           }`,
@@ -185,7 +185,7 @@ const SignupForm = () => {
         classNames={{
           root: "relative mt-1",
           input:
-            "block w-full rounded-none border-0 border-b-2 border-solid border-border bg-transparent px-0 pt-5 pb-1 focus:border-primary focus:outline-none",
+            "block w-full rounded-none !border-0 !border-b-2 border-solid bg-transparent px-0 pt-5 pb-1 focus:border-primary focus:outline-none",
           label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-muted-foreground transition-all duration-100 ease-in-out ${
             floatingEmail ? "-translate-y-5 text-xs text-foreground" : ""
           }`,
@@ -202,7 +202,7 @@ const SignupForm = () => {
         classNames={{
           root: "relative mt-1",
           input:
-            "block w-full rounded-none border-0 border-b-2 border-solid border-border bg-transparent px-0 pt-5 pb-1 focus:border-primary focus:outline-none",
+            "block w-full rounded-none !border-0 !border-b-2 border-solid bg-transparent px-0 pt-5 pb-1 focus:border-primary focus:outline-none",
           label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-muted-foreground transition-all duration-100 ease-in-out ${
             floatingPassword ? "-translate-y-5 text-xs text-foreground" : ""
           }`,
@@ -218,7 +218,7 @@ const SignupForm = () => {
         classNames={{
           root: "relative mt-1",
           input:
-            "block w-full rounded-none border-0 border-b-2 border-solid border-border bg-transparent px-0 pt-5 pb-1 focus:border-primary focus:outline-none",
+            "block w-full rounded-none !border-0 !border-b-2 border-solid bg-transparent px-0 pt-5 pb-1 focus:border-primary focus:outline-none",
           label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-muted-foreground transition-all duration-100 ease-in-out ${
             floatingPhone ? "-translate-y-5 text-xs text-foreground" : ""
           }`,
@@ -239,7 +239,7 @@ const SignupForm = () => {
           classNames={{
             root: "relative mt-1",
             input:
-              "block w-full rounded-none border-0 border-b-2 border-solid border-border bg-transparent px-0 pt-5 pb-1 focus:border-primary focus:outline-none",
+              "block w-full rounded-none !border-0 !border-b-2 border-solid bg-transparent px-0 pt-5 pb-1 focus:border-primary focus:outline-none",
             label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-muted-foreground transition-all duration-100 ease-in-out ${
               floatingOtp ? "-translate-y-5 text-xs text-foreground" : ""
             }`,
@@ -250,13 +250,13 @@ const SignupForm = () => {
       {errorMessage && <p className="text-sm text-destructive">{errorMessage}</p>}
 
       {!showVerifyFunctionality ? (
-        <Button onClick={handleSubmit} className="w-40">
+        <Button onClick={handleSubmit} className="w-full">
           {userMutation.isPending ? "Creating..." : "Create Account"}
         </Button>
       ) : (
         <Button
           onClick={() => codeMutation.mutate()}
-          className="w-40"
+          className="w-full"
           disabled={codeMutation.isPending}
         >
           {codeMutation.isPending ? "Verifying..." : "Verify OTP"}

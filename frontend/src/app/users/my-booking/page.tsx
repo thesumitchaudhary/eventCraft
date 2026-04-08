@@ -23,6 +23,8 @@ const ADMIN_API_URL = import.meta.env.VITE_ADMIN_BACKEND_URL;
 const EVENT_BOOKING_API_URL = import.meta.env.VITE_CUSTOMER_EVENT_BOOKING_BACKEND_URL;
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
+console.log(`${API_URL}/index/createEvent`)
+
 interface Booking {
   _id: string;
   eventName: string;
@@ -108,7 +110,7 @@ const createEventBooking = async ({
   guestCount,
   budget,
 }: EventBookingPayload) => {
-  const res = await fetch(`${EVENT_BOOKING_API_URL}/createEvent`, {
+  const res = await fetch(`${API_URL}/index/createEvent`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -343,7 +345,7 @@ function EventRegistrationModal({ close, onSuccess }: EventRegistrationModalProp
               classNames={{
                 root: "relative mt-1",
                 input:
-                  "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
                 label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
                   floatingEventname
                     ? "-translate-y-5 text-xs text-gray-900"
@@ -367,7 +369,7 @@ function EventRegistrationModal({ close, onSuccess }: EventRegistrationModalProp
               classNames={{
                 root: "relative mt-1",
                 input:
-                  "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
                 label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
                   floatingEventType
                     ? "-translate-y-5 text-xs text-gray-900"
@@ -389,7 +391,7 @@ function EventRegistrationModal({ close, onSuccess }: EventRegistrationModalProp
             classNames={{
               root: "relative mt-1",
               input:
-                "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
               label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
                 floatingSelectTheme
                   ? "-translate-y-5 text-xs text-gray-900"
@@ -409,10 +411,9 @@ function EventRegistrationModal({ close, onSuccess }: EventRegistrationModalProp
               classNames={{
                 root: "relative mt-1",
                 input:
-                  "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
-                label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
-                  floatingDate ? "-translate-y-5 text-xs text-gray-900" : ""
-                }`,
+                  "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
+                label:
+                  "absolute left-0 top-2 z-10 pointer-events-none -translate-y-5 text-xs font-normal text-gray-900 transition-all duration-100 ease-in-out",
               }}
             />
 
@@ -426,7 +427,7 @@ function EventRegistrationModal({ close, onSuccess }: EventRegistrationModalProp
               classNames={{
                 root: "relative mt-1",
                 input:
-                  "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
                 label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
                   floatingVenue ? "-translate-y-5 text-xs text-gray-900" : ""
                 }`,
@@ -444,7 +445,7 @@ function EventRegistrationModal({ close, onSuccess }: EventRegistrationModalProp
               classNames={{
                 root: "relative mt-1",
                 input:
-                  "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                  "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
                 label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
                   floatingGuestCount
                     ? "-translate-y-5 text-xs text-gray-900"
@@ -465,7 +466,7 @@ function EventRegistrationModal({ close, onSuccess }: EventRegistrationModalProp
             classNames={{
               root: "relative mt-1",
               input:
-                "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
               label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
                 floatingBudget ? "-translate-y-5 text-xs text-gray-900" : ""
               }`,
@@ -517,6 +518,15 @@ export default function Page() {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
+  const [focusedPaymentAmount, setFocusedPaymentAmount] = useState(false);
+  const [focusedCardNumber, setFocusedCardNumber] = useState(false);
+  const [focusedExpiryDate, setFocusedExpiryDate] = useState(false);
+  const [focusedCvv, setFocusedCvv] = useState(false);
+
+  const floatingPaymentAmount = focusedPaymentAmount || paymentAmount.length > 0;
+  const floatingCardNumber = focusedCardNumber || cardNumber.length > 0;
+  const floatingExpiryDate = focusedExpiryDate || expiryDate.length > 0;
+  const floatingCvv = focusedCvv || cvv.length > 0;
 
   const handleOpenPaymentModal = (bookingId: string) => {
     setSelectedBookingId(bookingId);
@@ -534,6 +544,10 @@ export default function Page() {
     setCardNumber("");
     setExpiryDate("");
     setCvv("");
+    setFocusedPaymentAmount(false);
+    setFocusedCardNumber(false);
+    setFocusedExpiryDate(false);
+    setFocusedCvv(false);
   };
 
   const parseExpiry = (value: string) => {
@@ -766,70 +780,90 @@ export default function Page() {
                     Remaining: ${remainingAmount}
                   </div>
                 </div>
-                <label
-                  htmlFor="payment-amount"
-                  className="mb-1 block text-sm font-medium text-gray-700"
-                >
-                  Payment Amount
-                </label>
-
-                <input
-                  id="payment-amount"
+                <TextInput
                   type="number"
-                  min="1"
+                  label="Payment Amount"
+                  value={paymentAmount}
+                  min={1}
                   max={remainingAmount > 0 ? remainingAmount : undefined}
                   step="0.01"
-                  value={paymentAmount}
-                  onChange={(e) => setPaymentAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black"
+                  onChange={(e) => setPaymentAmount(e.currentTarget.value)}
+                  onFocus={() => setFocusedPaymentAmount(true)}
+                  onBlur={() => setFocusedPaymentAmount(false)}
+                  placeholder={focusedPaymentAmount ? "Enter amount" : ""}
+                  mt="md"
+                  classNames={{
+                    root: "relative mt-1",
+                    input:
+                      "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
+                    label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                      floatingPaymentAmount
+                        ? "-translate-y-5 text-xs text-gray-900"
+                        : ""
+                    }`,
+                  }}
                 />
-                <label
-                  htmlFor="card-number"
-                  className="mb-1 mt-3 block text-sm font-medium text-gray-700"
-                >
-                  Card Number
-                </label>
-                <input
-                  id="card-number"
-                  type="text"
+
+                <TextInput
+                  label="Card Number"
                   value={cardNumber}
-                  onChange={(e) => setCardNumber(e.target.value)}
-                  placeholder="1234 5678 9012 3456"
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black"
+                  onChange={(e) => setCardNumber(e.currentTarget.value)}
+                  onFocus={() => setFocusedCardNumber(true)}
+                  onBlur={() => setFocusedCardNumber(false)}
+                  placeholder={focusedCardNumber ? "1234 5678 9012 3456" : ""}
+                  mt="md"
+                  classNames={{
+                    root: "relative mt-1",
+                    input:
+                      "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
+                    label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                      floatingCardNumber
+                        ? "-translate-y-5 text-xs text-gray-900"
+                        : ""
+                    }`,
+                  }}
                 />
 
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <div>
-                    <label
-                      htmlFor="expiry-date"
-                      className="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                      Expiry (MM/YY)
-                    </label>
-                    <input
-                      id="expiry-date"
-                      type="text"
+                    <TextInput
+                      label="Expiry (MM/YY)"
                       value={expiryDate}
-                      onChange={(e) => setExpiryDate(e.target.value)}
-                      placeholder="08/29"
-                      className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black"
+                      onChange={(e) => setExpiryDate(e.currentTarget.value)}
+                      onFocus={() => setFocusedExpiryDate(true)}
+                      onBlur={() => setFocusedExpiryDate(false)}
+                      placeholder={focusedExpiryDate ? "08/29" : ""}
+                      mt="md"
+                      classNames={{
+                        root: "relative mt-1",
+                        input:
+                          "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
+                        label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                          floatingExpiryDate
+                            ? "-translate-y-5 text-xs text-gray-900"
+                            : ""
+                        }`,
+                      }}
                     />
                   </div>
                   <div>
-                    <label
-                      htmlFor="card-cvv"
-                      className="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                      CVV
-                    </label>
-                    <input
-                      id="card-cvv"
+                    <TextInput
                       type="password"
+                      label="CVV"
                       value={cvv}
-                      onChange={(e) => setCvv(e.target.value)}
-                      placeholder="123"
-                      className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black"
+                      onChange={(e) => setCvv(e.currentTarget.value)}
+                      onFocus={() => setFocusedCvv(true)}
+                      onBlur={() => setFocusedCvv(false)}
+                      placeholder={focusedCvv ? "123" : ""}
+                      mt="md"
+                      classNames={{
+                        root: "relative mt-1",
+                        input:
+                          "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
+                        label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                          floatingCvv ? "-translate-y-5 text-xs text-gray-900" : ""
+                        }`,
+                      }}
                     />
                   </div>
                 </div>

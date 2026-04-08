@@ -7,6 +7,7 @@ import { SendVerificationCode, WellcomeEmail } from "../helpers/sendMail.js"
 // import customer model
 import userModel from "../models/userModel.js";
 import customerModel from "../models/customerModel.js";
+import employeeModel from "../models/employeeModel.js";
 
 // import nodemailer for send email
 import sendMail from "../helpers/sendVerificationMail.js"
