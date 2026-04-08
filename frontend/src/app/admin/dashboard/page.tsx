@@ -14,8 +14,115 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Users, Calendar, CircleUser, DollarSign } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+
+type BookingEvent = {
+  totalPaid?: number;
+  totalAmount?: number | number[];
+};
+
+type BookingCustomer = {
+  events?: BookingEvent[];
+};
+
+type BookingResponse = {
+  customers?: BookingCustomer[];
+};
+
+type EmployeeTask = {
+  status?: string;
+};
+
+type EmployeeUser = {
+  _id?: string;
+};
+
+type EmployeeDetail = {
+  userId?: string;
+  user?: {
+    _id?: string;
+  };
+  tasks?: EmployeeTask[];
+};
+
+type EmployeeResponse = {
+  users?: EmployeeUser[];
+  details?: EmployeeDetail[];
+};
+
+const fetcher = async <T,>(url: string): Promise<T> => {
+  const res = await fetch(url, { credentials: "include" });
+
+  const body: T & { message?: string } = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body.message || "Request Failed");
+  }
+
+  return body as T;
+};
 
 export default function AdminDashboardPage() {
+  const { data } = useQuery<BookingResponse>({
+    queryKey: ["showbookings"],
+    queryFn: () =>
+      fetcher<BookingResponse>(
+        "http://localhost:4041/api/admin/showBookedEvent",
+      ),
+  });
+
+  const customers = data?.customers ?? [];
+
+  const paidByCustomer = customers
+    .flatMap((customer) => customer.events ?? [])
+    .reduce((sum, eventDetail) => sum + (eventDetail.totalPaid ?? 0), 0);
+
+  // Calculate total revenue across all events
+  const totalRevenue = customers
+    .flatMap((customer) => customer?.events || [])
+    .reduce((total, event) => {
+      const eventTotal = Array.isArray(event?.totalAmount)
+        ? event.totalAmount.reduce((sum, amount) => sum + (amount || 0), 0)
+        : event?.totalAmount || 0;
+      return total + eventTotal;
+    }, 0);
+
+  // remaining amount
+  const remaining: number = totalRevenue - paidByCustomer;
+
+  const { data: data1 } = useQuery<EmployeeResponse>({
+    queryKey: ["showemployee"],
+    queryFn: () =>
+      fetcher<EmployeeResponse>(
+        "http://localhost:4041/api/employee/findEmployee",
+      ),
+  });
+
+  // normalize response safely
+  const users: EmployeeUser[] = Array.isArray(data1?.users) ? data1.users : [];
+  const details: EmployeeDetail[] = Array.isArray(data1?.details)
+    ? data1.details
+    : [];
+
+  // merge users + details (match by userId if available, else by index)
+  const employees = users.map((user, index) => {
+    const detail =
+      details.find((d) => d.userId === user._id || d.user?._id === user._id) ||
+      details[index] ||
+      {};
+
+    return {
+      ...user,
+      ...detail,
+    };
+  });
+
+  // console.log(users.map((user) => user.firstname));
+  const completed = details
+    .flatMap((detail) => detail?.tasks || [])
+    .filter((task) => task?.status === "in-progress").length;
+  // console.log(completed);
+
   return (
     <SidebarProvider>
       <AdminSidebar />
@@ -48,28 +155,32 @@ export default function AdminDashboardPage() {
                 <Users className="h-4 w-4" />
                 <h3>Total Customers</h3>
               </div>
-              <span>248</span>
+              <span> {data?.customers.length}</span>
             </div>
             <div className="rounded-xl bg-muted/50 p-5">
               <div className="flex gap-1">
                 <Calendar className="h-4 w-4" />
                 <h3>Active Bookings</h3>
               </div>
-              <span>17</span>
+              <span>
+                {data?.customers
+                  .flatMap((customer) => customer?.events.length)
+                  ?.reduce((total, totalcustomer) => total + totalcustomer, 0)}
+              </span>
             </div>
             <div className="rounded-xl bg-muted/50 p-5">
               <div className="flex gap-1">
                 <CircleUser className="h-4 w-4" />
                 <h3>Total Employees</h3>
               </div>
-              <span>17</span>
+              <span>{employees.length}</span>
             </div>
             <div className="rounded-xl bg-muted/50 p-5">
               <div className="flex gap-1">
                 <DollarSign className="h-4 w-4" />
                 <h3>Total Revenue</h3>
               </div>
-              <span>$128,000</span>
+              <span>${paidByCustomer}</span>
             </div>
           </div>
 
@@ -79,16 +190,35 @@ export default function AdminDashboardPage() {
                 <h4>Task Distribution</h4>
                 <p>Overview of task status</p>
                 <div className="grid grid-cols-3 my-3">
-                  <div>
-                    <span> 1 </span>
+                  <div className="flex flex-col">
+                    <span>
+                      {
+                        details
+                          .flatMap((detail) => detail?.tasks || [])
+                          .filter((task) => task?.status === "pending").length
+                      }
+                    </span>
                     <span>pending</span>
                   </div>
-                  <div>
-                    <span> 1 </span>
+                  <div className="flex flex-col">
+                    <span>
+                      {
+                        details
+                          .flatMap((detail) => detail?.tasks || [])
+                          .filter((task) => task?.status === "in-progress")
+                          .length
+                      }
+                    </span>
                     <span>in progress</span>
                   </div>
-                  <div>
-                    <span> 1 </span>
+                  <div className="flex flex-col">
+                    <span>
+                      {
+                        details
+                          .flatMap((detail) => detail?.tasks || [])
+                          .filter((task) => task?.status === "completed").length
+                      }
+                    </span>
                     <span>completed</span>
                   </div>
                 </div>
@@ -100,16 +230,16 @@ export default function AdminDashboardPage() {
                 <p>Payment status overview</p>
                 <div className="grid grid-rows-3 gap-3 mt-3">
                   <div className="flex justify-between">
-                    <p>pending</p>
-                    <p> 1 </p>
+                    <p>Total Received</p>
+                    <p>   ${paidByCustomer} </p>
                   </div>
                   <div className="flex justify-between">
-                    <p>in progress</p>
-                    <p> 1 </p>
+                    <p>Pending Amount</p>
+                    <p>  ${remaining} </p>
                   </div>
                   <div className="flex justify-between">
-                    <p>completed</p>
-                    <p> 1 </p>
+                    <p>Total Expected</p>
+                    <p>  ${totalRevenue?.toLocaleString() || 0} </p>
                   </div>
                 </div>
               </div>
@@ -121,53 +251,40 @@ export default function AdminDashboardPage() {
               <h4> Recent Bookings</h4>
               <p>Latest event bookings</p>
             </div>
-            <table className="w-full bg-white">
+             <table className="w-full my-3 border-collapse">
               <thead>
-                <tr className="border-b">
-                  <th className="px-4 py-2 text-left">Event Name</th>
-                  <th className="px-4 py-2 text-left">Type</th>			
-                  <th className="px-4 py-2 text-left">Date</th>
-                  <th className="px-4 py-2 text-left">Status From Admin</th>
-                  <th className="px-4 py-2 text-left">Status From Work</th>
-                  <th className="px-4 py-2 text-left">Amount</th>
+                <tr className="border-b-2 border-black text-left">
+                  <th className="py-2">Event Name</th>
+                  <th className="py-2">Type</th>
+                  <th className="py-2">Date</th>
+                  <th className="py-2">Status From Admin</th>
+                  <th className="py-2">Status From Work</th>
+                  <th className="py-2">Amount</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b">
-                  <td className="px-4 py-2">ORD-3021</td>
-                  <td className="px-4 py-2">Johnson Wedding</td>
-                  <td className="px-4 py-2">Riya Patel</td>
-                  <td className="px-4 py-2">In review</td>
-                  <td className="px-4 py-2">45%</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="px-4 py-2">ORD-2984</td>
-                  <td className="px-4 py-2">Corporate Summit</td>
-                  <td className="px-4 py-2">Arun Mehta</td>
-                  <td className="px-4 py-2">Approved</td>
-                  <td className="px-4 py-2">100%</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="px-4 py-2">ORD-2984</td>
-                  <td className="px-4 py-2">Corporate Summit</td>
-                  <td className="px-4 py-2">Arun Mehta</td>
-                  <td className="px-4 py-2">Approved</td>
-                  <td className="px-4 py-2">100%</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="px-4 py-2">ORD-2984</td>
-                  <td className="px-4 py-2">Corporate Summit</td>
-                  <td className="px-4 py-2">Arun Mehta</td>
-                  <td className="px-4 py-2">Approved</td>
-                  <td className="px-4 py-2">100%</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="px-4 py-2">ORD-2984</td>
-                  <td className="px-4 py-2">Corporate Summit</td>
-                  <td className="px-4 py-2">Arun Mehta</td>
-                  <td className="px-4 py-2">Approved</td>
-                  <td className="px-4 py-2">100%</td>
-                </tr>
+                {data?.customers.flatMap((customer) =>
+                  customer?.events.map((data) => (
+                    <tr key={data._id} className="border-b border-black">
+                      <td className="py-2 border-b  p-1">{data?.eventName}</td>
+                      <td className="border-b p-1">{data?.eventType}</td>
+                      <td className="border-b p-1">
+                        {new Date(data?.eventDate).toLocaleDateString()}
+                      </td>
+                      <td className="border-b  p-1">
+                        <span className="bg-black text-white text-xs p-1 rounded-md">
+                          {data?.bookingStatus}
+                        </span>
+                      </td>
+                      <td className="border-b p-1">
+                        <span className="text-xs bg-black p-1 text-white rounded-md">
+                          {data?.progress !== 0 ? "in-progress" : "pending"}
+                        </span>
+                      </td>
+                      <td className="border-b p-1">${data?.totalAmount}</td>
+                    </tr>
+                  )),
+                )}
               </tbody>
             </table>
           </div>

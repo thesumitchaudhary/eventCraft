@@ -15,7 +15,7 @@ import Payment from "./app/users/payment/page";
 
 // import for admin
 import AdminDashboardPage from "./app/admin/dashboard/page";
-import AdminBookingPage from "./app/admin/my-booking/page";
+import AdminBookingPage from "./app/admin/booking/page";
 import AdminEventThemePage from "./app/admin/event-theme/page";
 import AdminAnalyticsPage from "./app/admin/analytics/page";
 import AdminCustomerPage from "./app/admin/customer/page";

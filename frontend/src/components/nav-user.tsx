@@ -4,7 +4,6 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,17 +19,16 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Input } from "@/components/ui/input"
 import {
   Sheet,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
 import { BadgeCheckIcon, ChevronsUpDownIcon, LogOutIcon } from "lucide-react"
-import { Link } from "react-router-dom";
+import { ProfileEditor } from "@/components/profile-editor"
+import { useLogout } from "@/utils/logoutUtils"
 
 export function NavUser({
   user,
@@ -45,6 +43,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const [isAccountOpen, setIsAccountOpen] = useState(false)
+  const handleLogout = useLogout()
 
   return (
     <SidebarMenu>
@@ -115,7 +114,17 @@ export function NavUser({
               </DropdownMenuItem> */}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onLogout}>
+            <DropdownMenuItem
+              onSelect={(event) => {
+                event.preventDefault()
+                if (onLogout) {
+                  onLogout()
+                  return
+                }
+
+                handleLogout()
+              }}
+            >
               <LogOutIcon />
               <span className="ml-2">Log out</span>
             </DropdownMenuItem>
@@ -125,7 +134,7 @@ export function NavUser({
         <Sheet open={isAccountOpen} onOpenChange={setIsAccountOpen}>
           <SheetContent
             side={isMobile ? "bottom" : "right"}
-            className="sm:max-w-md"
+            className="flex h-full max-h-screen flex-col overflow-hidden sm:max-w-md"
           >
             <SheetHeader>
               <SheetTitle>Account</SheetTitle>
@@ -133,24 +142,7 @@ export function NavUser({
                 Manage your account details.
               </SheetDescription>
             </SheetHeader>
-
-            <div className="grid gap-4 px-4">
-              <div className="grid gap-1.5">
-                <p className="text-sm font-medium">Name</p>
-                <Input defaultValue={user.name} />
-              </div>
-              <div className="grid gap-1.5">
-                <p className="text-sm font-medium">Email</p>
-                <Input defaultValue={user.email} type="email" />
-              </div>
-            </div>
-
-            <SheetFooter>
-              <Button variant="outline" onClick={() => setIsAccountOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={() => setIsAccountOpen(false)}>Save</Button>
-            </SheetFooter>
+            <ProfileEditor onSaved={() => setIsAccountOpen(false)} />
           </SheetContent>
         </Sheet>
       </SidebarMenuItem>

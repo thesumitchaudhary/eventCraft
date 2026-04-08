@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { AdminSidebar } from "@/components/admin-sidebar";
 import {
   Breadcrumb,
@@ -14,13 +15,57 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Plus, X } from "lucide-react";
+import { UserPlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
+const fetcher = async (url) => {
+  const res = await fetch(url, { credentials: "include" });
+
+  const body = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body.message || "Request Failed");
+  }
+
+  return body;
+};
 
 export default function AdminThemePage() {
   const [isAddEmployeeOpen, setIsAddEmployeeOpen] = useState(false);
+
+  const { data } = useQuery({
+    queryKey: ["showemployee"],
+    queryFn: () => fetcher("http://localhost:4041/api/employee/findEmployee"),
+  });
+
+  // normalize response safely
+  const users = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.users)
+      ? data.users
+      : [];
+  const details = Array.isArray(data?.details) ? data.details : [];
+
+  // merge users + details (match by userId if available, else by index)
+  const employees = users.map((user, index) => {
+    const detail =
+      details.find((d) => d.userId === user._id || d.user?._id === user._id) ||
+      details[index] ||
+      {};
+
+    return {
+      ...user,
+      ...detail,
+    };
+  });
+
+  // console.log(users.map((user) => user.firstname));
+  const completed = details
+    .flatMap((detail) => detail?.tasks || [])
+    .filter((task) => task?.status === "in-progress").length;
+  console.log(completed);
 
   return (
     <SidebarProvider>
@@ -57,7 +102,7 @@ export default function AdminThemePage() {
                 className="bg-black text-white hover:bg-black hover:text-white"
                 onClick={() => setIsAddEmployeeOpen(true)}
               >
-                <Plus /> Add Employee
+                <UserPlus /> Add Employee
               </Button>
             </div>
           </div>
@@ -66,77 +111,78 @@ export default function AdminThemePage() {
               <div className="flex gap-1">
                 <h3>Total Employees</h3>
               </div>
-              <span>248</span>
+              <span>{employees.length}</span>
             </div>
             <div className="rounded-xl bg-muted/50 p-5">
               <div className="flex gap-1">
                 <h3>Active Tasks</h3>
               </div>
-              <span>17</span>
+              <span>
+                {
+                  details
+                    .flatMap((detail) => detail?.tasks || [])
+                    .filter((task) => task?.status === "in-progress").length
+                }
+              </span>
             </div>
             <div className="rounded-xl bg-muted/50 p-5">
               <div className="flex gap-1">
                 <h3>Completed Tasks</h3>
               </div>
-              <span>17</span>
+              <span>
+                {
+                  details
+                    .flatMap((detail) => detail?.tasks || [])
+                    .filter((task) => task?.status === "completed").length
+                }
+              </span>
             </div>
           </div>
 
           <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 p-5 md:min-h-min">
-            <table className="w-full bg-white hover:bg-black hover:text-white">
+            <table className="w-full my-3 border-collapse">
               <thead>
-                <tr className="border-b">
-                  <th className="px-4 py-2 text-left">Name</th>
-                  <th className="px-4 py-2 text-left">Email</th>
-                  <th className="px-4 py-2 text-left">Phone</th>
-                  <th className="px-4 py-2 text-left">Designation</th>
-                  <th className="px-4 py-2 text-left">Joining Date</th>
-                  <th className="px-4 py-2 text-left">Assigned Tasks</th>
+                <tr className="border-b-2 border-black text-left">
+                  <th className="py-2">Name</th>
+                  <th className="py-2">Email</th>
+                  <th className="py-2">Phone</th>
+                  <th className="py-2">Designation</th>
+                  <th className="py-2">Joining Date</th>
+                  <th className="py-2">Assigned Tasks</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b">
-                  <td className="px-4 py-2">ORD-3021</td>
-                  <td className="px-4 py-2">Johnson Wedding</td>
-                  <td className="px-4 py-2">Riya Patel</td>
-                  <td className="px-4 py-2">In review</td>
-                  <td className="px-4 py-2">45%</td>
-                  <td className="px-4 py-2">1</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="px-4 py-2">ORD-2984</td>
-                  <td className="px-4 py-2">Corporate Summit</td>
-                  <td className="px-4 py-2">Arun Mehta</td>
-                  <td className="px-4 py-2">Approved</td>
-                  <td className="px-4 py-2">100%</td>
-                  <td className="px-4 py-2">2</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="px-4 py-2">ORD-2984</td>
-                  <td className="px-4 py-2">Corporate Summit</td>
-                  <td className="px-4 py-2">Arun Mehta</td>
-                  <td className="px-4 py-2">Approved</td>
-                  <td className="px-4 py-2">100%</td>
-                  <td className="px-4 py-2">1</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="px-4 py-2">ORD-2984</td>
-                  <td className="px-4 py-2">Corporate Summit</td>
-                  <td className="px-4 py-2">Arun Mehta</td>
-                  <td className="px-4 py-2">Approved</td>
-                  <td className="px-4 py-2">100%</td>
-                  <td className="px-4 py-2">4</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="px-4 py-2">ORD-2984</td>
-                  <td className="px-4 py-2">Corporate Summit</td>
-                  <td className="px-4 py-2">Arun Mehta</td>
-                  <td className="px-4 py-2">Approved</td>
-                  <td className="px-4 py-2">100%</td>
-                  <td className="px-4 py-2">5</td>
-                </tr>
+                {employees?.length ? (
+                  employees.map((employee, index) => (
+                    <tr
+                      key={employee?._id || employee?.userId || `emp-${index}`}
+                      className="border-b border-black"
+                    >
+                      <td className="py-2 border-b p-1">
+                        {[employee?.firstname, employee?.lastname]
+                          .filter(Boolean)
+                          .join(" ") || "N/A"}
+                      </td>
+                      <td className="border-b p-1">{employee?.email}</td>
+                      <td className="border-b p-1">{employee?.phone}</td>
+                      <td className="border-b p-1">{employee?.designation}</td>
+                      <td className="border-b p-1">
+                        {new Date(employee?.joiningDate).toLocaleDateString()}
+                      </td>
+                      <td className="border-b p-1">
+                        <span>{employee?.tasks.length}</span>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="py-4 t ext-center text-gray-500">
+                      No employees found
+                    </td>
+                  </tr>
+                )}
               </tbody>
-            </table>
+            </table>   
           </div>
         </div>
 
@@ -199,7 +245,10 @@ export default function AdminThemePage() {
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" className="bg-black text-white hover:bg-black">
+                  <Button
+                    type="submit"
+                    className="bg-black text-white hover:bg-black"
+                  >
                     Add Employee
                   </Button>
                 </div>

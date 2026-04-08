@@ -182,8 +182,11 @@ export const login = async (req, res) => {
 
 // this is link with customer routes
 export const logout = (req, res) => {
-    res.cookie("token", "")
-    res.send("hey the customer is logout")
+    res.clearCookie("token");
+    return res.status(200).json({
+        success: true,
+        message: "Customer logged out successfully",
+    });
 }
 
 // for admin
@@ -246,8 +249,11 @@ export const adminLogin = async (req, res) => {
 // this is link with admin routes
 
 export const adminLogout = (req, res) => {
-    res.cookie("token", "");
-    res.json("hey the admin is logout successfully");
+    res.clearCookie("token");
+    return res.status(200).json({
+        success: true,
+        message: "Admin logged out successfully",
+    });
 }
 
 // this is for employee
@@ -351,6 +357,9 @@ export const employeeLogin = async (req, res) => {
 
 
 export const employeeLogout = (req, res) => {
-    res.cookie("token", "");
-    res.send("Employee is logout successfully")
+    res.clearCookie("token");
+    return res.status(200).json({
+        success: true,
+        message: "Employee logged out successfully",
+    });
 }

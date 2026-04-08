@@ -79,6 +79,7 @@ const SigninForm = () => {
       }
 
       const loggedInRole = data?.role || role;
+      localStorage.setItem("role", loggedInRole);
       if (loggedInRole === "admin") navigate("/admin");
       else if (loggedInRole === "employee") navigate("/employee");
       else navigate("/customer/dashboard");

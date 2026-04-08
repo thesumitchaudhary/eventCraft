@@ -1,3 +1,17 @@
+"use client";
+
+import React from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
+import { useQuery } from "@tanstack/react-query";
 import { AdminSidebar } from "@/components/admin-sidebar";
 import {
   Breadcrumb,
@@ -15,7 +29,89 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
+type EventDetail = {
+  _id?: string;
+  eventName?: string;
+  eventType?: string;
+  totalAmount?: number | number[];
+  totalPaid?: number;
+  paymentStatus?: "partial" | "pending" | string;
+  eventDate?: string;
+};
+
+type BookingCustomer = {
+  events?: EventDetail[];
+};
+
+type ShowBookingsResponse = {
+  customers?: BookingCustomer[];
+};
+
+const fetcher = async <T,>(url: string): Promise<T> => {
+  const res = await fetch(url, { credentials: "include" });
+  const body: T & { message?: string } = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body?.message || "Request Failed");
+  }
+
+  return body as T;
+};
+
 export default function AdminThemePage() {
+  const {
+    data: apiData,
+    isLoading,
+    error,
+  } = useQuery<ShowBookingsResponse>({
+    queryKey: ["showbookings"],
+    queryFn: () =>
+      fetcher<ShowBookingsResponse>(
+        "http://localhost:4041/api/admin/showBookedEvent",
+      ),
+  });
+
+  const customers = Array.isArray(apiData?.customers) ? apiData.customers : [];
+
+  const grossRevenue = customers
+    .flatMap((customer) => customer?.events ?? [])
+    .reduce((total, event) => {
+      const eventTotal = Array.isArray(event?.totalAmount)
+        ? event.totalAmount.reduce((sum, amount) => sum + (amount || 0), 0)
+        : Number(event?.totalAmount || 0);
+      return total + eventTotal;
+    }, 0);
+
+  const paidByCustomer = customers
+    .flatMap((customer) => customer?.events ?? [])
+    .reduce((sum, event) => sum + Number(event?.totalPaid || 0), 0);
+
+  const remaining = grossRevenue - paidByCustomer;
+
+  const chartData = React.useMemo(() => {
+    if (!Array.isArray(customers)) return [];
+
+    const revenueByEventType = customers
+      .flatMap((customer) =>
+        Array.isArray(customer?.events) ? customer.events : [],
+      )
+      .reduce<Record<string, number>>((acc, event) => {
+        const eventType = event?.eventType || "Unknown";
+        const revenue = Number(event?.totalPaid || 0);
+
+        acc[eventType] = (acc[eventType] || 0) + revenue;
+        return acc;
+      }, {});
+
+    return Object.entries(revenueByEventType)
+      .map(([name, revenue]) => ({ name, revenue }))
+      .sort((a, b) => b.revenue - a.revenue);
+  }, [customers]);
+
+  const totalRevenue = chartData.reduce((sum, item) => sum + item.revenue, 0);
+  const topCategory = chartData[0];
+  const averageRevenue = chartData.length ? totalRevenue / chartData.length : 0;
+
   return (
     <SidebarProvider>
       <AdminSidebar />
@@ -34,37 +130,145 @@ export default function AdminThemePage() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Theme Catalog</BreadcrumbPage>
+                  <BreadcrumbPage>Revenue Analytics</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-xl bg-muted/50 p-4">
-              <h4 className="font-semibold">Royal Classic</h4>
-              <span className="text-sm text-muted-foreground">Wedding</span>
-              <h3 className="mt-2 text-lg font-semibold">$7,500</h3>
-              <span className="text-sm text-muted-foreground">Premium package</span>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-xl bg-muted/50 p-5">
+              <p className="text-sm text-muted-foreground">Total revenue</p>
+              <h3 className="mt-2 text-2xl font-semibold">
+                ${grossRevenue.toLocaleString()}
+              </h3>
             </div>
-            <div className="aspect-video rounded-xl bg-muted/50 p-4">
-              <h4 className="font-semibold">Minimal Corporate</h4>
-              <span className="text-sm text-muted-foreground">Corporate</span>
-              <h3 className="mt-2 text-lg font-semibold">$5,200</h3>
-              <span className="text-sm text-muted-foreground">Business events</span>
+            <div className="rounded-xl bg-muted/50 p-5">
+              <p className="text-sm text-muted-foreground">Top event type</p>
+              <h3 className="mt-2 text-2xl font-semibold">
+                {topCategory?.name ?? "No data"}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                ${topCategory?.revenue?.toLocaleString() ?? 0}
+              </p>
             </div>
-            <div className="aspect-video rounded-xl bg-muted/50 p-4">
-              <h4 className="font-semibold">Bloom Garden</h4>
-              <span className="text-sm text-muted-foreground">Engagement</span>
-              <h3 className="mt-2 text-lg font-semibold">$4,300</h3>
-              <span className="text-sm text-muted-foreground">Outdoor setup</span>
+            <div className="rounded-xl bg-muted/50 p-5">
+              <p className="text-sm text-muted-foreground">Remaining balance</p>
+              <h3 className="mt-2 text-2xl font-semibold">
+                ${remaining.toLocaleString()}
+              </h3>
             </div>
-            <div className="aspect-video rounded-xl bg-muted/50 p-4">
-              <h4 className="font-semibold">Twinkle Kids</h4>
-              <span className="text-sm text-muted-foreground">Birthday</span>
-              <h3 className="mt-2 text-lg font-semibold">$2,100</h3>
-              <span className="text-sm text-muted-foreground">Starter package</span>
+          </div>
+
+          {isLoading ? (
+            <div className="rounded-xl border border-border bg-background p-6">
+              <p className="text-sm text-muted-foreground">
+                Loading revenue chart...
+              </p>
+            </div>
+          ) : error ? (
+            <div className="rounded-xl border border-border bg-background p-6">
+              <p className="text-sm text-destructive">{error.message}</p>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-border bg-background p-6 shadow-sm">
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold">Revenue by Event Type</h2>
+                <p className="text-sm text-muted-foreground">
+                  Total revenue generated per event category
+                </p>
+              </div>
+
+              <div className="h-[360px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} />
+                    <YAxis tickLine={false} axisLine={false} />
+                    <Tooltip />
+                    <Legend />
+                    <Bar
+                      dataKey="revenue"
+                      name="Revenue"
+                      fill="#10b981"
+                      radius={[6, 6, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+          <div className="gap-4 md:grid-cols-4 bg-muted/70">
+            <div className="bg-gray-50 p-5 rounded-2xl">
+              <h3 className="text-2xl font-bold">Payment Details</h3>
+              <p>All bookings with payment information</p>
+              <table className="w-full my-3 border-collapse">
+                <thead>
+                  <tr className="border-b-2 border-black text-left">
+                    <th className="py-2">Event Name</th>
+                    <th className="py-2">Customer Name</th>
+                    <th className="py-2">Budget</th>
+                    <th className="py-2">Amount Paid</th>
+                    <th className="py-2">Balance</th>
+                    <th className="py-2">Payment Status</th>
+                    <th className="py-2">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {customers.flatMap((customer, customerIndex) =>
+                    (customer?.events ?? []).map((event, eventIndex) => {
+                      const totalAmount = Array.isArray(event?.totalAmount)
+                        ? event.totalAmount.reduce(
+                            (sum, amount) => sum + (amount || 0),
+                            0,
+                          )
+                        : Number(event?.totalAmount || 0);
+
+                      return (
+                        <tr
+                          key={event?._id ?? `${customerIndex}-${eventIndex}`}
+                          className="border-b border-black"
+                        >
+                          <td className="py-2 border-b p-1">
+                            {event?.eventName ?? "N/A"}
+                          </td>
+                          <td className="border-b p-1">
+                            {event?.eventType ?? "N/A"}
+                          </td>
+                          <td className="border-b p-1">${totalAmount}</td>
+                          <td className="border-b p-1">
+                            <span className="text-[#00a63e] font-bold">
+                              {event?.totalPaid ?? 0}
+                            </span>
+                          </td>
+                          <td className="border-b p-1">
+                            <span className="text-[#f54a00] font-bold">
+                              {totalAmount - Number(event?.totalPaid || 0)}
+                            </span>
+                          </td>
+                          <td className="border-b p-1">
+                            {event?.paymentStatus === "partial" ? (
+                              <span className="bg-[#dbeafe] text-[#193cba] text-xs p-1 rounded-md">
+                                Partial
+                              </span>
+                            ) : (
+                              <span className="bg-black text-white text-xs p-1 rounded-md">
+                                Pending
+                              </span>
+                            )}
+                          </td>
+                          <td className="border-b p-1">
+                            {event?.eventDate
+                              ? new Date(event.eventDate).toLocaleDateString()
+                              : "N/A"}
+                          </td>
+                        </tr>
+                      );
+                    }),
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

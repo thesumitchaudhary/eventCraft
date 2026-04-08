@@ -14,8 +14,35 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useQuery } from "@tanstack/react-query";
+
+const API_URL_ADMIN = import.meta.env.VITE_ADMIN_BACKEND_URL;
+
+interface EventTheme {
+  _id: string;
+  themeName: string;
+  themeType: string;
+  themePrice: number;
+}
+
+const fetcher = async (url: string): Promise<EventTheme[]> => {
+  const res = await fetch(url, {
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch event themes");
+  }
+
+  return res.json();
+};
 
 export default function Page() {
+  const { data = [], isLoading } = useQuery<EventTheme[]>({
+    queryKey: ["eventThemesDetails"],
+    queryFn: () => fetcher(`${API_URL_ADMIN}/getAllEventTheme`),
+  });
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -41,47 +68,31 @@ export default function Page() {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-xl bg-muted/50">
-              <div>
-                <h4>Classic Elegant</h4>
-                <span>Wedding</span>
-
-                <h3>$5000</h3>
-                <span>Base package price</span>
-              </div>
-            </div>
-            <div className="aspect-video rounded-xl bg-muted/50">
-              <div>
-                <h4>Classic Elegant</h4>
-                <span>Wedding</span>
-
-                <h3>$5000</h3>
-                <span>Base package price</span>
-              </div>
-            </div>
-            <div className="aspect-video rounded-xl bg-muted/50">
-              <div>
-                <h4>Classic Elegant</h4>
-                <span>Wedding</span>
-
-                <h3>$5000</h3>
-                <span>Base package price</span>
-              </div>
-            </div>
-                   <div className="aspect-video rounded-xl bg-muted/50">
-              <div>
-                <h4>Classic Elegant</h4>
-                <span>Wedding</span>
-
-                <h3>$5000</h3>
-                <span>Base package price</span>
-              </div>
-            </div>
+          <div className="my-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {isLoading ? (
+              <p>Loading themes...</p>
+            ) : (
+              data?.map((theme) => (
+                <div
+                  key={theme._id}
+                  className="w-full rounded-2xl border border-gray-400 px-4 py-5"
+                >
+                  <div className="flex flex-col gap-2">
+                    <h3 className="text-sm font-bold">{theme.themeName}</h3>
+                    <p>{theme.themeType}</p>
+                  </div>
+                  <div className="mt-4 flex flex-col gap-2">
+                    <h3 className="text-2xl font-bold text-purple-600">
+                      {theme.themePrice}
+                    </h3>
+                    <p>Base package price</p>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </SidebarInset>
-     
     </SidebarProvider>
   );
 }

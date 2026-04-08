@@ -1,3 +1,5 @@
+"use client";
+
 import { AdminSidebar } from "@/components/admin-sidebar";
 import {
   Breadcrumb,
@@ -14,8 +16,71 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+
+interface CustomerUser {
+  firstname?: string;
+  lastname?: string;
+  email?: string;
+}
+
+interface Customer {
+  _id?: string;
+  userId?: CustomerUser;
+  phone?: string;
+  address?: string;
+  bookings?: unknown[];
+}
+
+interface ShowCustomer {
+  customers?: Customer[];
+}
+
+const fetcher = async <T,>(url: string): Promise<T> => {
+  const res = await fetch(url, {
+    credentials: "include",
+  });
+
+  const body = await res.json();
+
+  if (!res.ok) {
+    throw new Error(body?.message || "Request Failed");
+  }
+
+  return body;
+};
 
 export default function AdminThemePage() {
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const { data, isLoading } = useQuery<ShowCustomer>({
+    queryKey: ["showbookings"],
+    queryFn: () =>
+      fetcher<ShowCustomer>("http://localhost:4041/api/admin/showBookedEvent"),
+  });
+
+  const filteredCustomers = useMemo(() => {
+    const customers = data?.customers ?? [];
+    const keyword = searchTerm.trim().toLowerCase();
+
+    if (!keyword) return customers;
+
+    return customers.filter((customer) => {
+      const fullName = `${customer?.userId?.firstname || ""} ${customer?.userId?.lastname || ""}`.toLowerCase();
+      const email = customer?.userId?.email?.toLowerCase() || "";
+      const phone = customer?.phone?.toLowerCase() || "";
+      const address = customer?.address?.toLowerCase() || "";
+
+      return (
+        fullName.includes(keyword) ||
+        email.includes(keyword) ||
+        phone.includes(keyword) ||
+        address.includes(keyword)
+      );
+    });
+  }, [data?.customers, searchTerm]);
+
   return (
     <SidebarProvider>
       <AdminSidebar />
@@ -41,13 +106,19 @@ export default function AdminThemePage() {
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div>
+          <div className="flex justify-between">
             <div>
               <h3>Customer Management</h3>
-              <p>Total customers: 1</p>
+              <p>Total customers: {filteredCustomers.length}</p>
             </div>
             <div>
-              <input type="text" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search by name, email, phone, address"
+                className="rounded-md border px-3 py-2 w-70"
+              />
             </div>
           </div>
           <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 p-5 md:min-h-min">
@@ -62,13 +133,51 @@ export default function AdminThemePage() {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b">
-                  <td className="px-4 py-2">John Doe  </td>
-                  <td className="px-4 py-2">customer@example.com</td>
-                  <td className="px-4 py-2">+1234567891</td>
-                  <td className="px-4 py-2">123 Main St, New York, NY</td>  
-                  <td className="px-4 py-2">2</td>
-                </tr>
+                {isLoading ? (
+                  <tr>
+                    <td className="px-4 py-3" colSpan={5}>
+                      Loading customers...
+                    </td>
+                  </tr>
+                ) : filteredCustomers.length === 0 ? (
+                  <tr>
+                    <td className="px-4 py-3" colSpan={5}>
+                      No customers found.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredCustomers.map((customer) => {
+                    return (
+                      <tr
+                      key={customer._id}
+                      className="border-b border-black"
+                    >
+                      <td className="py-2 border-b p-1">
+                        {customer?.userId?.firstname}{" "}
+                        {customer?.userId?.lastname}
+                      </td>
+
+                      <td className="border-b p-1">
+                        {customer?.userId?.email}
+                      </td>
+
+                      <td className="border-b p-1">
+                        {customer?.phone}
+                      </td>
+
+                      <td className="border-b p-1">
+                        {customer?.address}
+                      </td>
+
+                      <td>
+                        <span className="bg-black mx-5 rounded-md px-2 py-1 text-white">
+                          {customer?.events.length}
+                        </span>
+                      </td>
+                    </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
