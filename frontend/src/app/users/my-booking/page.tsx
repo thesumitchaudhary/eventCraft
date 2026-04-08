@@ -1,3 +1,4 @@
+import { useContext, useEffect, useState } from "react";
 import { AppSidebar } from "../../../components/app-siderbar";
 import {
   Breadcrumb,
@@ -12,15 +13,21 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Button, Select, TextInput } from "@mantine/core";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import { useState } from "react";
+import { Plus, X } from "lucide-react";
+import { EventContext } from "../../../context/EventContext";
 
 const INDEX_BACKEND_API_URL = import.meta.env.VITE_INDEX_BACKEND_URL;
+const ADMIN_API_URL = import.meta.env.VITE_ADMIN_BACKEND_URL;
+const EVENT_BOOKING_API_URL = import.meta.env.VITE_CUSTOMER_EVENT_BOOKING_BACKEND_URL;
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 interface Booking {
   _id: string;
   eventName: string;
+  eventType?: string;
+  theme?: string;
   eventDate: string;
   venue: string;
   guestCount: number;
@@ -31,6 +38,15 @@ interface Booking {
 
 interface MyBookingsResponse {
   events: Booking[];
+}
+
+interface EventTheme {
+  _id: string;
+  themeName?: string;
+  themeType?: string;
+  eventType?: string;
+  theme?: string;
+  type?: string;
 }
 
 interface CardDetails {
@@ -46,18 +62,77 @@ interface PaymentPayload {
   cardDetails: CardDetails;
 }
 
+interface EventBookingPayload {
+  eventName: string;
+  eventType: string;
+  selectTheme: string;
+  date: string;
+  venue: string;
+  guestCount: string;
+  budget: string;
+}
+
 // this is for the show booked events
 const fetcher = async (url: string): Promise<MyBookingsResponse> => {
   const res = await fetch(url, { credentials: "include" });
+  const body = await res.json().catch(() => ({}));
 
   if (!res.ok) {
-    throw new Error("There was a problem");
+    throw new Error(body?.message || "There was a problem");
   }
 
-  return res.json();
+  return body;
 };
 
-const API_URL = import.meta.env.VITE_BACKEND_URL;
+const fetchThemes = async (url: string): Promise<EventTheme[]> => {
+  const res = await fetch(url, { credentials: "include" });
+  const body = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(body?.message || "Failed to fetch event themes");
+  }
+
+  if (Array.isArray(body)) {
+    return body;
+  }
+
+  return Array.isArray(body?.data) ? body.data : [];
+};
+
+const createEventBooking = async ({
+  eventName,
+  eventType,
+  selectTheme,
+  date,
+  venue,
+  guestCount,
+  budget,
+}: EventBookingPayload) => {
+  const res = await fetch(`${EVENT_BOOKING_API_URL}/createEvent`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      eventName,
+      eventType,
+      theme: selectTheme,
+      eventDate: date || null,
+      venue,
+      guestCount: Number(guestCount),
+      totalAmount: Number(budget),
+    }),
+  });
+
+  const body = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(body?.message || body?.error || "Event booking failed");
+  }
+
+  return body;
+};
 
 const makePayment = async ({
   bookingId,
@@ -86,8 +161,354 @@ const makePayment = async ({
   return data;
 };
 
+type EventRegistrationModalProps = {
+  close: () => void;
+  onSuccess: () => void;
+};
+
+function EventRegistrationModal({ close, onSuccess }: EventRegistrationModalProps) {
+  const {
+    eventName,
+    setEventName,
+    eventType,
+    setEventType,
+    selectTheme,
+    setSelectTheme,
+    date,
+    setDate,
+    venue,
+    setVenue,
+    guestCount,
+    setGuestCount,
+    budget,
+    setBudget,
+  } = useContext(EventContext);
+
+  const [focusedEventname, setFocusedEventname] = useState(false);
+  const [focusedDate, setFocusedDate] = useState(false);
+  const [focusedVenue, setFocusedVenue] = useState(false);
+  const [focusedGuestCount, setFocusedGuestCount] = useState(false);
+  const [focusedBudget, setFocusedBudget] = useState(false);
+  const [focusedEventType, setFocusedEventType] = useState(false);
+  const [focusedSelectTheme, setFocusedSelectTheme] = useState(false);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
+  const floatingEventname = focusedEventname || eventName?.length > 0;
+  const floatingDate = focusedDate || date?.length > 0;
+  const floatingVenue = focusedVenue || venue?.length > 0;
+  const floatingGuestCount = focusedGuestCount || guestCount?.length > 0;
+  const floatingBudget = focusedBudget || budget?.length > 0;
+  const floatingEventType = focusedEventType || eventType?.length > 0;
+  const floatingSelectTheme = focusedSelectTheme || selectTheme?.length > 0;
+
+  const { data: themesData = [], isPending, isError, error } = useQuery({
+    queryKey: ["eventThemesDetails", ADMIN_API_URL],
+    enabled: Boolean(ADMIN_API_URL),
+    queryFn: () => fetchThemes(`${ADMIN_API_URL}/getAllEventTheme`),
+  });
+
+  const getEventType = (item: EventTheme) =>
+    String(
+      item?.themeType ?? item?.eventType ?? item?.type ?? item?.theme ?? "",
+    ).trim();
+
+  const eventTypeOptions = [
+    ...new Map(
+      themesData
+        .map((item) => getEventType(item))
+        .filter(Boolean)
+        .map((type) => [type.toLowerCase(), { value: type, label: type }]),
+    ).values(),
+  ];
+
+  const themeOptions = themesData
+    .filter(
+      (item) =>
+        getEventType(item).toLowerCase() === String(eventType).toLowerCase(),
+    )
+    .map((item) => String(item?.themeName ?? item?.theme ?? "").trim())
+    .filter(Boolean)
+    .map((theme) => ({ value: theme, label: theme }));
+
+  const createEventMutation = useMutation({
+    mutationFn: () => {
+      if (!eventName.trim()) {
+        throw new Error("Event name is required");
+      }
+
+      if (!eventType.trim()) {
+        throw new Error("Event type is required");
+      }
+
+      if (!selectTheme.trim()) {
+        throw new Error("Theme is required");
+      }
+
+      if (!date.trim()) {
+        throw new Error("Event date is required");
+      }
+
+      if (!venue.trim()) {
+        throw new Error("Venue is required");
+      }
+
+      if (!guestCount.trim()) {
+        throw new Error("Guest count is required");
+      }
+
+      if (!budget.trim()) {
+        throw new Error("Budget is required");
+      }
+
+      return createEventBooking({
+        eventName,
+        eventType,
+        selectTheme,
+        date,
+        venue,
+        guestCount,
+        budget,
+      });
+    },
+    onSuccess: () => {
+      onSuccess();
+      close();
+    },
+  });
+
+  const handleClose = () => {
+    setEventName("");
+    setEventType("");
+    setSelectTheme("");
+    setDate("");
+    setVenue("");
+    setGuestCount("");
+    setBudget("");
+    close();
+  };
+
+  return (
+    <div className="z-50">
+      <div
+        className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+        onClick={handleClose}
+      />
+
+      <div
+        className="fixed left-1/2 top-1/2 z-50 w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-2xl"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="event-booking-dialog-title"
+      >
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <h3 id="event-booking-dialog-title" className="text-lg font-semibold text-gray-800">
+              Create New Event Booking
+            </h3>
+            <p className="text-sm text-gray-500">Fill in the details for your event</p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleClose}
+            className="text-gray-500 transition hover:text-black"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <form
+          className="space-y-6"
+          onSubmit={(e) => {
+            e.preventDefault();
+            createEventMutation.mutate();
+          }}
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextInput
+              label="Event Name"
+              placeholder={focusedEventname ? "e.g. Johnson Wedding" : ""}
+              value={eventName}
+              onChange={(e) => setEventName(e.currentTarget.value)}
+              onFocus={() => setFocusedEventname(true)}
+              onBlur={() => setFocusedEventname(false)}
+              classNames={{
+                root: "relative mt-1",
+                input:
+                  "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                  floatingEventname
+                    ? "-translate-y-5 text-xs text-gray-900"
+                    : ""
+                }`,
+              }}
+            />
+
+            <Select
+              value={eventType}
+              onChange={(value) => {
+                setEventType(value || "");
+                setSelectTheme("");
+              }}
+              label="Select Type"
+              placeholder={focusedEventType ? "Select Type" : ""}
+              data={eventTypeOptions}
+              disabled={isPending || isError}
+              onFocus={() => setFocusedEventType(true)}
+              onBlur={() => setFocusedEventType(false)}
+              classNames={{
+                root: "relative mt-1",
+                input:
+                  "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                  floatingEventType
+                    ? "-translate-y-5 text-xs text-gray-900"
+                    : ""
+                }`,
+              }}
+            />
+          </div>
+
+          <Select
+            disabled={!eventType}
+            value={selectTheme}
+            onChange={(value) => setSelectTheme(value || "")}
+            label="Select Theme"
+            placeholder={focusedSelectTheme ? "Select Theme" : ""}
+            data={themeOptions}
+            onFocus={() => setFocusedSelectTheme(true)}
+            onBlur={() => setFocusedSelectTheme(false)}
+            classNames={{
+              root: "relative mt-1",
+              input:
+                "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+              label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                floatingSelectTheme
+                  ? "-translate-y-5 text-xs text-gray-900"
+                  : ""
+              }`,
+            }}
+          />
+
+          <div className="grid gap-4 md:grid-cols-3">
+            <TextInput
+              type="date"
+              label="Select Date"
+              value={date}
+              onChange={(e) => setDate(e.currentTarget.value)}
+              onFocus={() => setFocusedDate(true)}
+              onBlur={() => setFocusedDate(false)}
+              classNames={{
+                root: "relative mt-1",
+                input:
+                  "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                  floatingDate ? "-translate-y-5 text-xs text-gray-900" : ""
+                }`,
+              }}
+            />
+
+            <TextInput
+              label="Venue"
+              placeholder={focusedVenue ? "e.g. Grand Hotel" : ""}
+              value={venue}
+              onChange={(e) => setVenue(e.currentTarget.value)}
+              onFocus={() => setFocusedVenue(true)}
+              onBlur={() => setFocusedVenue(false)}
+              classNames={{
+                root: "relative mt-1",
+                input:
+                  "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                  floatingVenue ? "-translate-y-5 text-xs text-gray-900" : ""
+                }`,
+              }}
+            />
+
+            <TextInput
+              type="number"
+              label="Guest Count"
+              placeholder={focusedGuestCount ? "Guest Count" : ""}
+              value={guestCount}
+              onChange={(e) => setGuestCount(e.currentTarget.value)}
+              onFocus={() => setFocusedGuestCount(true)}
+              onBlur={() => setFocusedGuestCount(false)}
+              classNames={{
+                root: "relative mt-1",
+                input:
+                  "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+                label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                  floatingGuestCount
+                    ? "-translate-y-5 text-xs text-gray-900"
+                    : ""
+                }`,
+              }}
+            />
+          </div>
+
+          <TextInput
+            type="number"
+            label="Budget ($)"
+            placeholder={focusedBudget ? "Budget" : ""}
+            value={budget}
+            onChange={(e) => setBudget(e.currentTarget.value)}
+            onFocus={() => setFocusedBudget(true)}
+            onBlur={() => setFocusedBudget(false)}
+            classNames={{
+              root: "relative mt-1",
+              input:
+                "bg-transparent border-0 border-b-2 border-gray-300 rounded-none px-0 pt-5 pb-1 focus:outline-none focus:border-gray-900",
+              label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
+                floatingBudget ? "-translate-y-5 text-xs text-gray-900" : ""
+              }`,
+            }}
+          />
+
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-h-5 text-sm text-red-600">
+              {isError && error instanceof Error ? error.message : ""}
+              {createEventMutation.error instanceof Error
+                ? createEventMutation.error.message
+                : ""}
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                color="dark"
+                onClick={handleClose}
+                disabled={createEventMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                color="dark"
+                loading={createEventMutation.isPending}
+                className="border border-black"
+              >
+                {createEventMutation.isPending ? "Booking..." : "Create Booking"}
+              </Button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function Page() {
   const queryClient = useQueryClient();
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(
     null,
@@ -189,6 +610,14 @@ export default function Page() {
   const remainingAmount =
     (selectedBooking?.totalAmount ?? 0) - (selectedBooking?.totalPaid ?? 0);
 
+  const handleOpenBookingModal = () => {
+    setIsBookingModalOpen(true);
+  };
+
+  const handleCloseBookingModal = () => {
+    setIsBookingModalOpen(false);
+  };
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -215,6 +644,19 @@ export default function Page() {
         </header>
 
         <div className="min-h-[60vh] rounded-xl p-4">
+          <div className="min-h-[10vh] rounded-xl bg-muted/50 p-4">
+            <div className="flex justify-between">
+              <h4 className="text-lg font-semibold">Payment History</h4>
+              <Button
+                color="dark"
+                onClick={handleOpenBookingModal}
+                className="flex items-center gap-2"
+              >
+                <Plus size={16} />
+                New Booking
+              </Button>
+            </div>
+          </div>
           <div className="left-4 p-2 my-4 rounded-xl max-w-250 flex flex-col gap-10">
             {data?.events?.map((booking) => (
               <div
@@ -288,6 +730,14 @@ export default function Page() {
             ))}
           </div>
         </div>
+        {isBookingModalOpen && (
+          <EventRegistrationModal
+            close={handleCloseBookingModal}
+            onSuccess={() =>
+              queryClient.invalidateQueries({ queryKey: ["my-bookings"] })
+            }
+          />
+        )}
         {isPaymentModalOpen && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
