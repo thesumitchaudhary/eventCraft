@@ -8,6 +8,10 @@ import {
   Mail,
   Star,
 } from "lucide-react";
+import { FaFacebookF } from "react-icons/fa";
+import { FaLinkedin } from "react-icons/fa";
+import { FaInstagram } from "react-icons/fa";
+import { FaTwitter } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const FeedBack = () => {
@@ -35,7 +39,9 @@ const FeedBack = () => {
                   <li>
                     <Link to={"/feedBack"}>Feedback</Link>
                   </li>
-                  <li>FAQ</li>
+                  <li>
+                    <Link to={"/FAQ"}> FAQ</Link>
+                  </li>
                 </ul>
               </nav>
             </div>
@@ -276,10 +282,18 @@ const FeedBack = () => {
               management and planning services.
             </p>
             <div className="flex gap-3">
-              <div className="h-10 w-10 rounded-full bg-background/10 p-1 transition-colors hover:bg-primary/30 " />
-              <div className="h-10 w-10 rounded-full bg-background/10 p-1" />
-              <div className="h-10 w-10 rounded-full bg-background/10 p-1" />
-              <div className="h-10 w-10 rounded-full bg-background/10 p-2" />
+              <div className="h-10 w-10 rounded-full bg-background/10 p-1 transition-colors hover:bg-primary/30 ">
+                <FaFacebookF className="h-8 w-8 rounded-full bg-[#1e2939] p-2" />
+              </div>
+              <div className="h-10 w-10 rounded-full bg-background/10 p-1">
+                <FaTwitter className="h-8 w-8 rounded-full bg-[#1e2939] p-2" />
+              </div>
+              <div className="h-10 w-10 rounded-full bg-background/10 p-1">
+                <FaInstagram className="h-8 w-8 rounded-full bg-[#1e2939] p-2" />
+              </div>
+              <div className="h-10 w-10 rounded-full bg-background/10 p-2">
+                <FaLinkedin className="h-6 w-6 rounded-full bg-[#1e2939] p-1" />
+              </div>
             </div>
           </div>
           <div>

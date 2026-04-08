@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import LandingPage from "./mainLandingPages/Dashboard";
 import FeedBack from "./mainLandingPages/FeedBack";
 import Gallery from "./mainLandingPages/Gallery";
+import FAQ from "./mainLandingPages/FAQ";
 
 // this is for the sign in and also sign up form for user,admin, and employee
 import AuthModal from "./mainLandingPages/AuthModel";
@@ -38,6 +39,7 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/feedBack" element={<FeedBack />} />
       <Route path="/Gallery" element={<Gallery />} />
+      <Route path="/FAQ" element={<FAQ />} />
 
       {/* auth (same UI, role decided by route) */}
       <Route path="/login" element={<AuthModal />} />

@@ -8,14 +8,14 @@ import {
   Users,
   Heart,
   CircleCheckBig,
-  //   Facebook,
-  //   Twitter,
-  //   Instagram,
-  //   Linkedin,
   MapPin,
   Phone,
   Mail,
-} from "lucide-react";
+} from "lucide-react"; 
+import { FaFacebookF } from "react-icons/fa";
+import { FaLinkedin } from "react-icons/fa";
+import { FaInstagram } from "react-icons/fa";
+import { FaTwitter } from "react-icons/fa";
 import type { CSSProperties } from "react";
 import { Button } from "../components/ui/button";
 import { MagicCard } from "../components/ui/magic-card";
@@ -65,10 +65,8 @@ const Dashboard = () => {
   return (
     <>
       <div className="relative h-50 overflow-hidden">
-        <div
-          className="absolute inset-0 z-0 opacity-60"
-        />
-        <div className="absolute inset-0 z-10">
+        <div className="absolute inset-0 z-0 opacity-60" />
+        <div className="absolute inset-0 z-10 opacity-30 bg-[#fafbf7]">
           <DotGrid
             dotSize={5}
             gap={15}
@@ -90,10 +88,19 @@ const Dashboard = () => {
             <div>
               <nav>
                 <ul className="flex gap-5">
-                  <li> <Link to={"/Gallery"}>Gallery</Link></li>
-                  <li><Link to={"/feedBack"}>Feedback</Link></li>
-                  <li>FAQ</li>
-                </ul>
+                  <li>
+                    <Link to={"/"}>Home</Link>
+                  </li>
+                  <li>
+                    <Link to={"/Gallery"}>Gallery</Link>
+                  </li>
+                  <li>
+                    <Link to={"/feedBack"}>Feedback</Link>
+                  </li>
+                  <li>
+                    <Link to={"/FAQ"}> FAQ</Link>
+                  </li>
+                </ul>{" "}
               </nav>
             </div>
             <div className="flex gap-3">
@@ -123,7 +130,7 @@ const Dashboard = () => {
       <main>
         <section className="flex flex-col gap-5 max-h-fit">
           <div className="relative h-100 w-full overflow-hidden rounded-2xl">
-            <div className="absolute inset-0">
+            <div className="absolute inset-0 opacity-35">
               <DotGrid
                 dotSize={5}
                 gap={15}
@@ -136,7 +143,7 @@ const Dashboard = () => {
                 returnDuration={1.5}
               />
             </div>
-            <div className="absolute inset-0 z-1 bg-background/45" />
+            <div className="absolute inset-0 z-1 bg-background/65" />
 
             <div className="relative z-10 flex h-full flex-col items-center justify-center gap-6 px-4 text-center">
               <h2 className="mr-2 flex justify-center text-7xl font-extrabold text-foreground text-nowrap">
@@ -157,7 +164,7 @@ const Dashboard = () => {
                   </div>
                 </span>
               </h2>
-              <p className="mx-auto max-w-4xl text-center text-lg font-medium text-foreground/90">
+              <p className="mx-auto max-w-4xl text-center text-lg font-semibold text-foreground">
                 From weddings to corporate events, we bring your vision to life
                 with expert planning, seamless execution, and unforgettable
                 experiences.
@@ -168,9 +175,10 @@ const Dashboard = () => {
                     setOpen(true);
                     setAuthMode("signup");
                   }}
-                  className="flex h-10 gap-1 rounded-md bg-primary p-2 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                 >
-                  Start Planning <MoveRight className="mt-0" />
+                  <span>Start Planning</span>
+                  <MoveRight className="h-4 w-4 shrink-0" />
                 </button>
                 <button
                   onClick={() => {
@@ -367,16 +375,17 @@ const Dashboard = () => {
             </p>
             <div className="flex gap-3">
               <div className="h-10 w-10 rounded-full bg-background/10 p-1 transition-colors hover:bg-primary/30 ">
-                {/* <Facebook className="h-8 w-8 rounded-full bg-[#1e2939] p-2" /> */}
+                <FaFacebookF className="h-8 w-8 rounded-full bg-[#1e2939] p-2" />
               </div>
               <div className="h-10 w-10 rounded-full bg-background/10 p-1">
-                {/* <Twitter className="h-8 w-8 rounded-full bg-[#1e2939] p-2" /> */}
+                <FaTwitter className="h-8 w-8 rounded-full bg-[#1e2939] p-2" />
               </div>
               <div className="h-10 w-10 rounded-full bg-background/10 p-1">
-                {/* <Instagram className="h-8 w-8 rounded-full bg-[#1e2939] p-2" /> */}
+                <FaInstagram className="h-8 w-8 rounded-full bg-[#1e2939] p-2" />
               </div>
               <div className="h-10 w-10 rounded-full bg-background/10 p-2">
-                {/* <Linkedin /> */}
+                <FaLinkedin className="h-6 w-6 rounded-full bg-[#1e2939] p-1"/>
+                
               </div>
             </div>
           </div>
