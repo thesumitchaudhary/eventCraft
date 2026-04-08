@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-export default function AdminDashboardPage() {
+export default function Page() {
   return (
     <SidebarProvider>
       <EmployeeSidebar />
