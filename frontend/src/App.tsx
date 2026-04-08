@@ -3,6 +3,8 @@ import { Routes, Route } from "react-router-dom";
 
 // this is main dashboard of the website
 import LandingPage from "./mainLandingPages/Dashboard";
+import FeedBack from "./mainLandingPages/FeedBack";
+import Gallery from "./mainLandingPages/Gallery";
 
 // this is for the sign in and also sign up form for user,admin, and employee
 import AuthModal from "./mainLandingPages/AuthModel";
@@ -34,6 +36,8 @@ function App() {
     <Routes>
       {/* this is the main dashboard */}
       <Route path="/" element={<LandingPage />} />
+      <Route path="/feedBack" element={<FeedBack />} />
+      <Route path="/Gallery" element={<Gallery />} />
 
       {/* auth (same UI, role decided by route) */}
       <Route path="/login" element={<AuthModal />} />

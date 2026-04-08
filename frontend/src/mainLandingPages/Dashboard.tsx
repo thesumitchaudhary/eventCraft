@@ -20,32 +20,41 @@ import type { CSSProperties } from "react";
 import { Button } from "../components/ui/button";
 import { MagicCard } from "../components/ui/magic-card";
 import DotGrid from "../components/DotGrid";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signup");
-  const [animatedText, setAnimatedText] = useState("Wedding Events");
+  const words = ["Wedding Events", "Birthday Events", "Corporates Events"];
+  const [wordIndex, setWordIndex] = useState(0);
+  const [animatedText, setAnimatedText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const words = ["Wedding Events", "Birthday Events", "Corporates Events"];
-    let timeoutIds: ReturnType<typeof setTimeout>[] = [];
+    const currentWord = words[wordIndex];
+    const typingSpeed = isDeleting ? 70 : 120;
 
-    const textLoad = () => {
-      timeoutIds = [
-        setTimeout(() => setAnimatedText(words[0]), 0),
-        setTimeout(() => setAnimatedText(words[1]), 4000),
-        setTimeout(() => setAnimatedText(words[2]), 8000),
-      ];
-    };
+    const timeoutId = setTimeout(() => {
+      if (!isDeleting && animatedText === currentWord) {
+        setTimeout(() => setIsDeleting(true), 1200);
+        return;
+      }
 
-    textLoad();
-    const intervalId = setInterval(textLoad, 12000);
+      if (isDeleting && animatedText === "") {
+        setIsDeleting(false);
+        setWordIndex((prev) => (prev + 1) % words.length);
+        return;
+      }
 
-    return () => {
-      timeoutIds.forEach(clearTimeout);
-      clearInterval(intervalId);
-    };
-  }, []);
+      const nextText = isDeleting
+        ? currentWord.slice(0, animatedText.length - 1)
+        : currentWord.slice(0, animatedText.length + 1);
+
+      setAnimatedText(nextText);
+    }, typingSpeed);
+
+    return () => clearTimeout(timeoutId);
+  }, [animatedText, isDeleting, wordIndex, words]);
 
   const wordWidths: Record<string, number> = {
     "Wedding Events": 565,
@@ -81,8 +90,8 @@ const Dashboard = () => {
             <div>
               <nav>
                 <ul className="flex gap-5">
-                  <li>Gallery</li>
-                  <li>Feedback</li>
+                  <li> <Link to={"/Gallery"}>Gallery</Link></li>
+                  <li><Link to={"/feedBack"}>Feedback</Link></li>
                   <li>FAQ</li>
                 </ul>
               </nav>
@@ -135,15 +144,15 @@ const Dashboard = () => {
                   <span className="h-20">Create Unforgettable</span>
                   <div className="mx-auto inline-block w-2xl rounded-xl border border-border bg-card/80 p-1 shadow-sm backdrop-blur-md">
                     <span
-                      key={animatedText}
                       className="typing-mask h-20 bg-linear-to-r/srgb from-primary via-primary/80 to-accent bg-clip-text font-semibold text-transparent"
                       style={
                         {
-                          "--word-px": `${wordWidths[animatedText] || 500}px`,
+                          "--word-px": `${wordWidths[words[wordIndex]] || 500}px`,
                         } as CSSProperties & { "--word-px": string }
                       }
                     >
                       {animatedText}
+                      <span className="text-primary">|</span>
                     </span>
                   </div>
                 </span>
