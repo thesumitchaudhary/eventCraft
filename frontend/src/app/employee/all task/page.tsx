@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { EmployeeSidebar } from "@/components/employee-sidebar";
 import {
   Breadcrumb,
@@ -13,8 +16,9 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Clock4, Upload } from "lucide-react";
+import { CircleAlert, CircleCheck, ClipboardList, Clock4, Upload } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import UpdateTaskModal from "@/components/update-task-modal";
 
 type TaskPriority = "Low" | "Medium" | "High";
 
@@ -54,8 +58,11 @@ const fetcher = async <T,>(url: string): Promise<T> => {
 };
 
 export default function AdminDashboardPage() {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<EmployeeTask | null>(null);
+
   const { data } = useQuery<EmployeeTasksResponse, Error>({
-    queryKey: ["showSigninEmployeeAndItAssignTasks"],
+    queryKey: ["employee-my-task"],
     queryFn: () =>
       fetcher<EmployeeTasksResponse>(
         "http://localhost:4041/api/employee/myTask",
@@ -63,6 +70,12 @@ export default function AdminDashboardPage() {
   });
 
   const tasks = data?.employee?.tasks ?? [];
+  const pendingTasks = tasks.filter((task) => task.status.toLowerCase() === "pending");
+  const inProgressTasks = tasks.filter((task) => {
+    const status = task.status.toLowerCase();
+    return status === "in-progress" || status === "in progress";
+  });
+  const completedTasks = tasks.filter((task) => task.status.toLowerCase() === "completed");
 
   return (
     <SidebarProvider>
@@ -90,18 +103,55 @@ export default function AdminDashboardPage() {
         </header>
 
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="rounded-xl bg-muted/50 p-10">
-              <h3>Total Customers</h3>
-              <span>248</span>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="w-full bg-gray-50 rounded-2xl p-10 border border-gray-300 border-l-6 border-l-gray-600">
+              <div className="flex gap-1">
+                <ClipboardList className="h-5 w-4 font-semibold text-gray-600" />
+                <p>Total Tasks</p>
+              </div>
+              <h1 className="text-xl font-bold text-gray-600">
+                {" "}
+                {tasks.length}
+              </h1>
             </div>
-            <div className="rounded-xl bg-muted/50 p-10">
-              <h3>Open Orders</h3>
-              <span>17</span>
+            <div className="w-full bg-gray-50 rounded-2xl p-10 border border-gray-300 border-l-6 border-l-[#f54a00]">
+              <div className="flex gap-1">
+                <Clock4 className="max-h-5 max-w-4 font-semibold" />
+                <p>Pending</p>
+              </div>
+              <div className="flex gap-3">
+                <h1 className="text-xl font-bold text-[#f54a00]">
+                  {pendingTasks.length}
+                </h1>
+                {pendingTasks.length > 0 ? (
+                  <span className="bg-[#f54a00] text-white rounded-3xl p-1 w-25 text-xs font-semibold animate-pulse">
+                    Action Needed
+                  </span>
+                ) : (
+                  <span></span>
+                )}
+              </div>
             </div>
-            <div className="rounded-xl bg-muted/50 p-10">
-              <h3>Revenue This Month</h3>
-              <span>$128,000</span>
+            <div className="w-full bg-gray-50 rounded-2xl p-10 border border-gray-300 border-l-6 border-l-[#155dfc]">
+              <div className="flex gap-1">
+                <CircleAlert className="max-h-5 max-w-4 font-semibold" />
+                <p>In Progress</p>
+              </div>
+              <div className="flex gap-2">
+                <h1 className="text-xl font-bold text-[#155dfc]">
+                  {inProgressTasks.length}
+                </h1>
+            
+              </div>
+            </div>
+            <div className="w-full bg-gray-50 rounded-2xl p-10 border border-gray-300 border-l-6 border-l-[#00a63e]">
+              <div className="flex gap-1">
+                <CircleCheck className="max-h-5 max-w-4 font-semibold" />
+                <p>Completed</p>
+              </div>
+              <h1 className="text-xl font-bold text-[#00a63e]">
+                {completedTasks.length}
+              </h1>
             </div>
           </div>
 
@@ -191,18 +241,21 @@ export default function AdminDashboardPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-col my-4 bg-gray-100 p-2 rounded-2xl">
+                {/* <div className="flex flex-col my-4 bg-gray-100 p-2 rounded-2xl">
                   <span className="text-gray-600 font-bold text-xs">
                     Work Updates:
                   </span>
                   <span className="text-gray-400">
                     Floral arrangements ordered. Setting up stage decorations.
                   </span>
-                </div>
+                </div> */}
                 <div className="my-5 flex justify-end">
                   <button
-                    //  onClick={() => openTaskUpdateModal(task)}
                     className="flex p-2 rounded-2xl bg-black text-white"
+                    onClick={() => {
+                      setSelectedTask(task);
+                      setIsDialogOpen(true);
+                    }}
                   >
                     <Upload />
                     <span>update Statues</span>
@@ -212,6 +265,16 @@ export default function AdminDashboardPage() {
             ))}
           </div>
         </div>
+
+        {isDialogOpen && selectedTask ? (
+          <UpdateTaskModal
+            task={selectedTask}
+            closeUpdateModal={() => {
+              setIsDialogOpen(false);
+              setSelectedTask(null);
+            }}
+          />
+        ) : null}
       </SidebarInset>
     </SidebarProvider>
   );

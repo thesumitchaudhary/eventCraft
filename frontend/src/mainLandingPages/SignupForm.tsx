@@ -125,7 +125,7 @@ const SignupForm = () => {
     onSuccess: () => {
       setErrorMessage("");
       resetForm();
-      navigate("/customerDashboard");
+      navigate("/customer/dashboard");
     },
     onError: (error) => {
       console.log("error", error);

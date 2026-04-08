@@ -1,4 +1,5 @@
 import { useState } from "react"
+import type { ComponentType } from "react"
 import {
   Avatar,
   AvatarFallback,
@@ -33,6 +34,7 @@ import { useLogout } from "@/utils/logoutUtils"
 export function NavUser({
   user,
   onLogout,
+  AccountEditor = ProfileEditor,
 }: {
   user: {
     name: string
@@ -40,10 +42,19 @@ export function NavUser({
     avatar: string
   }
   onLogout?: () => void
+  AccountEditor?: ComponentType<{ onSaved?: () => void }>
 }) {
   const { isMobile } = useSidebar()
   const [isAccountOpen, setIsAccountOpen] = useState(false)
   const handleLogout = useLogout()
+  const initials = user.name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("")
+
+  const hasEmail = Boolean(user.email?.trim())
 
   return (
     <SidebarMenu>
@@ -56,7 +67,7 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -75,7 +86,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -141,8 +152,24 @@ export function NavUser({
               <SheetDescription>
                 Manage your account details.
               </SheetDescription>
+              <div className="mt-4 flex items-center gap-3 rounded-xl border bg-muted/40 px-4 py-3 text-left">
+                <Avatar className="h-12 w-12 rounded-xl">
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback className="rounded-xl">{initials}</AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-medium text-foreground">
+                    {user.name}
+                  </div>
+                  {hasEmail && (
+                    <div className="truncate text-xs text-muted-foreground">
+                      {user.email}
+                    </div>
+                  )}
+                </div>
+              </div>
             </SheetHeader>
-            <ProfileEditor onSaved={() => setIsAccountOpen(false)} />
+            <AccountEditor onSaved={() => setIsAccountOpen(false)} />
           </SheetContent>
         </Sheet>
       </SidebarMenuItem>
