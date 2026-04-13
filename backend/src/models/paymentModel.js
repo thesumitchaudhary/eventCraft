@@ -15,27 +15,35 @@ const PaymentSchema = new mongoose.Schema({
     cardDetails: {
         cardNumber: {
             type: String,
-            required: true,
             match: /^[0-9]{12,16}$/
         },
 
         expiryMonth: {
             type: Number,
-            required: true,
             min: 1,
             max: 12
         },
 
         expiryYear: {
-            type: Number,
-            required: true
+            type: Number
         },
 
         cvv: {
             type: String,
-            required: true,
             match: /^[0-9]{3,4}$/
         }
+    },
+
+    razorpayOrderId: {
+        type: String
+    },
+
+    razorpayPaymentId: {
+        type: String
+    },
+
+    razorpaySignature: {
+        type: String
     },
 
     paymentMethod: {
@@ -47,9 +55,10 @@ const PaymentSchema = new mongoose.Schema({
             "net banking",
             "wallet",
             "cash on delivery",
-            "paypal"
+            "paypal",
+            "razorpay"
         ],
-        default: "credit card"
+        default: "razorpay"
     },
 
     status: {

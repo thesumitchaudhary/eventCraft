@@ -16,7 +16,7 @@ import paymentModel from "../models/paymentModel.js";
 import Ticket from "../models/ticketModel.js";
 
 // this is for payment controller
-import { Payment } from "../controllers/paymentController.js"
+import { createRazorpayOrder, verifyRazorpayPayment } from "../controllers/paymentController.js"
 import { createEvent } from "../controllers/eventBookController.js"
 
 const router = express.Router();
@@ -159,7 +159,8 @@ router.post("/createEvent", authMiddleware, customerMiddelware, createEvent);
 
 // this is for payment
 
-router.post("/payment", authMiddleware, Payment)
+router.post("/payment/create-order", authMiddleware, createRazorpayOrder)
+router.post("/payment/verify", authMiddleware, verifyRazorpayPayment)
 
 router.get("/support-ticket", authMiddleware, async (req, res) => {
     try {

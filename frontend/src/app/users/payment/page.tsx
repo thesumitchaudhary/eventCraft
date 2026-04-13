@@ -38,17 +38,59 @@ interface MyBookingsResponse {
   events: Booking[];
 }
 
-interface CardDetails {
-  cardNumber: string;
-  expiryMonth: number;
-  expiryYear: number;
-  cvv: string;
-}
-
-interface PaymentPayload {
+interface CreateOrderPayload {
   bookingId: string;
   paymentAmount: number;
-  cardDetails: CardDetails;
+}
+
+interface CreateOrderResponse {
+  success: boolean;
+  message: string;
+  data: {
+    key: string;
+    bookingId: string;
+    paymentAmount: number;
+    pendingAmount: number;
+    order: {
+      id: string;
+      amount: number;
+      currency: string;
+    };
+  };
+}
+
+interface VerifyPaymentPayload {
+  bookingId: string;
+  paymentAmount: number;
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
+
+declare global {
+  interface Window {
+    Razorpay?: new (options: {
+      key: string;
+      amount: number;
+      currency: string;
+      name: string;
+      description: string;
+      order_id: string;
+      handler: (response: {
+        razorpay_payment_id: string;
+        razorpay_order_id: string;
+        razorpay_signature: string;
+      }) => void;
+      modal?: {
+        ondismiss?: () => void;
+      };
+      theme?: {
+        color: string;
+      };
+    }) => {
+      open: () => void;
+    };
+  }
 }
 
 // this is for the show booked events
@@ -63,14 +105,31 @@ const fetcher = async (url: string): Promise<MyBookingsResponse> => {
   return body;
 };
 
-const API_URL = import.meta.env.VITE_BACKEND_URL;
+const loadRazorpayScript = async (): Promise<boolean> => {
+  if (window.Razorpay) return true;
 
-const makePayment = async ({
+  return new Promise((resolve) => {
+    const existingScript = document.getElementById("razorpay-checkout-js");
+    if (existingScript) {
+      resolve(Boolean(window.Razorpay));
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = "razorpay-checkout-js";
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
+const createRazorpayOrder = async ({
   bookingId,
   paymentAmount,
-  cardDetails,
-}: PaymentPayload) => {
-  const res = await fetch(`${API_URL}/index/payment`, {
+}: CreateOrderPayload): Promise<CreateOrderResponse> => {
+  const res = await fetch(`${INDEX_BACKEND_API_URL}/payment/create-order`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -79,17 +138,39 @@ const makePayment = async ({
     body: JSON.stringify({
       bookingId,
       paymentAmount,
-      cardDetails,
     }),
   });
 
   const data = await res.json();
+  const errorMessage =
+    data?.message || data?.error?.description || "Order creation failed";
 
   if (!res.ok || data?.success === false) {
-    throw new Error(data?.message || "Payment request failed");
+    throw new Error(errorMessage);
   }
 
-  return data;
+  return data as CreateOrderResponse;
+};
+
+const verifyRazorpayPayment = async (
+  payload: VerifyPaymentPayload,
+): Promise<void> => {
+  const res = await fetch(`${INDEX_BACKEND_API_URL}/payment/verify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+  const errorMessage =
+    data?.message || data?.error?.description || "Payment verification failed";
+
+  if (!res.ok || data?.success === false) {
+    throw new Error(errorMessage);
+  }
 };
 
 export default function Page() {
@@ -99,25 +180,13 @@ export default function Page() {
     null,
   );
   const [paymentAmount, setPaymentAmount] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvv, setCvv] = useState("");
   const [focusedPaymentAmount, setFocusedPaymentAmount] = useState(false);
-  const [focusedCardNumber, setFocusedCardNumber] = useState(false);
-  const [focusedExpiryDate, setFocusedExpiryDate] = useState(false);
-  const [focusedCvv, setFocusedCvv] = useState(false);
 
   const floatingPaymentAmount = focusedPaymentAmount || paymentAmount.length > 0;
-  const floatingCardNumber = focusedCardNumber || cardNumber.length > 0;
-  const floatingExpiryDate = focusedExpiryDate || expiryDate.length > 0;
-  const floatingCvv = focusedCvv || cvv.length > 0;
 
   const handleOpenPaymentModal = (bookingId: string) => {
     setSelectedBookingId(bookingId);
     setPaymentAmount("");
-    setCardNumber("");
-    setExpiryDate("");
-    setCvv("");
     setIsPaymentModalOpen(true);
   };
 
@@ -125,35 +194,11 @@ export default function Page() {
     setIsPaymentModalOpen(false);
     setSelectedBookingId(null);
     setPaymentAmount("");
-    setCardNumber("");
-    setExpiryDate("");
-    setCvv("");
     setFocusedPaymentAmount(false);
-    setFocusedCardNumber(false);
-    setFocusedExpiryDate(false);
-    setFocusedCvv(false);
-  };
-
-  const parseExpiry = (value: string) => {
-    const [mm, yy] = String(value || "").split("/");
-    const expiryMonth = Number(mm);
-    const twoDigitYear = Number(yy);
-
-    if (
-      !expiryMonth ||
-      expiryMonth < 1 ||
-      expiryMonth > 12 ||
-      Number.isNaN(twoDigitYear)
-    ) {
-      return null;
-    }
-
-    const expiryYear = twoDigitYear < 100 ? 2000 + twoDigitYear : twoDigitYear;
-    return { expiryMonth, expiryYear };
   };
 
   const paymentMutation = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
       if (!selectedBookingId) throw new Error("bookingId is required");
       if (!paymentAmount) throw new Error("paymentAmount is required");
 
@@ -168,24 +213,60 @@ export default function Page() {
         throw new Error("Payment amount cannot exceed remaining balance");
       }
 
-      const normalizedCardNumber = cardNumber.replace(/\D/g, ""); // remove spaces/dashes
-      const normalizedCvv = cvv.replace(/\D/g, "");
-      const expiry = parseExpiry(expiryDate);
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        throw new Error("Unable to load Razorpay Checkout. Please try again.");
+      }
 
-      if (!expiry) throw new Error("Expiry must be in MM/YY format");
-      if (normalizedCardNumber.length < 12)
-        throw new Error("Invalid card number");
-      if (normalizedCvv.length < 3) throw new Error("Invalid CVV");
-
-      return makePayment({
+      const orderResponse = await createRazorpayOrder({
         bookingId: selectedBookingId,
         paymentAmount: paymentAmountNumber,
-        cardDetails: {
-          cardNumber: normalizedCardNumber,
-          expiryMonth: expiry.expiryMonth,
-          expiryYear: expiry.expiryYear,
-          cvv: normalizedCvv,
-        },
+      });
+
+      const key = orderResponse?.data?.key;
+      const order = orderResponse?.data?.order;
+
+      if (!key || !order?.id || !window.Razorpay) {
+        throw new Error("Unable to initialize Razorpay Checkout");
+      }
+
+      await new Promise<void>((resolve, reject) => {
+        const razorpayInstance = new window.Razorpay({
+          key,
+          amount: order.amount,
+          currency: order.currency,
+          name: "EventyfyCraft",
+          description: `Payment for ${selectedBooking?.eventName || "event booking"}`,
+          order_id: order.id,
+          handler: async (response) => {
+            try {
+              await verifyRazorpayPayment({
+                bookingId: selectedBookingId,
+                paymentAmount: paymentAmountNumber,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              });
+              resolve();
+            } catch (verifyError) {
+              reject(
+                verifyError instanceof Error
+                  ? verifyError
+                  : new Error("Payment verification failed"),
+              );
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              reject(new Error("Payment cancelled"));
+            },
+          },
+          theme: {
+            color: "#111827",
+          },
+        });
+
+        razorpayInstance.open();
       });
     },
     onSuccess: () => {
@@ -388,68 +469,8 @@ export default function Page() {
                   }}
                 />
 
-                <TextInput
-                  label="Card Number"
-                  value={cardNumber}
-                  onChange={(e) => setCardNumber(e.currentTarget.value)}
-                  onFocus={() => setFocusedCardNumber(true)}
-                  onBlur={() => setFocusedCardNumber(false)}
-                  placeholder={focusedCardNumber ? "1234 5678 9012 3456" : ""}
-                  mt="md"
-                  classNames={{
-                    root: "relative mt-1",
-                    input:
-                      "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
-                    label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
-                      floatingCardNumber
-                        ? "-translate-y-5 text-xs text-gray-900"
-                        : ""
-                    }`,
-                  }}
-                />
-
-                <div className="mt-3 grid grid-cols-2 gap-3">
-                  <div>
-                    <TextInput
-                      label="Expiry (MM/YY)"
-                      value={expiryDate}
-                      onChange={(e) => setExpiryDate(e.currentTarget.value)}
-                      onFocus={() => setFocusedExpiryDate(true)}
-                      onBlur={() => setFocusedExpiryDate(false)}
-                      placeholder={focusedExpiryDate ? "08/29" : ""}
-                      mt="md"
-                      classNames={{
-                        root: "relative mt-1",
-                        input:
-                          "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
-                        label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
-                          floatingExpiryDate
-                            ? "-translate-y-5 text-xs text-gray-900"
-                            : ""
-                        }`,
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <TextInput
-                      type="password"
-                      label="CVV"
-                      value={cvv}
-                      onChange={(e) => setCvv(e.currentTarget.value)}
-                      onFocus={() => setFocusedCvv(true)}
-                      onBlur={() => setFocusedCvv(false)}
-                      placeholder={focusedCvv ? "123" : ""}
-                      mt="md"
-                      classNames={{
-                        root: "relative mt-1",
-                        input:
-                          "bg-transparent !border-0 !border-b-2 !border-gray-300 !rounded-none px-0 pt-5 pb-1 focus:!border-b-gray-900 focus:!ring-0 focus:!outline-none",
-                        label: `absolute left-0 top-2 z-10 pointer-events-none text-sm font-normal text-gray-400 transition-all duration-100 ease-in-out ${
-                          floatingCvv ? "-translate-y-5 text-xs text-gray-900" : ""
-                        }`,
-                      }}
-                    />
-                  </div>
+                <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
+                  Secure payment powered by Razorpay Checkout.
                 </div>
 
                 {paymentMutation.error instanceof Error && (
@@ -472,7 +493,7 @@ export default function Page() {
                     className="rounded-xl bg-black px-4 py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-60"
                     disabled={paymentMutation.isPending}
                   >
-                    {paymentMutation.isPending ? "Processing..." : "Pay"}
+                    {paymentMutation.isPending ? "Opening Razorpay..." : "Pay with Razorpay"}
                   </button>
                 </div>
               </form>
