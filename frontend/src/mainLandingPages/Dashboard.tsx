@@ -17,8 +17,6 @@ import { FaLinkedin } from "react-icons/fa";
 import { FaInstagram } from "react-icons/fa";
 import { FaTwitter } from "react-icons/fa";
 import type { CSSProperties } from "react";
-import { Button } from "../components/ui/button";
-import { MagicCard } from "../components/ui/magic-card";
 import DotGrid from "../components/DotGrid";
 import { Link } from "react-router-dom";
 
@@ -79,15 +77,15 @@ const Dashboard = () => {
             returnDuration={1.5}
           />
         </div>
-        <header className="fixed top-0 z-50 h-20 w-full border-b border-border bg-background/80 py-5 backdrop-blur-md shadow-sm">
-          <div className="flex justify-between max-w-6xl mx-auto">
+        <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background/80 py-5 backdrop-blur-md shadow-sm">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6">
             <h1 className="flex gap-2">
               <Calendar className="mt-1 text-primary" />{" "}
               <span className="text-xl mt-1 font-bold">Eventify</span>
             </h1>
             <div>
               <nav>
-                <ul className="flex gap-5">
+                <ul className="hidden gap-5 md:flex">
                   <li>
                     <Link to={"/"}>Home</Link>
                   </li>
@@ -127,7 +125,7 @@ const Dashboard = () => {
         </header>
       </div>
       {open && <AuthModal setOpen={setOpen} defaultMode={authMode} />}
-      <main>
+      <main className="overflow-x-hidden">
         <section className="flex flex-col gap-5 max-h-fit">
           <div className="relative h-100 w-full overflow-hidden rounded-2xl">
             <div className="absolute inset-0 opacity-35">
@@ -146,10 +144,10 @@ const Dashboard = () => {
             <div className="absolute inset-0 z-1 bg-background/65" />
 
             <div className="relative z-10 flex h-full flex-col items-center justify-center gap-6 px-4 text-center">
-              <h2 className="mr-2 flex justify-center text-7xl font-extrabold text-foreground text-nowrap">
+              <h2 className="mr-2 flex justify-center text-4xl font-extrabold text-foreground sm:text-6xl lg:text-7xl">
                 <span className="mt-5 flex flex-col">
                   <span className="h-20">Create Unforgettable</span>
-                  <div className="mx-auto inline-block w-2xl rounded-xl border border-border bg-card/80 p-1 shadow-sm backdrop-blur-md">
+                  <div className="mx-auto inline-block w-full max-w-2xl rounded-xl border border-border bg-card/80 p-1 shadow-sm backdrop-blur-md">
                     <span
                       className="typing-mask h-20 bg-linear-to-r/srgb from-primary via-primary/80 to-accent bg-clip-text font-semibold text-transparent"
                       style={
@@ -169,7 +167,7 @@ const Dashboard = () => {
                 with expert planning, seamless execution, and unforgettable
                 experiences.
               </p>
-              <div className="flex justify-center gap-10">
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-10">
                 <button
                   onClick={() => {
                     setOpen(true);
@@ -193,7 +191,7 @@ const Dashboard = () => {
             </div>
           </div>
         </section>
-        <section className="my-37 flex flex-col gap-10">
+        <section className="my-37 flex flex-col gap-10 px-4 sm:px-6">
           <div className="flex flex-col gap-4">
             <h2 className="flex justify-center text-3xl font-bold">
               Why Choose Eventify?
@@ -202,8 +200,8 @@ const Dashboard = () => {
               Everything you need to plan the perfect event
             </p>
           </div>
-          <div className="mx-8 flex gap-5">
-            <div className="max-w-md rounded-2xl border border-border bg-card p-2 shadow-sm transition-shadow hover:shadow-lg">
+          <div className="mx-auto grid w-full max-w-6xl gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="w-full rounded-2xl border border-border bg-card p-2 shadow-sm transition-shadow hover:shadow-lg">
               <Calenders className="mx-auto my-5 h-12 w-12 rounded-full bg-primary/10 p-3 text-primary" />
               <h3 className="text-center my-2 font-semibold text-base">
                 Easy Event Booking
@@ -212,7 +210,7 @@ const Dashboard = () => {
                 Book your dream event in minutes with our streamlined process
               </p>
             </div>
-            <div className="max-w-md rounded-2xl border border-border bg-card p-2 shadow-sm transition-shadow hover:shadow-lg">
+            <div className="w-full rounded-2xl border border-border bg-card p-2 shadow-sm transition-shadow hover:shadow-lg">
               <Sparkles className="mx-auto my-5 h-12 w-12 rounded-full bg-primary/10 p-3 text-primary" />
               <h3 className="text-center my-2 font-semibold">Custom Themes</h3>
               <p className="mx-7 text-center text-sm text-muted-foreground">
@@ -220,14 +218,14 @@ const Dashboard = () => {
                 occasion
               </p>
             </div>
-            <div className="max-w-md rounded-2xl border border-border bg-card p-2 shadow-sm transition-shadow hover:shadow-lg">
+            <div className="w-full rounded-2xl border border-border bg-card p-2 shadow-sm transition-shadow hover:shadow-lg">
               <Users className="mx-auto my-5 h-12 w-12 rounded-full bg-primary/10 p-3 text-primary" />
               <h3 className="text-center my-2 font-semibold">Expert Team</h3>
               <p className="mx-7 text-center text-sm text-muted-foreground">
                 Professional event planners and staff dedicated to your event
               </p>
             </div>
-            <div className="max-w-md rounded-2xl border border-border bg-card p-2 shadow-sm transition-shadow hover:shadow-lg">
+            <div className="w-full rounded-2xl border border-border bg-card p-2 shadow-sm transition-shadow hover:shadow-lg">
               <Heart className="mx-auto my-5 h-12 w-12 rounded-full bg-primary/10 p-3 text-primary" />
               <h3 className="text-center my-2 font-semibold">
                 Memorable Experiences
@@ -239,99 +237,47 @@ const Dashboard = () => {
             </div>
           </div>
         </section>
-        <section className="my-16">
+        <section className="my-16 px-4 sm:px-6">
           <h2 className="flex justify-center mb-3 text-3xl font-bold">
             What You Get
           </h2>
           <p className="flex justify-center text-base text-muted-foreground">
             Comprehensive event management at your fingertips
           </p>
-          <div className="flex justify-center mt-5 gap-25">
+          <div className="mx-auto mt-5 grid w-full max-w-6xl gap-8 md:grid-cols-2">
             <div className="flex flex-col gap-4">
-              <p className="flex w-95 gap-2 rounded-2xl p-4 transition-colors hover:bg-accent/50">
+              <p className="flex w-full gap-2 rounded-2xl p-4 transition-colors hover:bg-accent/50">
                 <CircleCheckBig className="text-primary" /> Real-time event
                 tracking
               </p>
-              <p className="flex w-95 gap-2 rounded-2xl p-4 transition-colors hover:bg-accent/50">
+              <p className="flex w-full gap-2 rounded-2xl p-4 transition-colors hover:bg-accent/50">
                 {" "}
                 <CircleCheckBig className="text-primary" /> Professional event
                 coordination
               </p>
-              <p className="flex w-95 gap-2 rounded-2xl p-4 transition-colors hover:bg-accent/50">
+              <p className="flex w-full gap-2 rounded-2xl p-4 transition-colors hover:bg-accent/50">
                 {" "}
                 <CircleCheckBig className="text-primary" /> Dedicated customer
                 support
               </p>
             </div>
             <div className="flex flex-col gap-4">
-              <p className="flex w-95 gap-2 rounded-2xl p-4 transition-colors hover:bg-accent/50">
+              <p className="flex w-full gap-2 rounded-2xl p-4 transition-colors hover:bg-accent/50">
                 <CircleCheckBig className="text-primary" /> Flexible payment
                 options
               </p>
-              <p className="flex w-95 gap-2 rounded-2xl p-4 transition-colors hover:bg-accent/50">
+              <p className="flex w-full gap-2 rounded-2xl p-4 transition-colors hover:bg-accent/50">
                 <CircleCheckBig className="text-primary" /> Customizable event
                 packages
               </p>
-              <p className="flex w-95 gap-2 rounded-2xl p-4 transition-colors hover:bg-accent/50">
+              <p className="flex w-full gap-2 rounded-2xl p-4 transition-colors hover:bg-accent/50">
                 <CircleCheckBig className="text-primary" /> 100% satisfaction
                 guarantee
               </p>
             </div>
           </div>
         </section>
-        {/* <section className="my-16 max-w-6xl mx-auto px-4">
-          <div className="flex justify-center">
-            <MagicCard
-              mode="orb"
-              glowFrom="var(--accent)"
-              glowTo="var(--primary)"
-              className="w-full max-w-sm rounded-2xl"
-            >
-              <div className="overflow-hidden rounded-2xl border border-border bg-card/90 backdrop-blur-sm">
-                <div className="border-b border-border p-4">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src="https://avatars.githubusercontent.com/u/81306489"
-                      alt="Yeom JinHo"
-                      className="h-12 w-12 rounded-full object-cover"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-base">Yeom JinHo</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        Frontend Developer
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2 p-4">
-                  <p className="text-sm font-medium">
-                    Frontend Developer focused on Interactive UI &amp;
-                    Performance
-                  </p>
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    I&apos;m passionate about visual presentation and currently
-                    focusing on interactive UI.
-                  </p>
-                </div>
-
-                <div className="border-t border-border p-4">
-                  <Button asChild className="w-full">
-                    <a
-                      href="https://github.com/Yeom-JinHo"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2"
-                    >
-                      View on GitHub
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </MagicCard>
-          </div>
-        </section> */}
-        <section className="max-w-6xl mx-auto my-20">
+        <section className="mx-auto my-20 max-w-6xl px-4 sm:px-6">
           <div className="rounded-2xl bg-linear-to-r from-primary via-secondary to-accent p-10 text-primary-foreground shadow-lg">
             <h2 className="my-5 text-3xl font-bold flex justify-center">
               Ready to Get Started?
@@ -364,12 +310,12 @@ const Dashboard = () => {
         </section>
       </main>
       <footer className="w-full bg-foreground p-10 text-background">
-        <div className="flex gap-40">
-          <div className="w-70 flex flex-col gap-4">
+        <div className="mx-auto flex max-w-6xl flex-wrap gap-10 md:justify-between">
+          <div className="w-full max-w-sm flex flex-col gap-4">
             <h1 className="flex gap-3 text-xl font-semibold">
               <Calenders className="text-primary" /> Eventify
             </h1>
-            <p className="my-2 w-90 text-base text-background/75">
+            <p className="my-2 text-base text-background/75">
               Creating unforgettable moments through professional event
               management and planning services.
             </p>
@@ -416,13 +362,13 @@ const Dashboard = () => {
             <div className="flex flex-col gap-4 my-5">
               <div className="flex gap-2">
                 <MapPin className="text-primary" />
-                <span className="mr-10">
-                  123 Event Street, New York, NY 10001
+                <span className="whitespace-nowrap">
+                 near kh-5 circle, sector 25, gandhinagar
                 </span>
               </div>
               <div className="flex gap-2">
                 <Phone className="text-primary" />
-                <span>+1 (555) 123-4567</span>
+                <span>+91 4537532549</span>
               </div>
               <div className="flex gap-2">
                 <Mail className="text-primary" />
@@ -433,7 +379,7 @@ const Dashboard = () => {
         </div>
         <br />
         <hr />
-        <div className="flex justify-between">
+        <div className="mx-auto mt-4 flex max-w-6xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             &copy; <span>2026 Eventify. All rights reserved.</span>
           </div>
