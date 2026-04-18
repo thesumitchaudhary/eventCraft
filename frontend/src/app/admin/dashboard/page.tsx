@@ -17,6 +17,12 @@ import { Users, Calendar, CircleUser, IndianRupee } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 type BookingEvent = {
+  _id?: string;
+  eventName?: string;
+  eventType?: string;
+  eventDate?: string;
+  bookingStatus?: string;
+  progress?: number;
   totalPaid?: number;
   totalAmount?: number | number[];
 };
@@ -164,8 +170,8 @@ export default function AdminDashboardPage() {
               </div>
               <span>
                 {data?.customers
-                  .flatMap((customer) => customer?.events.length)
-                  ?.reduce((total, totalcustomer) => total + totalcustomer, 0)}
+                  .flatMap((customer) => customer?.events ?? [])
+                  .length ?? 0}
               </span>
             </div>
             <div className="rounded-xl bg-[#fefdfe]  p-5">
@@ -257,7 +263,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-[#fefdfe] p-5 md:min-h-min">
+          <div className="min-h-screen flex-1 rounded-xl bg-[#fefdfe] p-5 md:min-h-min">
             <div>
               <h4> Recent Bookings</h4>
               <p>Latest event bookings</p>
@@ -275,7 +281,7 @@ export default function AdminDashboardPage() {
               </thead>
               <tbody>
                 {data?.customers.flatMap((customer) =>
-                  customer?.events.map((data) => (
+                  (customer?.events ?? []).map((data) => (
                     <tr key={data._id} className="border-b border-black">
                       <td className="py-2 border-b  p-1">{data?.eventName}</td>
                       <td className="border-b p-1">{data?.eventType}</td>

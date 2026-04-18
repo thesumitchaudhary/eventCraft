@@ -91,7 +91,7 @@ export default function Page() {
               </span>
             </div>
           </div>
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min p-5">
+          <div className="min-h-screen flex-1 rounded-xl bg-muted/50 md:min-h-min p-5">
             <table className="w-full my-3 border-collapse">
                 <thead>
                   <tr className="border-b-2 border-black text-left">
@@ -111,7 +111,7 @@ export default function Page() {
                 <tbody>
                   {isLoading && (
                     <tr>
-                      <td colSpan="5" className="text-center py-4">
+                      <td colSpan={5} className="text-center py-4">
                         Loading...
                       </td>
                     </tr>

@@ -20,16 +20,25 @@ import { EllipsisVertical } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
-type BookingStatus = "pending" | "confirmed" | "in-progress" | "completed";
+type BookingStatus =
+  | "requested"
+  | "accepted"
+  | "rejected"
+  | "in-progress"
+  | "completed";
 
 type EventBooking = {
+  _id?: string;
   eventName?: string;
   eventType?: string;
   theme?: string;
+  eventDate?: string;
   venue?: string;
   bookingStatus?: string;
   paymentStatus?: string;
   guestCount?: number;
+  totalAmount?: number;
+  progress?: number;
 };
 
 type CustomerWithEvents = {
@@ -239,7 +248,7 @@ export default function AdminBookingsPage() {
                 <tbody>
                   {isLoading && (
                     <tr>
-                      <td colSpan="11" className="text-center py-4">
+                      <td colSpan={11} className="text-center py-4">
                         loading...
                       </td>
                     </tr>
@@ -252,13 +261,15 @@ export default function AdminBookingsPage() {
                         <td className="py-2 px-2">{booking.eventType}</td>
                         <td className="py-2 px-2">{booking.theme}</td>
                         <td className="py-2 px-2">
-                          {new Date(booking.eventDate).toLocaleDateString()}
+                          {booking.eventDate
+                            ? new Date(booking.eventDate).toLocaleDateString()
+                            : "-"}
                         </td>
                         <td className="py-2 px-2">{booking.venue}</td>
                         <td className="py-2 px-2">{booking.guestCount}</td>
                         <td className="py-2 px-2">
                           <span className="flex">
-                            <IndianRupee className="h-3 w-3 mt-1"/> {booking.totalAmount}
+                            <IndianRupee className="h-3 w-3 mt-1" /> {booking.totalAmount ?? 0}
                           </span>
                         </td>
                         <td className="py-2 px-2">
@@ -272,7 +283,7 @@ export default function AdminBookingsPage() {
                           </span>
                         </td>
                         <td className="py-2 px-2 font-medium">
-                          {booking.progress}%
+                          {booking.progress ?? 0}%
                         </td>
 
                         <td className="py-2 px-2 font-medium flex flex-col">
@@ -325,7 +336,7 @@ export default function AdminBookingsPage() {
                   {/* NO RESULTS */}
                   {!isLoading && filteredBookings.length === 0 && (
                     <tr>
-                      <td colSpan="11" className="text-center py-4">
+                      <td colSpan={11} className="text-center py-4">
                         No bookings found
                       </td>
                     </tr>

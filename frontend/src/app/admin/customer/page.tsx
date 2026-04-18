@@ -121,7 +121,7 @@ export default function AdminThemePage() {
               />
             </div>
           </div>
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-[#fefdfe] p-5 md:min-h-min">
+          <div className="min-h-screen flex-1 rounded-xl bg-[#fefdfe] p-5 md:min-h-min">
             <table className="w-full">
               <thead>
                 <tr className="border-b">
@@ -171,7 +171,7 @@ export default function AdminThemePage() {
 
                       <td>
                         <span className="bg-black mx-5 rounded-md px-2 py-1 text-white">
-                          {customer?.events.length}
+                          {customer?.bookings?.length ?? 0}
                         </span>
                       </td>
                     </tr>

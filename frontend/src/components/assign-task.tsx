@@ -43,6 +43,8 @@ type AssignTaskPayload = {
   selectDate: string;
 };
 
+type TaskPriority = "Low" | "Medium" | "High";
+
 type AssignTaskModalProps = {
   open: boolean;
   closeTaskModal: () => void;
@@ -95,7 +97,7 @@ const AssignTaskModal = ({ open, closeTaskModal }: AssignTaskModalProps) => {
   const [taskTitle, setTaskTitle] = useState("");
   const [description, setDescription] = useState("");
   const [assignTo, setAssignTo] = useState<string | null>(null);
-  const [priority, setPriority] = useState<string | null>("Medium");
+  const [priority, setPriority] = useState<TaskPriority | null>("Medium");
   const [dueDate, setDueDate] = useState("");
   const [submitError, setSubmitError] = useState("");
 
@@ -142,7 +144,7 @@ const AssignTaskModal = ({ open, closeTaskModal }: AssignTaskModalProps) => {
         taskTitle: taskTitle.trim(),
         taskDescription: description.trim(),
         assignTo,
-        priority: (priority as "Low" | "Medium" | "High") || "Medium",
+        priority: priority || "Medium",
         selectDate: new Date(dueDate).toISOString(),
       });
     },
@@ -214,7 +216,7 @@ const AssignTaskModal = ({ open, closeTaskModal }: AssignTaskModalProps) => {
             label="Related Event"
             placeholder={isLoading ? "Loading events..." : "Select event"}
             value={selectedEventId}
-            onChange={setSelectedEventId}
+            onChange={(value) => setSelectedEventId(value ? String(value) : null)}
             data={eventOptions}
             searchable
             disabled={isLoading || eventOptions.length === 0}
@@ -262,7 +264,7 @@ const AssignTaskModal = ({ open, closeTaskModal }: AssignTaskModalProps) => {
             label="Assign To"
             placeholder={isEmployeeLoading ? "Loading employees..." : "Select employee"}
             value={assignTo}
-            onChange={setAssignTo}
+            onChange={(value) => setAssignTo(value ? String(value) : null)}
             data={employeeOptions}
             searchable
             disabled={isEmployeeLoading || employeeOptions.length === 0}
@@ -272,7 +274,9 @@ const AssignTaskModal = ({ open, closeTaskModal }: AssignTaskModalProps) => {
             label="Priority"
             placeholder="Select priority"
             value={priority}
-            onChange={setPriority}
+            onChange={(value) =>
+              setPriority(value ? (String(value) as TaskPriority) : null)
+            }
             data={["Low", "Medium", "High"]}
           />
 
