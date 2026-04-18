@@ -19,6 +19,10 @@ import { ClipboardList } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import AssignTaskModal from "@/components/assign-task";
 
+const API_EMPLOYEE_URL =
+  import.meta.env.VITE_EMPLOYEE_BACKEND_URL ??
+  "http://localhost:4041/api/employee";
+
 const fetcher = async (url) => {
   const res = await fetch(url, { credentials: "include" });
 
@@ -36,7 +40,7 @@ export default function AdminThemePage() {
 
   const { data } = useQuery({
     queryKey: ["allTaskDetails"],
-    queryFn: () => fetcher("http://localhost:4041/api/employee/findEmployee"),
+    queryFn: () => fetcher(`${API_EMPLOYEE_URL}/findEmployee`),
   });
 
   const users = Array.isArray(data)

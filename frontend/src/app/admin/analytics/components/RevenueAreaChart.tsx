@@ -13,12 +13,14 @@ import {IndianRupee} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher, type ShowBookingsResponse } from "./api";
 
+const API_ADMIN_BACKEND_URL = import.meta.env.VITE_ADMIN_BACKEND_URL ?? "http://localhost:4041/api/admin";
+
 export default function RevenueAreaChart() {
   const { data: apiData, isLoading, error } = useQuery<ShowBookingsResponse>({
     queryKey: ["showbookings"],
     queryFn: () =>
       fetcher<ShowBookingsResponse>(
-        "http://localhost:4041/api/admin/showBookedEvent",
+        `${API_ADMIN_BACKEND_URL}/showBookedEvent`,
       ),
   });
 

@@ -4,12 +4,14 @@ import { fetcher, getBookingEvents, type ShowBookingsResponse } from "./api";
 
 const colors = ["#f59e0b", "#0ea5e9", "#10b981"];
 
+const API_ADMIN_BACKEND_URL = import.meta.env.VITE_ADMIN_BACKEND_URL ?? "http://localhost:4041/api/admin";
+
 export default function BookingStatusPie() {
   const { data, isLoading, error } = useQuery<ShowBookingsResponse>({
     queryKey: ["showbookings"],
     queryFn: () =>
       fetcher<ShowBookingsResponse>(
-        "http://localhost:4041/api/admin/showBookedEvent",
+        `${API_ADMIN_BACKEND_URL}/showBookedEvent`,
       ),
   });
 

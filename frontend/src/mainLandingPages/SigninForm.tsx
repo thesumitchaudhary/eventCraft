@@ -17,7 +17,8 @@ type LoginResponse = {
   role?: string;
 };
 
-const API_BASE_URL: string = "http://localhost:4041/api";
+const API_BASE_URL: string =
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:4041/api";
 
 const loginUser = async ({
   email,

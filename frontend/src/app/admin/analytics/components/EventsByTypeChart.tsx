@@ -12,12 +12,14 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { fetcher, getBookingEvents, type ShowBookingsResponse } from "./api";
 
+const API_ADMIN_BACKEND_URL = import.meta.env.VITE_ADMIN_BACKEND_URL ?? "http://localhost:4041/api/admin";
+
 export default function EventsByTypeChart() {
   const { data, isLoading, error } = useQuery<ShowBookingsResponse>({
     queryKey: ["showbookings"],
     queryFn: () =>
       fetcher<ShowBookingsResponse>(
-        "http://localhost:4041/api/admin/showBookedEvent",
+        `${API_ADMIN_BACKEND_URL}/showBookedEvent`,
       ),
   });
 
