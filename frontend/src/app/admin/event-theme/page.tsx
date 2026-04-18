@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Palette } from "lucide-react";
+import { IndianRupee, Palette } from "lucide-react";
 import { AdminSidebar } from "@/components/admin-sidebar";
 import {
   Breadcrumb,
@@ -175,7 +175,8 @@ export default function AdminThemePage() {
     });
   };
 
-  const getPriceAsNumber = (price: number | string) => Number(String(price).trim());
+  const getPriceAsNumber = (price: number | string) =>
+    Number(String(price).trim());
 
   return (
     <SidebarProvider>
@@ -220,7 +221,7 @@ export default function AdminThemePage() {
             </div>
           </div>
 
-          <div className="flex justify-between rounded-xl bg-muted/50 p-4">
+          <div className="flex justify-between rounded-xl bg-[#fefdfe] p-4">
             <table className="min-w-full">
               <thead className="sticky top-0">
                 <tr className="border-b-2 border-black text-left">
@@ -299,22 +300,26 @@ export default function AdminThemePage() {
                       </td>
 
                       <td className="border-b px-4 py-3 font-medium">
-                        <input
-                          type="text"
-                          inputMode="decimal"
-                          value={
-                            editRow?._id === theme._id
-                              ? editRow.themePrice
-                              : theme.themePrice
-                          }
-                          onFocus={() => setEditRow(theme)}
-                          onChange={(e) =>
-                            setEditRow((prev) => ({
-                              ...(prev?._id === theme._id ? prev : theme),
-                              themePrice: e.target.value,
-                            }))
-                          }
-                        />
+                        <div className="flex items-center gap-1">
+                          <IndianRupee className="h-5 w-5" />
+                          <input
+                            type="text"
+                            className="w-full bg-transparent outline-none"
+                            inputMode="decimal"
+                            value={String(
+                              editRow?._id === theme._id
+                                ? editRow.themePrice
+                                : theme.themePrice,
+                            )}
+                            onFocus={() => setEditRow(theme)}
+                            onChange={(e) =>
+                              setEditRow((prev) => ({
+                                ...(prev?._id === theme._id ? prev : theme),
+                                themePrice: e.target.value,
+                              }))
+                            }
+                          />
+                        </div>
                       </td>
 
                       <td className="border-b px-4 py-3 text-center">
@@ -326,7 +331,9 @@ export default function AdminThemePage() {
                               return;
                             }
 
-                            const parsedPrice = getPriceAsNumber(editRow.themePrice);
+                            const parsedPrice = getPriceAsNumber(
+                              editRow.themePrice,
+                            );
 
                             if (Number.isNaN(parsedPrice)) {
                               return;

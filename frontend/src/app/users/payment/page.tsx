@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { TextInput } from "@mantine/core";
+import { IndianRupee } from "lucide-react";
 
 import { useState } from "react";
 
@@ -182,7 +183,8 @@ export default function Page() {
   const [paymentAmount, setPaymentAmount] = useState("");
   const [focusedPaymentAmount, setFocusedPaymentAmount] = useState(false);
 
-  const floatingPaymentAmount = focusedPaymentAmount || paymentAmount.length > 0;
+  const floatingPaymentAmount =
+    focusedPaymentAmount || paymentAmount.length > 0;
 
   const handleOpenPaymentModal = (bookingId: string) => {
     setSelectedBookingId(bookingId);
@@ -278,11 +280,7 @@ export default function Page() {
     },
   });
 
-  const {
-    data,
-    isLoading,
-    error,
-  } = useQuery<MyBookingsResponse>({
+  const { data, isLoading, error } = useQuery<MyBookingsResponse>({
     queryKey: ["my-bookings"],
     queryFn: () => fetcher(`${INDEX_BACKEND_API_URL}/my-booking`),
   });
@@ -347,8 +345,12 @@ export default function Page() {
                     <th className="border-b px-4 py-2 text-left">Event</th>
                     <th className="border-b px-4 py-2 text-left">Date</th>
                     <th className="border-b px-4 py-2 text-left">Venue</th>
-                    <th className="border-b px-4 py-2 text-left">Total Budget</th>
-                    <th className="border-b px-4 py-2 text-left">Amount Paid</th>
+                    <th className="border-b px-4 py-2 text-left">
+                      Total Budget
+                    </th>
+                    <th className="border-b px-4 py-2 text-left">
+                      Amount Paid
+                    </th>
                     <th className="border-b px-4 py-2 text-left">Remaining</th>
                     <th className="border-b px-4 py-2 text-left">Status</th>
                     <th className="border-b px-4 py-2 text-left">Action</th>
@@ -363,11 +365,16 @@ export default function Page() {
                       (bookingRemaining <= 0 ? "paid" : "partial");
 
                     return (
-                      <tr key={booking._id} className="border-b last:border-b-0">
+                      <tr
+                        key={booking._id}
+                        className="border-b last:border-b-0"
+                      >
                         <td className="px-4 py-3">
                           <div className="font-medium">{booking.eventName}</div>
                           <div className="text-xs text-muted-foreground">
-                            {booking.eventType ?? booking.theme ?? "Event booking"}
+                            {booking.eventType ??
+                              booking.theme ??
+                              "Event booking"}
                           </div>
                         </td>
                         <td className="px-4 py-3">
@@ -377,13 +384,22 @@ export default function Page() {
                         </td>
                         <td className="px-4 py-3">{booking.venue}</td>
                         <td className="px-4 py-3">
-                          ${Number(booking.totalAmount || 0).toLocaleString()}
+                          <span className="flex">
+                            <IndianRupee className="h-5 w-5 mt-1" />
+                            {Number(booking.totalAmount || 0).toLocaleString()}
+                          </span>
                         </td>
                         <td className="px-4 py-3">
-                          ${Number(booking.totalPaid || 0).toLocaleString()}
+                          <span className="flex">
+                            <IndianRupee className="h-5 w-5 mt-1" />
+                            {Number(booking.totalPaid || 0).toLocaleString()}
+                          </span>
                         </td>
                         <td className="px-4 py-3">
-                          ${Math.max(bookingRemaining, 0).toLocaleString()}
+                          <span className="flex">
+                            <IndianRupee className="h-5 w-5 mt-1" />
+                            {Math.max(bookingRemaining, 0).toLocaleString()}
+                          </span>
                         </td>
                         <td className="px-4 py-3">
                           <span
@@ -439,7 +455,8 @@ export default function Page() {
                     {Number(selectedBooking?.totalAmount ?? 0).toLocaleString()}
                   </div>
                   <div className="mb-2 text-sm text-gray-600">
-                    Paid: ${Number(selectedBooking?.totalPaid ?? 0).toLocaleString()}
+                    Paid: $
+                    {Number(selectedBooking?.totalPaid ?? 0).toLocaleString()}
                   </div>
                   <div className="mb-2 text-sm text-gray-600">
                     Remaining: ${Math.max(remainingAmount, 0).toLocaleString()}
@@ -493,7 +510,9 @@ export default function Page() {
                     className="rounded-xl bg-black px-4 py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-60"
                     disabled={paymentMutation.isPending}
                   >
-                    {paymentMutation.isPending ? "Opening Razorpay..." : "Pay with Razorpay"}
+                    {paymentMutation.isPending
+                      ? "Opening Razorpay..."
+                      : "Pay with Razorpay"}
                   </button>
                 </div>
               </form>

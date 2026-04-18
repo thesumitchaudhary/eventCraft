@@ -13,7 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Search } from "lucide-react";
+import { IndianRupee, Search } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Menu, ActionIcon } from "@mantine/core";
 import { EllipsisVertical } from "lucide-react";
@@ -167,7 +167,7 @@ export default function AdminBookingsPage() {
             </div>
           </div>
           <div className="grid auto-rows-4 gap-4 md:grid-cols-4">
-            <div className="rounded-md bg-muted/50 p-5 border-gary-200 border-l-6 border-l-[#6a7282]">
+            <div className="rounded-md bg-[#fefdfe]  p-5 border-gary-200 border-l-6 border-l-[#6a7282]">
               <div className="flex gap-1">
                 <h3>Pending</h3>
               </div>
@@ -179,7 +179,7 @@ export default function AdminBookingsPage() {
                 }
               </span>
             </div>
-            <div className="rounded-md bg-muted/50 p-5 border-gary-200 border-l-6 border-l-[#155dfc]">
+            <div className="rounded-md bg-[#fefdfe]  p-5 border-gary-200 border-l-6 border-l-[#155dfc]">
               <div className="flex gap-1">
                 <h3>Confirmed</h3>
               </div>
@@ -191,7 +191,7 @@ export default function AdminBookingsPage() {
                 }
               </span>
             </div>
-            <div className="rounded-md bg-muted/50 p-5 border-gary-200 border-l-6 border-l-[#fd0d0d]">
+            <div className="rounded-md bg-[#fefdfe]  p-5 border-gary-200 border-l-6 border-l-[#fd0d0d]">
               <div className="flex gap-1">
                 <h3>rejected</h3>
               </div>
@@ -203,7 +203,7 @@ export default function AdminBookingsPage() {
                 }
               </span>
             </div>
-            <div className="rounded-md bg-muted/50 p-5 border-gary-200 border-l-6 border-l-[#00a63e]">
+            <div className="rounded-md bg-[#fefdfe]  p-5 border-gary-200 border-l-6 border-l-[#00a63e]">
               <div className="flex gap-1">
                 <h3>Completed</h3>
               </div>
@@ -217,7 +217,7 @@ export default function AdminBookingsPage() {
             </div>
           </div>
 
-          <div className="min-h-[60vh] rounded-xl bg-muted/50 p-4">
+          <div className="min-h-[60vh] rounded-xl bg-[#fefdfe]  p-4">
             <div className="w-full overflow-x-auto">
               <table className="w-full my-4 border-collapse text-sm">
                 <thead>
@@ -256,7 +256,11 @@ export default function AdminBookingsPage() {
                         </td>
                         <td className="py-2 px-2">{booking.venue}</td>
                         <td className="py-2 px-2">{booking.guestCount}</td>
-                        <td className="py-2 px-2">{booking.totalAmount}</td>
+                        <td className="py-2 px-2">
+                          <span className="flex">
+                            <IndianRupee className="h-3 w-3 mt-1"/> {booking.totalAmount}
+                          </span>
+                        </td>
                         <td className="py-2 px-2">
                           <span className="bg-gray-800 text-white text-xs px-2 py-1 rounded">
                             {booking.paymentStatus}

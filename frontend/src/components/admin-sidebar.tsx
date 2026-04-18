@@ -5,7 +5,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import {
   Calendar,
-  DollarSign,
+  IndianRupee,
   ChartColumn,
   Palette,
   Shield,
@@ -85,7 +85,7 @@ const logoutAdmin = async () => {
 const data = {
   teams: [
     {
-      name: "Event Craft Admin",
+      name: "Event Craft",
       logo: Shield,
       plan: "Control Center",
     },
@@ -166,7 +166,7 @@ const data = {
     {
       title: "Revenue",
       url: "/admin/revenue",
-      icon: DollarSign,
+      icon: IndianRupee,
       items: [
         { title: "Invoices", url: "#" },
         { title: "Payouts", url: "#" },

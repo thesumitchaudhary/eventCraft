@@ -116,7 +116,7 @@ export default function AdminThemePage() {
             </div>
           </div>
 
-          <div className="min-h-[60vh] rounded-xl bg-muted/50 p-4">
+          <div className="min-h-[60vh] rounded-xl bg-[#fefdfe] p-4">
             <div className="w-full overflow-x-auto">
               <table className="w-full table-fixed border-collapse">
                 <thead className="  text-sm uppercase tracking-wide">

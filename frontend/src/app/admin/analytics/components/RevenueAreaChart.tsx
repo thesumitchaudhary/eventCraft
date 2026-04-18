@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import {IndianRupee} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { fetcher, type ShowBookingsResponse } from "./api";
 
@@ -84,11 +85,14 @@ export default function RevenueAreaChart() {
               tickLine={false}
               axisLine={false}
               tick={{ fill: "#475569", fontSize: 12 }}
-              tickFormatter={(value: number) => `$${value.toLocaleString()}`}
+              tickFormatter={(value: number) => `₹ ${value.toLocaleString()}`}
             />
             <Tooltip
               formatter={(value) => [
-                `$${Number(value ?? 0).toLocaleString()}`,
+                <span className="inline-flex items-center gap-1">
+                  <IndianRupee className="h-3.5 w-3.5" />
+                  {Number(value ?? 0).toLocaleString()}
+                </span>,
                 "Revenue",
               ]}
             />
@@ -99,7 +103,7 @@ export default function RevenueAreaChart() {
               stroke="#0284c7"
               strokeWidth={2}
               fill="url(#revenueGradient)"
-              name="Revenue ($)"
+              name="Revenue (INR)"
               dot={false}
             />
           </AreaChart>

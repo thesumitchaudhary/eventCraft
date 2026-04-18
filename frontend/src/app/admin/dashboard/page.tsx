@@ -13,7 +13,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Users, Calendar, CircleUser, DollarSign } from "lucide-react";
+import { Users, Calendar, CircleUser, IndianRupee } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 type BookingEvent = {
@@ -150,14 +150,14 @@ export default function AdminDashboardPage() {
 
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <div className="grid auto-rows-4 gap-4 md:grid-cols-4">
-            <div className="rounded-xl bg-muted/50 p-5">
+            <div className="rounded-xl bg-[#fefdfe]  p-5">
               <div className="flex gap-1">
                 <Users className="h-4 w-4" />
                 <h3>Total Customers</h3>
               </div>
               <span> {data?.customers.length}</span>
             </div>
-            <div className="rounded-xl bg-muted/50 p-5">
+            <div className="rounded-xl bg-[#fefdfe]  p-5">
               <div className="flex gap-1">
                 <Calendar className="h-4 w-4" />
                 <h3>Active Bookings</h3>
@@ -168,24 +168,26 @@ export default function AdminDashboardPage() {
                   ?.reduce((total, totalcustomer) => total + totalcustomer, 0)}
               </span>
             </div>
-            <div className="rounded-xl bg-muted/50 p-5">
+            <div className="rounded-xl bg-[#fefdfe]  p-5">
               <div className="flex gap-1">
                 <CircleUser className="h-4 w-4" />
                 <h3>Total Employees</h3>
               </div>
               <span>{employees.length}</span>
             </div>
-            <div className="rounded-xl bg-muted/50 p-5">
+            <div className="rounded-xl bg-[#fefdfe]  p-5">
               <div className="flex gap-1">
-                <DollarSign className="h-4 w-4" />
+                <IndianRupee className="h-4 w-4 mt-1" />
                 <h3>Total Revenue</h3>
               </div>
-              <span>${paidByCustomer}</span>
+              <span className="flex">
+                <IndianRupee className="h-5 w-5 mt-1" /> {paidByCustomer}
+              </span>
             </div>
           </div>
 
           <div className="grid auto-rows-4 gap-4 md:grid-cols-2">
-            <div className="rounded-xl bg-muted/50 p-5">
+            <div className="rounded-xl bg-[#fefdfe]  p-5">
               <div>
                 <h4>Task Distribution</h4>
                 <p>Overview of task status</p>
@@ -224,34 +226,43 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             </div>
-            <div className="rounded-xl bg-muted/50 p-5">
+            <div className="rounded-xl bg-[#fefdfe]  p-5">
               <div>
                 <h4>Revenue Summary</h4>
                 <p>Payment status overview</p>
                 <div className="grid grid-rows-3 gap-3 mt-3">
                   <div className="flex justify-between">
                     <p>Total Received</p>
-                    <p>   ${paidByCustomer} </p>
+                    <div className="flex">
+                      <IndianRupee className="h-5 w-5 mt-1" />
+                      {paidByCustomer}
+                    </div>
                   </div>
                   <div className="flex justify-between">
                     <p>Pending Amount</p>
-                    <p>  ${remaining} </p>
+                    <div className="flex">
+                      <IndianRupee className="h-5 w-5 mt-1" />
+                      {remaining}
+                    </div>
                   </div>
                   <div className="flex justify-between">
                     <p>Total Expected</p>
-                    <p>  ${totalRevenue?.toLocaleString() || 0} </p>
+                    <div className="flex">
+                      <IndianRupee className="h-5 w-5 mt-1" />
+                      {totalRevenue?.toLocaleString() || 0}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 p-5 md:min-h-min">
+          <div className="min-h-[100vh] flex-1 rounded-xl bg-[#fefdfe] p-5 md:min-h-min">
             <div>
               <h4> Recent Bookings</h4>
               <p>Latest event bookings</p>
             </div>
-             <table className="w-full my-3 border-collapse">
+            <table className="w-full my-3 border-collapse p-1">
               <thead>
                 <tr className="border-b-2 border-black text-left">
                   <th className="py-2">Event Name</th>
@@ -281,7 +292,12 @@ export default function AdminDashboardPage() {
                           {data?.progress !== 0 ? "in-progress" : "pending"}
                         </span>
                       </td>
-                      <td className="border-b p-1">${data?.totalAmount}</td>
+                      <td className="border-b p-1">
+                        <span className="flex">
+                          <IndianRupee className="h-5 w-5 mt-1" />{" "}
+                          {data?.totalAmount}
+                        </span>
+                      </td>
                     </tr>
                   )),
                 )}

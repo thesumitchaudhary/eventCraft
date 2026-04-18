@@ -14,6 +14,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import {IndianRupee} from "lucide-react"
 import { useQuery } from "@tanstack/react-query";
 
 const API_URL_ADMIN = import.meta.env.VITE_ADMIN_BACKEND_URL;
@@ -82,8 +83,8 @@ export default function Page() {
                     <p>{theme.themeType}</p>
                   </div>
                   <div className="mt-4 flex flex-col gap-2">
-                    <h3 className="text-2xl font-bold text-purple-600">
-                      {theme.themePrice}
+                    <h3 className="text-2xl font-bold text-purple-600 flex ">
+                      <IndianRupee className="h-5 w-5 mt-1" /> {theme.themePrice}
                     </h3>
                     <p>Base package price</p>
                   </div>

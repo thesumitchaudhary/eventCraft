@@ -308,6 +308,7 @@ export function ProfileEditorAdmin({ onSaved, closeModal }: ProfileEditorAdminPr
   const handleRetake = () => {
     setCameraError("");
     setImageDraft(null);
+    void startCamera();
   };
 
   return (
@@ -316,13 +317,6 @@ export function ProfileEditorAdmin({ onSaved, closeModal }: ProfileEditorAdminPr
         <div className="mx-auto flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-gray-100">
           {isLoading ? (
             <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
-          ) : imagePreview ? (
-            <img
-              src={imagePreview}
-              alt="Profile"
-              className="h-full w-full object-cover"
-              onError={() => setImageDraft(null)}
-            />
           ) : isCameraOpen ? (
             <video
               ref={videoRef}
@@ -332,6 +326,13 @@ export function ProfileEditorAdmin({ onSaved, closeModal }: ProfileEditorAdminPr
               onLoadedMetadata={() => setIsVideoReady(true)}
               onCanPlay={() => setIsVideoReady(true)}
               className="h-full w-full object-cover"
+            />
+          ) : imagePreview ? (
+            <img
+              src={imagePreview}
+              alt="Profile"
+              className="h-full w-full object-cover"
+              onError={() => setImageDraft(null)}
             />
           ) : (
             <span className="text-center text-xs text-gray-400">No image</span>

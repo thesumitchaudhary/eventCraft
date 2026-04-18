@@ -15,6 +15,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import {IndianRupee} from "lucide-react"
 import { useQuery } from "@tanstack/react-query";
 
 const API_INDEX_BASE_URL = import.meta.env.VITE_INDEX_BACKEND_URL;
@@ -82,8 +83,8 @@ export default function Page() {
             </div>
             <div className="rounded-xl bg-muted/50 p-10">
               <h3>Total Spent</h3>
-              <span>
-                {data?.events.reduce(
+              <span className="flex gap-1">
+                <IndianRupee className="h-5 w-5 mt-1" /> {data?.events.reduce(
                   (total, event) => total + event.totalPaid,
                   0,
                 )}

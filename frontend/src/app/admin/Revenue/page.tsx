@@ -29,7 +29,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import { FileText, TrendingUp, DollarSign } from "lucide-react";
+import { FileText, TrendingUp, DollarSign, IndianRupee } from "lucide-react";
 
 type EventDetail = {
   _id?: string;
@@ -140,22 +140,34 @@ export default function AdminThemePage() {
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-xl bg-muted/50 p-5">
-              <p className="text-sm text-muted-foreground">Total revenue</p>
-              <h3 className="mt-2 text-2xl font-semibold">
-                ${grossRevenue.toLocaleString()}
+            <div className="rounded-xl bg-[#fefdfe] p-5  border border-gray-300 border-l-6 border-l-[#00a63e]">
+              <p className="flex">
+                <IndianRupee className="text-[#00a63e] h-4 w-4 mt-2" />
+                Total Revenue
+              </p>
+              <h3 className="font-semibold text-2xl text-[#00a63e]">
+                <span className="flex">
+                  <IndianRupee className="text-[#00a63e] mt-1" />{" "}
+                  {paidByCustomer}
+                </span>
               </h3>
             </div>
-            <div className="rounded-xl bg-muted/50 p-5">
-              <p className="text-sm text-muted-foreground">   Pending Amount</p>
-              <h3 className="mt-2 text-2xl font-semibold">
-                ${topCategory?.revenue?.toLocaleString() ?? 0}
+            <div className="rounded-xl bg-[#fefdfe] p-5 border border-gray-300 border-l-6 border-l-[#f54a00] ">
+              <p className="flex gap-1">
+                <TrendingUp className="text-[#f54a00] h-5 w-5 mt-1" />
+                Pending Amount
+              </p>
+              <h3 className="font-semibold text-2xl flex text-[#f54a00]">
+                <IndianRupee className="text-[#f54a00] mt-1" /> {remaining}
               </h3>
             </div>
-            <div className="rounded-xl bg-muted/50 p-5">
-              <p className="text-sm text-muted-foreground">Total Expected</p>
-              <h3 className="mt-2 text-2xl font-semibold">
-                ${remaining.toLocaleString()}
+            <div className="rounded-xl bg-[#fefdfe] p-5 border border-gray-300 border-l-6 border-l-[#155dfc] ">
+              <p className="flex gap-1">
+                <FileText className="text-[#155dfc] h-5 w-5 mt-1" />
+                Total Expected
+              </p>
+              <h3 className="font-semibold text-2xl text-[#155dfc] flex ">
+                <IndianRupee className="text-[#155dfc] mt-1" /> {totalRevenue}
               </h3>
             </div>
           </div>
@@ -171,7 +183,7 @@ export default function AdminThemePage() {
               <p className="text-sm text-destructive">{error.message}</p>
             </div>
           ) : (
-            <div className="rounded-xl border border-border bg-background p-6 shadow-sm">
+            <div className="rounded-xl border border-border bg-[#fefdfe] p-6 shadow-sm">
               <div className="mb-6">
                 <h2 className="text-lg font-semibold">Revenue by Event Type</h2>
                 <p className="text-sm text-muted-foreground">
@@ -199,36 +211,7 @@ export default function AdminThemePage() {
             </div>
           )}
           <div className="gap-4 md:grid-cols-4 bg-muted/70">
-            <div>
-              <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#00a63e]">
-                <p className="flex">
-                  <DollarSign className="text-[#00a63e]" />
-                  Total Revenue
-                </p>
-                <h3 className="font-semibold text-2xl text-[#00a63e]">
-                  $ {paidByCustomer}
-                </h3>
-              </div>
-              <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#f54a00]">
-                <p className="flex gap-1">
-                  <TrendingUp className="text-[#f54a00]" />
-                  Pending Amount
-                </p>
-                <h3 className="font-semibold text-2xl text-[#f54a00]">
-                  $ {remaining}
-                </h3>
-              </div>
-              <div className="bg-gray-50 min-w-98 p-7 rounded-2xl border border-gray-300 border-l-6 border-l-[#155dfc]">
-                <p className="flex gap-1">
-                  <FileText className="text-[#155dfc]" />
-                  Total Expected
-                </p>
-                <h3 className="font-semibold text-2xl text-[#155dfc]">
-                  $ {totalRevenue}
-                </h3>
-              </div>
-            </div>
-            <div className="bg-gray-50 p-5 rounded-2xl">
+            <div className="bg-[#fefdfe] p-5 rounded-2xl">
               <h3 className="text-2xl font-bold">Payment Details</h3>
               <p>All bookings with payment information</p>
               <table className="w-full my-3 border-collapse">
@@ -264,14 +247,22 @@ export default function AdminThemePage() {
                           <td className="border-b p-1">
                             {event?.eventType ?? "N/A"}
                           </td>
-                          <td className="border-b p-1">${totalAmount}</td>
                           <td className="border-b p-1">
-                            <span className="text-[#00a63e] font-bold">
+                            <span className="flex gap-1">
+                              {" "}
+                              <IndianRupee className="h-4 w-4 mt-1" />{" "}
+                              {totalAmount}{" "}
+                            </span>
+                          </td>
+                          <td className="border-b p-1">
+                            <span className="text-[#00a63e] font-bold flex">
+                              <IndianRupee className="h-4 w-4 mt-1" />{" "}
                               {event?.totalPaid ?? 0}
                             </span>
                           </td>
                           <td className="border-b p-1">
-                            <span className="text-[#f54a00] font-bold">
+                            <span className="text-[#f54a00] font-bold flex">
+                              <IndianRupee className="h-4 w-4 mt-1" />{" "}
                               {totalAmount - Number(event?.totalPaid || 0)}
                             </span>
                           </td>

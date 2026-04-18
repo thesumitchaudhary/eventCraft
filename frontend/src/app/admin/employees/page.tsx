@@ -107,13 +107,13 @@ export default function AdminThemePage() {
             </div>
           </div>
           <div className="grid auto-rows-4 gap-4 md:grid-cols-3">
-            <div className="rounded-xl bg-muted/50 p-5">
+            <div className="rounded-xl bg-[#fefdfe] p-5">
               <div className="flex gap-1">
                 <h3>Total Employees</h3>
               </div>
               <span>{employees.length}</span>
             </div>
-            <div className="rounded-xl bg-muted/50 p-5">
+            <div className="rounded-xl bg-[#fefdfe] p-5">
               <div className="flex gap-1">
                 <h3>Active Tasks</h3>
               </div>
@@ -125,7 +125,7 @@ export default function AdminThemePage() {
                 }
               </span>
             </div>
-            <div className="rounded-xl bg-muted/50 p-5">
+            <div className="rounded-xl bg-[#fefdfe] p-5">
               <div className="flex gap-1">
                 <h3>Completed Tasks</h3>
               </div>
@@ -139,7 +139,7 @@ export default function AdminThemePage() {
             </div>
           </div>
 
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 p-5 md:min-h-min">
+          <div className="min-h-[100vh] flex-1 rounded-xl bg-[#fefdfe] p-5 md:min-h-min">
             <table className="w-full my-3 border-collapse">
               <thead>
                 <tr className="border-b-2 border-black text-left">

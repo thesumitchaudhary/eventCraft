@@ -121,8 +121,8 @@ export default function AdminThemePage() {
               />
             </div>
           </div>
-          <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 p-5 md:min-h-min">
-            <table className="w-full bg-white">
+          <div className="min-h-[100vh] flex-1 rounded-xl bg-[#fefdfe] p-5 md:min-h-min">
+            <table className="w-full">
               <thead>
                 <tr className="border-b">
                   <th className="px-4 py-2 text-left">Name</th>
