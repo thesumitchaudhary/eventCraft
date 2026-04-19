@@ -23,18 +23,39 @@ dotenv.config();
 const PORT = process.env.PORT;
 const MONGO_CONNECT_URL = process.env.MONGO_URI;
 
+const defaultAllowedOrigins = [
+    "http://localhost:5173",
+    "https://eventcraft-frontend.onrender.com",
+    "https://eventcraft-1-lo3t.onrender.com",
+];
+
+const envAllowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+const allowedOrigins = [...new Set([...defaultAllowedOrigins, ...envAllowedOrigins])];
+
+const corsOriginHandler = (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+    }
+
+    callback(new Error(`Not allowed by CORS: ${origin}`));
+};
+
+const corsOptions = {
+    origin: corsOriginHandler,
+    credentials: true,
+};
+
 const app = express();
 const server = http.createServer(app);
 
 // ================= SOCKET.IO SETUP =================
 const io = new Server(server, {
-    cors: {
-        origin: [
-            "http://localhost:5173",
-            "https://eventcraft-frontend.onrender.com"
-        ],
-        credentials: true,
-    },
+    cors: corsOptions,
 });
 
 // ================= MEMORY STORE =================
@@ -174,21 +195,8 @@ io.on("connection", (socket) => {
 // ================= EXPRESS MIDDLEWARE =================
 app.use(express.json({ limit: "8mb" }));
 app.use(express.urlencoded({ extended: true, limit: "8mb" }));
-const allowedOrigins = [
-    "http://localhost:5173",
-    "https://eventcraft-frontend.onrender.com"
-];
-
-app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
-    credentials: true
-}));
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(cookieParser());
 app.disable("etag");
 

@@ -14,6 +14,21 @@ import sendMail from "../helpers/sendVerificationMail.js"
 
 // this is link with customer routes
 
+const isProduction = process.env.NODE_ENV === "production";
+
+const getAuthCookieOptions = (maxAge) => ({
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge,
+});
+
+const clearAuthCookieOptions = {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+};
+
 export const register = async (req, res) => {
     try {
         const { firstname, lastname, email, password, phone } = req.body;
@@ -53,12 +68,7 @@ export const register = async (req, res) => {
             { expiresIn: "7d" }
         );
 
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "Strict",
-            maxAge: 1 * 24 * 60 * 60 * 1000, // 1 days
-        });
+        res.cookie("token", token, getAuthCookieOptions(1 * 24 * 60 * 60 * 1000));
         await SendVerificationCode(email, verificationCode);
 
         if (user.role === "customer") {
@@ -153,12 +163,7 @@ export const login = async (req, res) => {
             { expiresIn: "7d" }
         );
 
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "Strict",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie("token", token, getAuthCookieOptions(7 * 24 * 60 * 60 * 1000));
 
         return res.status(200).json({
             success: true,
@@ -183,7 +188,7 @@ export const login = async (req, res) => {
 
 // this is link with customer routes
 export const logout = (req, res) => {
-    res.clearCookie("token");
+    res.clearCookie("token", clearAuthCookieOptions);
     return res.status(200).json({
         success: true,
         message: "Customer logged out successfully",
@@ -231,11 +236,7 @@ export const adminLogin = async (req, res) => {
             { expiresIn: "1d" }
         );
 
-        res.cookie("token", token, {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: process.env.NODE_ENV === "production"
-        });
+        res.cookie("token", token, getAuthCookieOptions(1 * 24 * 60 * 60 * 1000));
 
         return res.status(200).json({
             message: "Admin login successful",
@@ -250,7 +251,7 @@ export const adminLogin = async (req, res) => {
 // this is link with admin routes
 
 export const adminLogout = (req, res) => {
-    res.clearCookie("token");
+    res.clearCookie("token", clearAuthCookieOptions);
     return res.status(200).json({
         success: true,
         message: "Admin logged out successfully",
@@ -300,7 +301,7 @@ export const employeesCreate = async (req, res) => {
                         process.env.JWT_SECRET,
                         { expiresIn: "7d" }
                     );
-                    res.cookie("token", token);
+                    res.cookie("token", token, getAuthCookieOptions(7 * 24 * 60 * 60 * 1000));
                     res.json(userCreated);
                 } catch (createError) {
                     res.status(400).json({ error: createError.message });
@@ -344,7 +345,7 @@ export const employeeLogin = async (req, res) => {
                 process.env.JWT_SECRET,
                 { expiresIn: "7d" }
             );
-            res.cookie("token", token);
+            res.cookie("token", token, getAuthCookieOptions(7 * 24 * 60 * 60 * 1000));
             return res.json({
                 message: "employee is login successfully",
                 token,
@@ -358,7 +359,7 @@ export const employeeLogin = async (req, res) => {
 
 
 export const employeeLogout = (req, res) => {
-    res.clearCookie("token");
+    res.clearCookie("token", clearAuthCookieOptions);
     return res.status(200).json({
         success: true,
         message: "Employee logged out successfully",
