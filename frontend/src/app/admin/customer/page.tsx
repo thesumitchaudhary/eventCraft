@@ -30,7 +30,7 @@ interface Customer {
   userId?: CustomerUser;
   phone?: string;
   address?: string;
-  bookings?: unknown[];
+  events?: unknown[];
 }
 
 interface ShowCustomer {
