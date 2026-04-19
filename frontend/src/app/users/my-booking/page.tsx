@@ -22,7 +22,7 @@ const INDEX_BACKEND_API_URL = import.meta.env.VITE_INDEX_BACKEND_URL;
 const ADMIN_API_URL = import.meta.env.VITE_ADMIN_BACKEND_URL;
 const API_URL = import.meta.env.VITE_BACKEND_URL;
 
-console.log(`${API_URL}/index/createEvent`)
+// console.log(`${API_URL}/index/createEvent`)
 
 interface Booking {
   _id: string;

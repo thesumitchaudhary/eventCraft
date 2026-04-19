@@ -62,6 +62,8 @@ export default function AdminThemePage() {
       fetcher<ShowCustomer>(`${API_ADMIN_BACKEND_URL}/showBookedEvent`),
   });
 
+  console.log(data?.customers)
+// console.log(`${API_ADMIN_BACKEND_URL}/showBookedEvent`)
   const filteredCustomers = useMemo(() => {
     const customers = data?.customers ?? [];
     const keyword = searchTerm.trim().toLowerCase();
@@ -173,7 +175,7 @@ export default function AdminThemePage() {
 
                       <td>
                         <span className="bg-black mx-5 rounded-md px-2 py-1 text-white">
-                          {customer?.bookings?.length ?? 0}
+                          {customer?.events?.length ?? 0}
                         </span>
                       </td>
                     </tr>

@@ -1,5 +1,5 @@
 import "./App.css";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 // this is main dashboard of the website
 import LandingPage from "./mainLandingPages/Dashboard";
@@ -40,6 +40,9 @@ function App() {
       <Route path="/feedBack" element={<FeedBack />} />
       <Route path="/Gallery" element={<Gallery />} />
       <Route path="/FAQ" element={<FAQ />} />
+      <Route path="/feedback" element={<FeedBack />} />
+      <Route path="/gallery" element={<Gallery />} />
+      <Route path="/faq" element={<FAQ />} />
 
       {/* auth (same UI, role decided by route) */}
       <Route path="/login" element={<AuthModal />} />
@@ -67,6 +70,7 @@ function App() {
         element={<EmployeeInProgressPage />}
       />
       <Route path="/employee/completed" element={<EmployeeCompletedPage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
