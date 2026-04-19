@@ -25,8 +25,7 @@ const MONGO_CONNECT_URL = process.env.MONGO_URI;
 
 const defaultAllowedOrigins = [
     "http://localhost:5173",
-    "https://eventcraft-frontend.onrender.com",
-    "https://eventcraft-1-lo3t.onrender.com",
+    "https://eventcraft-1-nffh.onrender.com",
 ];
 
 const envAllowedOrigins = (process.env.CORS_ALLOWED_ORIGINS || "")
