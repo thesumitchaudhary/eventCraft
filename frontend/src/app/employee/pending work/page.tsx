@@ -50,6 +50,8 @@ interface EmployeeTaskResponse {
   message?: string;
 }
 
+const API_EMPLOYEE_BACKEND_URL = import.meta.env.VITE_EMPLOYEE_BACKEND_URL;
+
 type ApiError = Error & { status?: number };
 
 const fetcher = async <T,>(url: string): Promise<T> => {
@@ -94,7 +96,7 @@ export default function Page() {
     queryKey: ["employee-my-task"],
     queryFn: () =>
       fetcher<EmployeeTaskResponse>(
-        "http://localhost:4041/api/employee/myTask",
+        `${API_EMPLOYEE_BACKEND_URL}/myTask`,
       ),
   });
 

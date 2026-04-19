@@ -20,6 +20,8 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import AddEmployeeModal from "@/components/add-employee";
 
+const API_EMPLOYEE_BACKEND_URL = import.meta.env.VITE_EMPLOYEE_BACKEND_URL;
+
 const fetcher = async (url) => {
   const res = await fetch(url, { credentials: "include" });
 
@@ -37,7 +39,7 @@ export default function AdminThemePage() {
 
   const { data } = useQuery({
     queryKey: ["showemployee"],
-    queryFn: () => fetcher("http://localhost:4041/api/employee/findEmployee"),
+    queryFn: () => fetcher(`${API_EMPLOYEE_BACKEND_URL}/findEmployee`),
   });
 
   // normalize response safely

@@ -38,6 +38,8 @@ type EmployeeTaskResponse = {
   message?: string;
 };
 
+const API_EMPLOYEE_BACKEND_URL = import.meta.env.VITE_EMPLOYEE_BACKEND_URL;
+
 const fetcher = async (url: string): Promise<EmployeeTaskResponse> => {
   const res = await fetch(url, { credentials: "include" });
   const body: EmployeeTaskResponse = await res.json();
@@ -52,7 +54,7 @@ const fetcher = async (url: string): Promise<EmployeeTaskResponse> => {
 export default function Page() {
   const { data } = useQuery<EmployeeTaskResponse>({
     queryKey: ["employee-my-task"],
-    queryFn: () => fetcher("http://localhost:4041/api/employee/myTask"),
+    queryFn: () => fetcher(`${API_EMPLOYEE_BACKEND_URL}/myTask`),
   });
 
   const tasks = data?.employee?.tasks ?? [];

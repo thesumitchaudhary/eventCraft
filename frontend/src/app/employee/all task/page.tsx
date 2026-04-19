@@ -45,6 +45,8 @@ interface EmployeeTasksResponse {
   message?: string;
 }
 
+const API_EMPLOYEE_BACKEND_URL = import.meta.env.VITE_EMPLOYEE_BACKEND_URL;
+
 const fetcher = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url, { credentials: "include" });
 
@@ -65,7 +67,7 @@ export default function AdminDashboardPage() {
     queryKey: ["employee-my-task"],
     queryFn: () =>
       fetcher<EmployeeTasksResponse>(
-        "http://localhost:4041/api/employee/myTask",
+        `${API_EMPLOYEE_BACKEND_URL}/myTask`,
       ),
   });
 

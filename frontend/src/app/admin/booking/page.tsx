@@ -19,6 +19,7 @@ import { Menu, ActionIcon } from "@mantine/core";
 import { EllipsisVertical } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_BACKEND_URL;
+const API_ADMIN_BACKEND_URL = import.meta.env.VITE_ADMIN_BACKEND_URL;
 
 type BookingStatus =
   | "requested"
@@ -97,7 +98,7 @@ export default function AdminBookingsPage() {
     queryKey: ["showbookings"],
     queryFn: async () =>
       await fetcher<ShowBookingsResponse>(
-        "http://localhost:4041/api/admin/showBookedEvent",
+        `${API_ADMIN_BACKEND_URL}/showBookedEvent`,
       ),
   });
 

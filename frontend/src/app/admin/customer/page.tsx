@@ -37,6 +37,8 @@ interface ShowCustomer {
   customers?: Customer[];
 }
 
+const API_ADMIN_BACKEND_URL = import.meta.env.VITE_ADMIN_BACKEND_URL;
+
 const fetcher = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url, {
     credentials: "include",
@@ -57,7 +59,7 @@ export default function AdminThemePage() {
   const { data, isLoading } = useQuery<ShowCustomer>({
     queryKey: ["showbookings"],
     queryFn: () =>
-      fetcher<ShowCustomer>("http://localhost:4041/api/admin/showBookedEvent"),
+      fetcher<ShowCustomer>(`${API_ADMIN_BACKEND_URL}/showBookedEvent`),
   });
 
   const filteredCustomers = useMemo(() => {

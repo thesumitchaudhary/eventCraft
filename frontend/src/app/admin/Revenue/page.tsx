@@ -49,6 +49,8 @@ type ShowBookingsResponse = {
   customers?: BookingCustomer[];
 };
 
+const API_ADMIN_BACKEND_URL = import.meta.env.VITE_ADMIN_BACKEND_URL;
+
 const fetcher = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url, { credentials: "include" });
   const body: T & { message?: string } = await res.json();
@@ -69,7 +71,7 @@ export default function AdminThemePage() {
     queryKey: ["showbookings"],
     queryFn: () =>
       fetcher<ShowBookingsResponse>(
-        "http://localhost:4041/api/admin/showBookedEvent",
+        `${API_ADMIN_BACKEND_URL}/showBookedEvent`,
       ),
   });
 

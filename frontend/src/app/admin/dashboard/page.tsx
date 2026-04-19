@@ -56,6 +56,9 @@ type EmployeeResponse = {
   details?: EmployeeDetail[];
 };
 
+const API_ADMIN_BACKEND_URL = import.meta.env.VITE_ADMIN_BACKEND_URL;
+const API_EMPLOYEE_BACKEND_URL = import.meta.env.VITE_EMPLOYEE_BACKEND_URL;
+
 const fetcher = async <T,>(url: string): Promise<T> => {
   const res = await fetch(url, { credentials: "include" });
 
@@ -73,7 +76,7 @@ export default function AdminDashboardPage() {
     queryKey: ["showbookings"],
     queryFn: () =>
       fetcher<BookingResponse>(
-        "http://localhost:4041/api/admin/showBookedEvent",
+        `${API_ADMIN_BACKEND_URL}/showBookedEvent`,
       ),
   });
 
@@ -100,7 +103,7 @@ export default function AdminDashboardPage() {
     queryKey: ["showemployee"],
     queryFn: () =>
       fetcher<EmployeeResponse>(
-        "http://localhost:4041/api/employee/findEmployee",
+        `${API_EMPLOYEE_BACKEND_URL}/findEmployee`,
       ),
   });
 

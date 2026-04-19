@@ -39,7 +39,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-const EMPLOYEE_API_URL = "http://localhost:4041/api/employee";
+const EMPLOYEE_API_URL = import.meta.env.VITE_EMPLOYEE_BACKEND_URL;
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const sidebarData = {

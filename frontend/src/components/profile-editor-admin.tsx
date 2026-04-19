@@ -44,7 +44,7 @@ type ProfileEditorAdminProps = {
   closeModal?: () => void;
 };
 
-const ADMIN_API_URL = "http://localhost:4041/api/admin";
+const ADMIN_API_URL = import.meta.env.VITE_ADMIN_BACKEND_URL;
 
 const fetchMe = async (): Promise<AdminMeResponse> => {
   const res = await fetch(`${ADMIN_API_URL}/me`, {
