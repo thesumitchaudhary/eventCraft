@@ -17,7 +17,7 @@ export const SendVerificationCode = async (email, verificationCode) => {
             html,
         });
 
-        console.log("Email sent successfully", response);
+        // console.log("Email sent successfully", response);
     } catch (error) {
         console.log("Error sending verification", error);
         throw new Error(`Error sending verification email: ${error}`);
@@ -43,7 +43,7 @@ export const WellcomeEmail = async (email, firstname, lastname) => {
             html,
         });
 
-        console.log("Email send Successfully", response);
+        // console.log("Email send Successfully", response);
     } catch (error) {
         console.log("Email Error", error);
     }
@@ -87,7 +87,7 @@ export const SendEventBookingMail = async (
             html,
         });
 
-        console.log("Event booking email sent successfully", response);
+        // console.log("Event booking email sent successfully", response);
     } catch (error) {
         console.log("Email Error", error);
     }

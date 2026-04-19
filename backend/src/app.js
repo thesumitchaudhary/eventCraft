@@ -131,7 +131,7 @@ io.on("connection", (socket) => {
                 }
             }
 
-            console.log(`${role} joined ticket ${ticketId}`);
+            // console.log(`${role} joined ticket ${ticketId}`);
         } catch (err) {
             console.error(err);
         }
@@ -174,7 +174,7 @@ io.on("connection", (socket) => {
                 });
             });
 
-            console.log("Ticket escalated:", ticketId);
+            // console.log("Ticket escalated:", ticketId);
         } catch (err) {
             console.error(err);
         }
