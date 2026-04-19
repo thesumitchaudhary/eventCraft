@@ -1,10 +1,11 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { Context } from "../context/Context";
 import { TextInput } from "@mantine/core";
 import { syncSocketAuth } from "../socket-connection/socket";
 import { Button } from "../components/ui/button";
+import { API_BASE_URL } from "../lib/backend-url";
 
 type LoginPayload = {
   email: string;
@@ -16,11 +17,6 @@ type LoginResponse = {
   token?: string;
   role?: string;
 };
-
-const rawApiBaseUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4041/api";
-const API_BASE_URL = rawApiBaseUrl.replace(/\/$/, "").endsWith("/api")
-  ? rawApiBaseUrl.replace(/\/$/, "")
-  : `${rawApiBaseUrl.replace(/\/$/, "")}/api`;
 
 const loginUser = async ({
   email,

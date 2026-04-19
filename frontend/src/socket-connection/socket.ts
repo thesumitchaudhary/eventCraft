@@ -1,12 +1,7 @@
 import { io } from "socket.io-client";
+import { SOCKET_BASE_URL } from "../lib/backend-url";
 
-const rawApiBaseUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:4041/api";
-const normalizedApiBaseUrl = rawApiBaseUrl.replace(/\/$/, "").endsWith("/api")
-  ? rawApiBaseUrl.replace(/\/$/, "")
-  : `${rawApiBaseUrl.replace(/\/$/, "")}/api`;
-const socketBaseUrl = normalizedApiBaseUrl.replace(/\/api$/, "");
-
-const socket = io(socketBaseUrl, {
+const socket = io(SOCKET_BASE_URL, {
   transports: ["websocket"],
   withCredentials: true,
   auth: {

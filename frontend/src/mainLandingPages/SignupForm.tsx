@@ -5,8 +5,7 @@ import { TextInput } from "@mantine/core";
 
 import { Context } from "../context/Context";
 import { Button } from "../components/ui/button";
-
-const API_URL = import.meta.env.VITE_CUSTOMER_BACKEND_URL;
+import { CUSTOMER_API_URL } from "../lib/backend-url";
 
 type CreateUserPayload = {
   firstname: string;
@@ -28,7 +27,7 @@ const userCreate = async ({
   phone,
 }: CreateUserPayload) => {
   try {
-    const response = await fetch(`${API_URL}/create`, {
+    const response = await fetch(`${CUSTOMER_API_URL}/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +46,7 @@ const userCreate = async ({
 
 const verifyCode = async ({ code }: VerifyCodePayload) => {
   try {
-    const res = await fetch(`${API_URL}/verifyEmail`, {
+    const res = await fetch(`${CUSTOMER_API_URL}/verifyEmail`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
