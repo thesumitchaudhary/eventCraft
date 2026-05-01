@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button, Select, TextInput } from "@mantine/core";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, X } from "lucide-react";
+import { IndianRupee, Plus, X } from "lucide-react";
 import { EventContext } from "../../../context/EventContext";
 
 const INDEX_BACKEND_API_URL = import.meta.env.VITE_INDEX_BACKEND_URL;
@@ -250,7 +250,10 @@ type EventRegistrationModalProps = {
   onSuccess: () => void;
 };
 
-function EventRegistrationModal({ close, onSuccess }: EventRegistrationModalProps) {
+function EventRegistrationModal({
+  close,
+  onSuccess,
+}: EventRegistrationModalProps) {
   const {
     eventName,
     setEventName,
@@ -292,7 +295,12 @@ function EventRegistrationModal({ close, onSuccess }: EventRegistrationModalProp
   const floatingEventType = focusedEventType || eventType?.length > 0;
   const floatingSelectTheme = focusedSelectTheme || selectTheme?.length > 0;
 
-  const { data: themesData = [], isPending, isError, error } = useQuery({
+  const {
+    data: themesData = [],
+    isPending,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["eventThemesDetails", ADMIN_API_URL],
     enabled: Boolean(ADMIN_API_URL),
     queryFn: () => fetchThemes(`${ADMIN_API_URL}/getAllEventTheme`),
@@ -393,10 +401,15 @@ function EventRegistrationModal({ close, onSuccess }: EventRegistrationModalProp
       >
         <div className="mb-6 flex items-start justify-between">
           <div>
-            <h3 id="event-booking-dialog-title" className="text-lg font-semibold text-gray-800">
+            <h3
+              id="event-booking-dialog-title"
+              className="text-lg font-semibold text-gray-800"
+            >
               Create New Event Booking
             </h3>
-            <p className="text-sm text-gray-500">Fill in the details for your event</p>
+            <p className="text-sm text-gray-500">
+              Fill in the details for your event
+            </p>
           </div>
 
           <button
@@ -578,7 +591,9 @@ function EventRegistrationModal({ close, onSuccess }: EventRegistrationModalProp
                 loading={createEventMutation.isPending}
                 className="border border-black"
               >
-                {createEventMutation.isPending ? "Booking..." : "Create Booking"}
+                {createEventMutation.isPending
+                  ? "Booking..."
+                  : "Create Booking"}
               </Button>
             </div>
           </div>
@@ -598,7 +613,8 @@ export default function Page() {
   const [paymentAmount, setPaymentAmount] = useState("");
   const [focusedPaymentAmount, setFocusedPaymentAmount] = useState(false);
 
-  const floatingPaymentAmount = focusedPaymentAmount || paymentAmount.length > 0;
+  const floatingPaymentAmount =
+    focusedPaymentAmount || paymentAmount.length > 0;
 
   const handleOpenPaymentModal = (bookingId: string) => {
     setSelectedBookingId(bookingId);
@@ -789,7 +805,12 @@ export default function Page() {
                   </div>
                   <div>
                     <span>Budgets</span>
-                    <p>{booking.totalAmount}</p>
+                    <p className="flex">
+                      <span>
+                        <IndianRupee className="h-4 w-5 mt-1" />
+                      </span>
+                      <span>{booking.totalAmount}</span>
+                    </p>
                   </div>
                 </div>
                 <div className="">
@@ -808,8 +829,13 @@ export default function Page() {
                 <div className="flex justify-between mt-2">
                   <div className="flex flex-col">
                     <span className="text-sm text-gray-500">Payment</span>
-                    <span className="font-semibold text-sm">
-                      ${booking.totalPaid} / {booking.totalAmount}
+                    <span className="font-semibold text-sm flex">
+                      <span>
+                        <IndianRupee className="h-4 w-5 mt-1" />
+                      </span>
+                      <span>
+                        {booking.totalPaid} / {booking.totalAmount}
+                      </span>
                     </span>
                   </div>
 
@@ -852,13 +878,24 @@ export default function Page() {
               >
                 <div>
                   <div className="mb-2 text-sm text-gray-600">
-                    Total Amount: ${selectedBooking?.totalAmount ?? 0}
+                    Total Amount:
+                    <div className="flex">
+                      <IndianRupee className="h-3 w-5 mt-1" />
+                      {selectedBooking?.totalAmount ?? 0}
+                    </div>
                   </div>
                   <div className="mb-2 text-sm text-gray-600">
-                    Paid: ${selectedBooking?.totalPaid ?? 0}
+                    Paid:
+                    <div className="flex">
+                      <IndianRupee className="h-3 w-5 mt-1" />
+                      {selectedBooking?.totalPaid ?? 0}
+                    </div>
                   </div>
                   <div className="mb-2 text-sm text-gray-600">
-                    Remaining: ${remainingAmount}
+                    Remaining:
+                    <div className="flex">
+                      <IndianRupee className="h-3 w-5 mt-1" /> {remainingAmount}
+                    </div>
                   </div>
                 </div>
                 <TextInput
@@ -909,7 +946,9 @@ export default function Page() {
                     className="rounded-xl bg-black px-4 py-2 text-sm text-white disabled:cursor-not-allowed disabled:opacity-60"
                     disabled={paymentMutation.isPending}
                   >
-                    {paymentMutation.isPending ? "Opening Razorpay..." : "Pay with Razorpay"}
+                    {paymentMutation.isPending
+                      ? "Opening Razorpay..."
+                      : "Pay with Razorpay"}
                   </button>
                 </div>
               </form>

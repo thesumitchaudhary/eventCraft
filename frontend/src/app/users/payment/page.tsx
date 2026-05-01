@@ -451,15 +451,27 @@ export default function Page() {
               >
                 <div>
                   <div className="mb-2 text-sm text-gray-600">
-                    Total Amount: $
-                    {Number(selectedBooking?.totalAmount ?? 0).toLocaleString()}
+                    Total Amount:
+                    <div className="flex">
+                      <IndianRupee className="h-4 w-5 mt-1" />
+                      {Number(
+                        selectedBooking?.totalAmount ?? 0,
+                      ).toLocaleString()}
+                    </div>
                   </div>
                   <div className="mb-2 text-sm text-gray-600">
-                    Paid: $
-                    {Number(selectedBooking?.totalPaid ?? 0).toLocaleString()}
+                    Paid:
+                    <div className="flex">
+                      <IndianRupee className="h-4 w-5 mt-1" />
+                      {Number(selectedBooking?.totalPaid ?? 0).toLocaleString()}
+                    </div>
                   </div>
                   <div className="mb-2 text-sm text-gray-600">
-                    Remaining: ${Math.max(remainingAmount, 0).toLocaleString()}
+                    Remaining:{" "}
+                    <div className="flex">
+                      <IndianRupee className="h-4 w-5 mt-1" />
+                      {Math.max(remainingAmount, 0).toLocaleString()}
+                    </div>
                   </div>
                 </div>
                 <TextInput
