@@ -59,7 +59,7 @@ export const Welcome_Email_Template = `
 
       <!-- CTA -->
       <div style="text-align: center; margin-top: 30px;">
-        <a href="http://localhost:5173/dashboard"
+        <a href="https://eventcraft-1-nffh.onrender.com/"
           style="
             display: inline-block;
             background-color: #6d28d9;
