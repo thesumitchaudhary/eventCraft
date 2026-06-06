@@ -9,7 +9,7 @@ dotenv.config();
 const MONGO_URI = process.env.MONGO_URI;
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const ADMIN_PASSWORD = process.env.ADMIN_PASS;
-const JWT_SECRET = process.env.JWT_SECRET;
+        const JWT_SECRET = process.env.JWT_SECRET;
 
 const syncAdminDoc = async (u) => {
     if (u.role !== "admin") return;

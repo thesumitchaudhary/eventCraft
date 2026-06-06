@@ -40,7 +40,7 @@ function App() {
       <Route path="/feedBack" element={<FeedBack />} />
       <Route path="/Gallery" element={<Gallery />} />
       <Route path="/FAQ" element={<FAQ />} />
-      <Route path="/feedback" element={<FeedBack />} />
+      {/* <Route path="/feedback" element={<FeedBack />} /> */}
       <Route path="/gallery" element={<Gallery />} />
       <Route path="/faq" element={<FAQ />} />
 
